@@ -1,0 +1,3 @@
+module XmlSendersHelper
+
+end

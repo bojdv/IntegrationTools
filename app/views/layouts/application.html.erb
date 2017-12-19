@@ -9,6 +9,9 @@
   </head>
 
   <body>
-    <%= yield %>
+  <%= yield %>
+  <div class="footer">
+    <%= debug(params) if Rails.env.development? %>
+  </div>
   </body>
 </html>

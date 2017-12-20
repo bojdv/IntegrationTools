@@ -1,16 +1,17 @@
 <% provide(:title, "XML Sender") %>
 
-<%= simple_form_for :user, :remote => true, url: xml_sender_send_to_queue_path, html: { class: 'form-group' },
-                    wrapper: :horizontal_form,
-                    wrapper_mappings: {
-                        check_boxes: :horizontal_radio_and_checkboxes,
-                        radio_buttons: :horizontal_radio_and_checkboxes,
-                        file: :horizontal_file_input,
-                        boolean: :horizontal_boolean
-                    } do |f| %>
-    <%= f.input :xml, as: :text, value: 'DEFAULT', placeholder: "#{QueueManager.first['host']}", html: { class: 'form-control', id: 'exampleInputEmail1', value: 'DEFAULT' } %>
-    <%= f.input :active %>
-    <%= f.input :sex, as: :radio_buttons, collection: ["Male", "Female"] %>
-    <%= f.button :submit, html: { class: 'btn btn-primary' }%>
+<% @manager.each do |user| %>
+    <tr>
+      <td><%= user.name %></td>
+<% end %>
 
+<%= simple_form_for :@manager, :remote => true, url: xml_sender_send_to_queue_path, html: { class: 'form-group' } do |f| %>
+    <%= f.input :name%>
+<% end %>
+
+    <%= simple_form_for :user, :remote => true, url: xml_sender_send_to_queue_path, html: { class: 'form-group' } do |f| %>
+    <%= f.input :queue_manager, :required => false, collection: QueueManager.select(:name) %>
+    <%= f.input :xml, as: :text, :required => false, input_html: { value: :queue_manager.empty? }, placeholder: "#{QueueManager.first['host']}", html: { class: 'form-control', id: 'exampleInputEmail1' } %>
+    <%= f.input :sex, as: :radio_buttons, :required => false, collection: ["Male", "Female"] %>
+    <%= f.button :submit, 'Send', class: 'btn btn-primary'%>
 <% end %>

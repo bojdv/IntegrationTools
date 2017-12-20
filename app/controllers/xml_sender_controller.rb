@@ -1,5 +1,6 @@
 class XmlSenderController < ApplicationController
   def index
+    @manager = QueueManager.all
   end
   def send_to_queue
     client = Stomp::Client.new('admin', 'admin', 'localhost', '61613')

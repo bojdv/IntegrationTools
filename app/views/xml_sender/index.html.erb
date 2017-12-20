@@ -1,0 +1,16 @@
+<% provide(:title, "XML Sender") %>
+
+<%= simple_form_for :user, :remote => true, url: xml_sender_send_to_queue_path, html: { class: 'form-group' },
+                    wrapper: :horizontal_form,
+                    wrapper_mappings: {
+                        check_boxes: :horizontal_radio_and_checkboxes,
+                        radio_buttons: :horizontal_radio_and_checkboxes,
+                        file: :horizontal_file_input,
+                        boolean: :horizontal_boolean
+                    } do |f| %>
+    <%= f.input :xml, as: :text, value: 'DEFAULT', placeholder: "#{QueueManager.first['host']}", html: { class: 'form-control', id: 'exampleInputEmail1', value: 'DEFAULT' } %>
+    <%= f.input :active %>
+    <%= f.input :sex, as: :radio_buttons, collection: ["Male", "Female"] %>
+    <%= f.button :submit, html: { class: 'btn btn-primary' }%>
+
+<% end %>

@@ -1,17 +1,34 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>IntegrationUI</title>
-    <%= csrf_meta_tags %>
+<head>
+  <title><%= full_title(yield(:title))%></title>
+  <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+  <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
+  <%= csrf_meta_tags %>
+  <%= render 'layouts/ie9' %>
+</head>
 
-    <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
-    <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
-  </head>
+<body>
+<%= render 'layouts/header' %>
 
-  <body>
-  <%= yield %>
-  <div class="footer">
-    <%= debug(params) if Rails.env.development? %>
+<div class="container-fluid">
+  <div class="row">
+    <%= render 'layouts/left_menu' %>
+    <main role="main" class="col-sm-9 ml-sm-auto col-md-10 pt-3">
+      <h2><%= yield(:title)%></h2>
+
+      <section class="row text-left placeholders">
+        <div class="col-6 col-sm-3 placeholder">
+          <%= yield %>
+        </div>
+        <div class="col-6 col-sm-3 placeholder">
+          <h2>Секция 2</h2>
+        </div>
+      </section>
+
+      <%= debug(params) if Rails.env.development? %>
+    </main>
   </div>
-  </body>
+</div>
+</body>
 </html>

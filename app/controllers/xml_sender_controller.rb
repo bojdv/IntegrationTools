@@ -1,7 +1,7 @@
-class XmlSendersController < ApplicationController
+class XmlSenderController < ApplicationController
   def index
   end
-  def sendd
+  def send_to_queue
     client = Stomp::Client.new('admin', 'admin', 'localhost', '61613')
     client.publish("/queue/test_in", params[:user][:xml]) #Кидаем запрос в очередь
     client.close

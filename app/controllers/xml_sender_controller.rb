@@ -1,11 +1,23 @@
 class XmlSenderController < ApplicationController
   def index
-    @manager = QueueManager.all
+    @qm = QueueManager.all
   end
   def send_to_queue
-    client = Stomp::Client.new('admin', 'admin', 'localhost', '61613')
-    client.publish("/queue/test_in", params[:user][:xml]) #Кидаем запрос в очередь
+    client = Stomp::Client.new(
+        params[:mq_attributes][:user],
+        params[:mq_attributes][:password],
+        params[:mq_attributes][:host],
+        params[:mq_attributes][:port])
+    client.publish("/queue/test_in", params[:mq_attributes][:xml]) #Кидаем запрос в очередь
     client.close
-    puts "Сообщение отправлено в очередь"
+  end
+  def manager_choise
+    (function() {
+
+      this.test = function() {
+        return alert('Hello world');
+      };
+
+    }).call(this);
   end
 end

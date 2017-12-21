@@ -1,17 +1,17 @@
 <% provide(:title, "XML Sender") %>
 
-<% @manager.each do |user| %>
-    <tr>
-      <td><%= user.name %></td>
-<% end %>
+    <%= simple_form_for :mq, :remote => true, url: 'xml_sender/manager_choise', html: { class: 'form-group' } do |manager_list| %>
+    <%= manager_list.input :name,:required => false, :label => 'Настроенные менеджеры очередей', input_html: {onclick: 'test_call(1)'}, collection: QueueManager.select(:name) %>
+    <!--%= manager_list.input :name,:required => false, :label => 'Настроенные менеджеры очередей', :collection => @qm %-->
+    <!--%= manager_list.button :submit, 'Отправить', class: 'btn btn-primary'%-->
+    <% end %>
 
-<%= simple_form_for :@manager, :remote => true, url: xml_sender_send_to_queue_path, html: { class: 'form-group' } do |f| %>
-    <%= f.input :name%>
-<% end %>
-
-    <%= simple_form_for :user, :remote => true, url: xml_sender_send_to_queue_path, html: { class: 'form-group' } do |f| %>
-    <%= f.input :queue_manager, :required => false, collection: QueueManager.select(:name) %>
-    <%= f.input :xml, as: :text, :required => false, input_html: { value: :queue_manager.empty? }, placeholder: "#{QueueManager.first['host']}", html: { class: 'form-control', id: 'exampleInputEmail1' } %>
-    <%= f.input :sex, as: :radio_buttons, :required => false, collection: ["Male", "Female"] %>
-    <%= f.button :submit, 'Send', class: 'btn btn-primary'%>
+    <%= simple_form_for :mq_attributes, :remote => true, url: 'xml_sender/send_to_queue', html: { class: 'form-group' } do |mq_settings| %>
+    <%= mq_settings.input :queue, :label => 'Имя очереди', :required => false, placeholder: 'Например: test_in' %>
+    <%= mq_settings.input :host, :label => 'Хост', :required => false , placeholder: 'Например: localhost' %>
+    <%= mq_settings.input :port, :label => 'Порт', :required => false , placeholder: 'Например: 61613' %>
+    <%= mq_settings.input :user, :label => 'Имя пользователя', :required => false , placeholder: 'Например: admin' %>
+    <%= mq_settings.input :password, :label => 'Пароль пользователя', :required => false , input_html: {value: 'admin'}, placeholder: 'Например: password' %>
+    <%= mq_settings.input :xml, :label => 'XML файл', input_html: {value: 'XML'}, placeholder: 'Например: localhost', :required => false, html: { class: 'form-control', id: 'exampleInputEmail1' } %>
+    <%= mq_settings.button :submit, 'Отправить', class: 'btn btn-primary'%>
 <% end %>

@@ -16,16 +16,9 @@
     <%= render 'layouts/left_menu' %>
     <main role="main" class="col-sm-9 ml-sm-auto col-md-10 pt-3">
       <h2><%= yield(:title)%></h2>
-
       <section class="row text-left placeholders">
-        <div class="col-6 col-sm-3 placeholder">
           <%= yield %>
-        </div>
-        <div class="col-6 col-sm-3 placeholder">
-          <h2>Секция 2</h2>
-        </div>
       </section>
-
       <%= debug(params) if Rails.env.development? %>
     </main>
   </div>

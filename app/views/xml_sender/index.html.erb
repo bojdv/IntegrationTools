@@ -1,9 +1,9 @@
 <% provide(:title, "XML Sender") %>
-
-    <%= simple_form_for :mq, :remote => true, url: 'xml_sender/manager_choise', html: { class: 'form-group' } do |manager_list| %>
-    <%= manager_list.input :name,:required => false, :label => 'Настроенные менеджеры очередей', input_html: {onclick: 'test_call(1)'}, collection: QueueManager.select(:name) %>
-    <!--%= manager_list.input :name,:required => false, :label => 'Настроенные менеджеры очередей', :collection => @qm %-->
-    <!--%= manager_list.button :submit, 'Отправить', class: 'btn btn-primary'%-->
+<div class="col-sm-2 placeholder">
+    <%= simple_form_for :manager_name, :remote => true, url: 'xml_sender/manager_choise', html: { class: 'form-group' } do |manager_list| %>
+    <!--%= manager_list.input :name,:required => false, :label => 'Настроенные менеджеры очередей', input_html: {onclick: 'test_call(1)'}, collection: QueueManager.select(:name) %-->
+    <%= manager_list.input :id,:required => false, :label => 'Настроенные менеджеры очередей', :collection => @qm %>
+    <%= manager_list.button :submit, 'Получить настройки', class: 'btn btn-primary'%>
     <% end %>
 
     <%= simple_form_for :mq_attributes, :remote => true, url: 'xml_sender/send_to_queue', html: { class: 'form-group' } do |mq_settings| %>
@@ -12,6 +12,9 @@
     <%= mq_settings.input :port, :label => 'Порт', :required => false , placeholder: 'Например: 61613' %>
     <%= mq_settings.input :user, :label => 'Имя пользователя', :required => false , placeholder: 'Например: admin' %>
     <%= mq_settings.input :password, :label => 'Пароль пользователя', :required => false , input_html: {value: 'admin'}, placeholder: 'Например: password' %>
-    <%= mq_settings.input :xml, :label => 'XML файл', input_html: {value: 'XML'}, placeholder: 'Например: localhost', :required => false, html: { class: 'form-control', id: 'exampleInputEmail1' } %>
+</div>
+<div class="col-sm-4 placeholder">
+    <%= mq_settings.input :xml, :label => 'XML файл', input_html: {value: 'XML'}, placeholder: 'Место для XML:)', :required => false, input_html: { class: 'form-control', :style=> 'height: 500px', id: 'exampleInputEmail1' } %>
     <%= mq_settings.button :submit, 'Отправить', class: 'btn btn-primary'%>
 <% end %>
+</div>

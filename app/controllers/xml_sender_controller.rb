@@ -12,12 +12,9 @@ class XmlSenderController < ApplicationController
     client.close
   end
   def manager_choise
-    (function() {
-
-      this.test = function() {
-        return alert('Hello world');
-      };
-
-    }).call(this);
+    select_manager = QueueManager.find(params[:manager_name][:id])
+    respond_to do |format|
+      format.js { render :js => "changeText(\"#{select_manager.queue}\", \"#{select_manager.host}\", \"#{select_manager.port}\", \"#{select_manager.user}\", \"#{select_manager.password}\");" }
+    end
   end
 end

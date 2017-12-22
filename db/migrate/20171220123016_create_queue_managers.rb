@@ -6,6 +6,7 @@ class CreateQueueManagers < ActiveRecord::Migration[5.1]
       t.string :host
       t.string :port
       t.string :user
+
       t.string :password
 
       t.timestamps

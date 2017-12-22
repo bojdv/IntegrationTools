@@ -2,7 +2,7 @@
 <div class="col-sm-2 placeholder">
     <%= simple_form_for :manager_name, :remote => true, url: 'xml_sender/manager_choise', html: { class: 'form-group' } do |manager_list| %>
     <!--%= manager_list.input :name,:required => false, :label => 'Настроенные менеджеры очередей', input_html: {onclick: 'test_call(1)'}, collection: QueueManager.select(:name) %-->
-    <%= manager_list.input :id,:required => false, :label => 'Настроенные менеджеры очередей', :collection => @qm %>
+    <%= manager_list.input :name,:required => false, :label => 'Настроенные менеджеры очередей', :collection => @qm %>
     <%= manager_list.button :submit, 'Получить настройки', class: 'btn btn-primary'%>
     <% end %>
 
@@ -14,7 +14,28 @@
     <%= mq_settings.input :password, :label => 'Пароль пользователя', :required => false , input_html: {value: 'admin'}, placeholder: 'Например: password' %>
 </div>
 <div class="col-sm-4 placeholder">
-    <%= mq_settings.input :xml, :label => 'XML файл', input_html: {value: 'XML'}, placeholder: 'Место для XML:)', :required => false, input_html: { class: 'form-control', :style=> 'height: 500px', id: 'exampleInputEmail1' } %>
+    <%= mq_settings.input :xml, as: :text, :label => 'XML файл', :required => false, input_html: { class: 'form-control', :style=> 'height: 500px', id: 'exampleInputEmail1', placeholder: 'Место для XML:)' } %>
     <%= mq_settings.button :submit, 'Отправить', class: 'btn btn-primary'%>
 <% end %>
 </div>
+  <div class="col-sm-4 placeholder" id="select_product">
+    <%= simple_form_for :product_name, :remote => true, url: 'xml_sender/get_xml_by_product', html: { class: 'form-group' } do |f| %>
+        <%= f.input :name,:required => false, :label => 'Выберите продукт', :collection => @product, value_method: :name %>
+        <div id="list"></div>
+        <%= f.button :submit, 'Получить xml', class: 'btn btn-primary'%>
+    <% end %>
+        <%= simple_form_for :product_2, :remote => true, url: 'xml_sender/get_xml_by_product', html: { class: 'form-group' } do |f| %>
+        <%= f.input :name,:required => false, :label => 'Выберите xml', :collection => @select_xml, value_method: :name %>
+        <%= f.button :submit, 'Получить xml', class: 'btn btn-primary'%>
+    <% end %>
+
+    <%= form_for :test do |f| %>
+        <div clss="field">
+          <%= f.collection_select :name, Product.order(:name), :id, :name, include_blank: true %>
+        </div>
+        <div clss="field">
+          <%= f.grouped_collection_select :xml, Product.order(:name), :xmls, :name, :id, :name%>
+        </div>
+      <% end %>
+    </div>
+  </div>

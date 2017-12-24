@@ -2,14 +2,14 @@
 # All this logic will automatically be available in application.js.
 # You can use CoffeeScript in this file: http://coffeescript.org/
 jQuery ->
-  $('#xml_xml').parent().hide()
-  xml = $('#xml_xml').html()
-  $('#xml_name').change ->
-    product = $('#xml_name :selected').text()
+  #$('#xml_xml_name').parent().hide()
+  xml = $('#xml_xml_name').html()
+  $('#xml_product_name').change ->
+    product = $('#xml_product_name :selected').text()
     options = $(xml).filter("optgroup[label = '#{product}']").html()
     if options
-      $('#xml_xml').html(options)
-      $('#xml_xml').parent().show()
+      $('#xml_xml_name').html(options)
+      $('#xml_xml_name').parent().show()
     else
-      $('#xml_xml').empty()
-      $('#xml_xml').parent().hide()
+      $('#xml_xml_name').empty()
+      #$('#xml_xml_name').parent().hide()

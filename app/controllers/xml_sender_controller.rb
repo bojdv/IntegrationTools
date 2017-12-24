@@ -1,6 +1,6 @@
 class XmlSenderController < ApplicationController
   def index
-    @qm = QueueManager.all
+    @qm = QueueManager.pluck(:manager_name)
     @product = Product.all
   end
   def send_to_queue
@@ -13,13 +13,13 @@ class XmlSenderController < ApplicationController
     client.close
   end
   def manager_choise
-    select_manager = QueueManager.find(params[:manager_name][:name])
+    select_manager = QueueManager.find_by_manager_name(params[:manager][:manager_name])
     respond_to do |format|
       format.js { render :js => "changeText(\"#{select_manager.queue}\", \"#{select_manager.host}\", \"#{select_manager.port}\", \"#{select_manager.user}\", \"#{select_manager.password}\");" }
     end
   end
   def get_xml_by_product
-    @select_xml = Xml.where(product: 'TIR')
+    @select_xml = Xml.where(product_name: 'TIR')
     send(list)
     @select_xml.each do |x|
       puts x.name
@@ -29,5 +29,8 @@ class XmlSenderController < ApplicationController
     respond_to do |format|
       format.js { render :js => "addElement();" }
     end
+  end
+  def put_xml
+
   end
 end

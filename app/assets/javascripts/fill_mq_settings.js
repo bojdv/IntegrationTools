@@ -1,6 +1,7 @@
 /**
  * Created by PekAV on 21.12.2017.
  */
+/**
 function changeText(name, host, port, user, password)
 {
     document.getElementById('mq_attributes_queue').value = name;
@@ -9,6 +10,7 @@ function changeText(name, host, port, user, password)
     document.getElementById('mq_attributes_user').value = user;
     document.getElementById('mq_attributes_password').value = password;
 }
+ */
 function addElement(text)
 {
     $('#list').html(text);

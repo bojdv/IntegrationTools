@@ -1,0 +1,12 @@
+<% provide(:title, "XML Sender") %>
+<div class="col-sm-5 placeholder">
+  <%= simple_form_for @new_xml, :remote => true, url: xml_sender_create_xml_path, html: { class: 'form-group' } do |f| %>
+    <%= f.input :xml_text, as: :text, :label => 'XML файл', input_html: { class: 'form-control', :style=> 'height: 500px', id: 'exampleInputEmail1', placeholder: 'Место для XML:)' } %>
+</div>
+  <div class="col-sm-2 placeholder">
+      <%= f.input :xml_name, :label => 'Название XML'%>
+      <%= f.association :product, collection: @product_name, prompt: "Выберите продукт", label_method: :product_name %>
+      <!--%= f.input :product_id, multiple: true, :label => 'Название продукта', :collection => @product_name, label_method: :product_name, value_method: :id %-->
+      <%= f.button :submit, 'Вставить xml', class: 'btn btn-primary'%>
+    <% end %>
+  </div>

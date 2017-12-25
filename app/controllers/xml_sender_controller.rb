@@ -39,7 +39,12 @@ class XmlSenderController < ApplicationController
       format.js { render :js => "updateXml('#{select_xml.xml_text.inspect}')" }
     end
   end
+  def tester
+    encode = Base64.encode64(Clipboard.paste.encode('UTF-8'))
+    Clipboard.copy encode
+  end
 end
+
 
 private
 

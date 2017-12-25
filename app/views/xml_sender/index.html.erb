@@ -26,6 +26,7 @@
       <%= f.input :select_xml_name, :required => false, :label => 'Выберите xml файл', :collection => @product, as: :grouped_select ,group_method: :xmls, group_label_method: :product_name, label_method: :xml_name%>
       </div>
       <%= f.button :submit, 'Вставить xml', class: 'btn btn-primary'%>
-      <%= link_to 'Добавить XML', xml_sender_new_path, :class => 'btn btn-primary' %>
+      <%= link_to 'Добавить XML', xml_sender_new_path, 'data-no-turbolink' => true, :class => 'btn btn-primary' %>
+      <%= link_to 'Кодировать', xml_sender_tester_path, :remote => true, :class => 'btn btn-primary' %>
     <% end %>
     </div>

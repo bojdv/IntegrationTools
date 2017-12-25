@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171224153820) do
+ActiveRecord::Schema.define(version: 20171225171555) do
 
   create_table "products", force: :cascade do |t|
     t.string "product_name"
@@ -32,10 +32,9 @@ ActiveRecord::Schema.define(version: 20171224153820) do
   create_table "xmls", force: :cascade do |t|
     t.string "xml_name"
     t.text "xml_text"
-    t.string "product_name"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.decimal "product_id"
+    t.integer "product_id", limit: 10, precision: 10
   end
 
 end

@@ -6,7 +6,7 @@
     <%= f.button :submit, 'Получить настройки', class: 'btn btn-primary'%>
     <% end %>
 
-    <%= simple_form_for :mq_attributes, remote: true, url: xml_sender_send_to_queue_path, html: { class: 'form-group' } do |f| %>
+    <%= simple_form_for :mq_attributes, remote: true, url: xml_sender_send_to_queue_path, html: {class: 'form-group' } do |f| %>
     <%= f.input :queue, :label => 'Имя очереди', :required => false, placeholder: 'Например: test_in' %>
     <%= f.input :host, :label => 'Хост', :required => false , placeholder: 'Например: localhost' %>
     <%= f.input :port, :label => 'Порт', :required => false , placeholder: 'Например: 61613' %>
@@ -15,7 +15,9 @@
 </div>
 <div class="col-sm-4 placeholder">
     <%= f.input :xml, as: :text, :label => 'XML файл', :required => false, input_html: { id: 'xml_text_field', class: 'form-control', :style=> 'height: 500px; white-space: nowrap', placeholder: 'Место для XML:)' } %>
+    <%= f.input :xsd, as: :file, :label => false, :required => false, class: 'btn btn-primary'%>
     <%= f.button :submit, 'Отправить', class: 'btn btn-primary'%>
+
 <% end %>
   <div class="options">
     <a>Опции:</a><br>
@@ -37,5 +39,5 @@
       <%= f.input :xsd, as: :file %>
       <%= f.button :submit, 'Валидировать', class: 'btn btn-primary'%>
     <% end %>
-    <%= link_to 'JavaScript', '#',:remote => true, :onclick => 'get_xml_text()' %>
+    <%= link_to 'JavaScript', '#',:remote => true, :onclick => 'send_alert()' %>
     </div>

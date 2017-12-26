@@ -11,20 +11,44 @@ function changeText(name, host, port, user, password)
     document.getElementById('mq_attributes_password').value = password;
 }
  */
+function send_alert(message)
+{
+    alert(message);
+}
+function get_xml_text(xsd)
+{
+    xml = document.getElementById("xml_text_field").value;
+    $.ajax({
+        url: "/xml_sender/tester",
+        type: "POST",
+        data: { xmlvalue: { xml_value: xml, xsd_value: xsd} },
+    });
+}
 function addElement(text)
 {
     $('#list').html(text);
+}
+function Base64(coding_mode){
+    textarea = document.getElementById("xml_text_field");
+    selection = (textarea.value).substring(textarea.selectionStart,textarea.selectionEnd);
+    if (coding_mode == "encode"){
+        selectionEncode = window.btoa(unescape(encodeURIComponent(selection)));
+    }
+    else{
+        selectionEncode = decodeURIComponent(escape(window.atob(selection)));
+    }
+    new_text = textarea.value.replace(selection, selectionEncode);
+    textarea.value = new_text;
 }
 function updateDiv()
 {
     $( "#list" ).load(window.location.href + " #list" );
 }
-function test_call(val)
+function test_call()
 {
-    new Ajax.Request('/xml_sender/manager_choise', {
-        method: 'post',
-        parameters: {
-            menu_id: val,
-        }
+    $.ajax({
+        url: "/xml_sender/tester",
+        type: "POST",
+        data: { product: { name: "Filip", description: "whatever" } },
     });
 }

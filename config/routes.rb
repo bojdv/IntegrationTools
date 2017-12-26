@@ -7,7 +7,7 @@ Rails.application.routes.draw do
   post '/xml_sender/put_xml' => 'xml_sender#put_xml'
   post '/xml_sender/create_xml' => 'xml_sender#create_xml'
   get '/xml_sender' => 'xml_sender#index'
-  get '/xml_sender/tester' => 'xml_sender#tester'
+  post '/xml_sender/tester' => 'xml_sender#tester'
 
   root 'main_page#index'
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html

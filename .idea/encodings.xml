@@ -3,7 +3,9 @@
   <component name="Encoding" defaultCharsetForPropertiesFiles="UTF-8">
     <file url="file://$PROJECT_DIR$/app/controllers/application_controller.rb" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/controllers/xml_sender_controller.rb" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/views/layouts/application.html.erb" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/views/xml_sender/index.html.erb" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/config/routes.rb" charset="UTF-8" />
     <file url="PROJECT" charset="UTF-8" />
   </component>
 </project>

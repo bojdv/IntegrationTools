@@ -24,4 +24,4 @@ $(document).on 'turbolinks:load', ->
   $('#mq_attributes_password').val password
 
 @updateXml = (xml) ->
-  $('#exampleInputEmail1').val(xml.slice(1, -1))
+  $('#xml_text_field').val(xml.slice(1, -1))

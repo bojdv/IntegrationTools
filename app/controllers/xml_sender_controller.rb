@@ -19,13 +19,24 @@ class XmlSenderController < ApplicationController
 
   end
   def send_to_queue
-    client = Stomp::Client.new(
-        params[:mq_attributes][:user],
-        params[:mq_attributes][:password],
-        params[:mq_attributes][:host],
-        params[:mq_attributes][:port])
-    client.publish("/queue/#{params[:mq_attributes][:queue]}", params[:mq_attributes][:xml]) #Кидаем запрос в очередь
-    client.close
+    if (params[:mq_attributes][:xsd]).blank?
+      client = Stomp::Client.new(
+          params[:mq_attributes][:user],
+          params[:mq_attributes][:password],
+          params[:mq_attributes][:host],
+          params[:mq_attributes][:port])
+      client.publish("/queue/#{params[:mq_attributes][:queue]}", params[:mq_attributes][:xml]) #Кидаем запрос в очередь
+      client.close
+    else
+      puts "hi"
+      xsd = Nokogiri::XML::Schema(params[:mq_attributes][:xsd])
+      xml = Nokogiri::XML(params[:mq_attributes][:xml])
+      result = xsd.validate(xml)
+      respond_to do |format|
+        format.js { render :js => "send_alert(\"#{result}\")" }
+      end
+    end
+
   end
   def manager_choise
     select_manager = QueueManager.find_by_manager_name(params[:manager][:manager_name])
@@ -40,11 +51,22 @@ class XmlSenderController < ApplicationController
     end
   end
   def tester
-    encode = Base64.encode64(Clipboard.paste.encode('UTF-8'))
-    Clipboard.copy encode
+    if params[:xmlvalue].nil?
+      respond_to do |format|
+        format.js { render :js => "get_xml_text(\"#{Nokogiri::XML::Schema(params[:xsd_file][:xsd])}\")" }
+      end
+    else
+      xsd = Nokogiri::XML::Schema(params[:xmlvalue][:xsd_path])
+      puts xsd
+      xml = Nokogiri::XML(params[:xmlvalue][:xml_value])
+      puts xml
+      result = xsd.validate(xml)
+      respond_to do |format|
+        format.js { render :js => "send_alert(\"#{result}\")" }
+      end
+    end
   end
 end
-
 
 private
 

@@ -9,7 +9,7 @@ class XmlSenderController < ApplicationController
     new_xml_save = Xml.new(new_xml_params)
     if new_xml_save.save
       respond_to do |format|
-        format.js{ render :js => "send_alert('Ok!')" }
+        format.js{ render :js => "send_alert('Сохранили XML в базу')" }
       end
     else
       respond_to do |format|
@@ -21,7 +21,7 @@ class XmlSenderController < ApplicationController
     xml_delete = Xml.find(params[:form_elements][:id])
     if xml_delete.destroy
       respond_to do |format|
-        format.js{ render :js => "send_alert('Ok!')" }
+        format.js{ render :js => "send_alert('Удалили XML!')" }
       end
     else
       respond_to do |format|
@@ -29,11 +29,11 @@ class XmlSenderController < ApplicationController
       end
     end
   end
-  def edit_xml
+  def save_xml
     xml_edit = Xml.find(params[:form_elements][:id])
     if xml_edit.update_attributes(new_xml_params)
       respond_to do |format|
-        format.js{ render :js => "send_alert('Ok!')" }
+        format.js{ render :js => "send_alert('Сохранили изменения!')" }
       end
     else
       respond_to do |format|
@@ -83,6 +83,6 @@ end
 private
 
 def new_xml_params
-  params.require(:form_elements).permit(:xml_text, :category_id, :id)
+  params.require(:form_elements).permit(:xml_text, :category_id, :xml_name, :id)
   #params.require(:xml).permit(:xml_text, :xml_name, :product_id)
 end

@@ -12,6 +12,10 @@
     <%= f.input :port, :label => 'Порт', :required => false , placeholder: 'STOMP порт, обычно: 61613' %>
     <%= f.input :user, :label => 'Имя пользователя', :required => false , placeholder: 'Например: admin' %>
     <%= f.input :password, :label => 'Пароль пользователя', :required => false , input_html: {value: 'admin'}, placeholder: 'Например: password' %>
+    <%=simple_form_for :output_queue, html: { class: 'form-group' }, :remote => true do |f|%>
+      <%= link_to 'Слушать очередь:', '#',:remote => true, :onclick => 'get_manager_form_data()', class: 'btn btn-primary' %>
+      <%=f.input :output_queue, :required => false, :label => false, :placeholder => 'Имя очереди'%>
+    <%end%>
 </div>
 <div class="col-sm-5 placeholder">
     <%= f.input :xml, as: :text, :label => false, :required => false, input_html: { id: 'xml_text_field', class: 'form-control', :style=> 'height: 500px; white-space: nowrap', placeholder: 'Место для XML:)' } %>
@@ -41,4 +45,5 @@
       <%= f.button :submit, 'Вставить XML', class: 'btn btn-primary context-menu-one'%>
     <% end %>
     <%= link_to 'JavaScript', '#',:remote => true, :onclick => 'get_form_data()' %>
+
   </div>

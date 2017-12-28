@@ -11,7 +11,7 @@ Rails.application.routes.draw do
   post '/xml_sender/tester' => 'xml_sender#tester'
   post '/xml_sender/redirect_to_new' => 'xml_sender#redirect_to_new'
   post '/xml_sender/delete_xml' => 'xml_sender#delete_xml'
-  post '/xml_sender/edit_xml' => 'xml_sender#edit_xml'
+  post '/xml_sender/save_xml' => 'xml_sender#save_xml'
 
   root 'main_page#index'
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html

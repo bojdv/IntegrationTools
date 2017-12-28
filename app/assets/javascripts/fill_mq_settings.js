@@ -15,6 +15,16 @@ function send_alert(message)
 {
     alert(message);
 }
+function get_manager_form_data()
+{
+    form_host = document.getElementById("mq_attributes_host").value;
+    form_port= document.getElementById("mq_attributes_port").value;
+    form_login = document.getElementById("mq_attributes_user").value;
+    form_password = document.getElementById("mq_attributes_password").value;
+    form_output_queue = document.getElementById("output_queue_output_queue").value;
+    alert(form_output_queue);
+
+}
 function get_form_data()
 {
     form_xml = document.getElementById("xml_text_field").value;
@@ -108,9 +118,9 @@ $(function() {
                         } },
                 });
             }
-            if (key == 'edit'){
+            if (key == 'save'){
                 $.ajax({
-                    url: "xml_sender/edit_xml",
+                    url: "xml_sender/save_xml",
                     type: "POST",
                     dataType: "script",
                     data: { form_elements: {
@@ -127,7 +137,6 @@ $(function() {
         items: {
             "save": {name: "Сохранить изменения", icon: "edit"},
             "new": {name: "Сохранить,как новую", icon: "edit"},
-            "edit": {name: "Редактировать", icon: "edit"},
             "delete": {name: "Удалить", icon: "delete"},
         }
     });

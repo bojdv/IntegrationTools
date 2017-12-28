@@ -5,7 +5,7 @@
   </div>
   <div class="col-sm-2 placeholder">
       <%= f.input :xml_name, :label => 'Название XML'%>
-      <%= f.association :product, collection: @product_name, prompt: "Выберите продукт", label_method: :product_name %>
+      <%= f.association :category, collection: @category_name, prompt: "Выберите продукт", label_method: :category_name %>
       <%= f.button :submit, 'Вставить xml', class: 'btn btn-primary'%>
   <% end %>
   </div>

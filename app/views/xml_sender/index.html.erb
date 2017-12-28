@@ -2,19 +2,19 @@
 <div class="col-sm-2 placeholder">
     <%= simple_form_for :manager, :remote => true, url: 'xml_sender/manager_choise', html: { class: 'form-group' } do |f| %>
     <!--%= manager_list.input :name,:required => false, :label => 'Настроенные менеджеры очередей', input_html: {onclick: 'test_call(1)'}, collection: QueueManager.select(:name) %-->
-    <%= f.input :manager_name, :required => false, :label => 'Настроенные менеджеры очередей', :collection => @qm %>
+    <%= f.input :manager_name, :required => false, :label => false, :collection => @qm, prompt: 'Сохраненные менеджеры' %>
     <%= f.button :submit, 'Получить настройки', class: 'btn btn-primary'%>
     <% end %>
 
-    <%= simple_form_for :mq_attributes, remote: true, url: xml_sender_send_to_queue_path, html: {class: 'form-group' } do |f| %>
+    <%= simple_form_for :mq_attributes, remote: false, url: xml_sender_send_to_queue_path, html: {class: 'form-group' } do |f| %>
     <%= f.input :queue, :label => 'Имя очереди', :required => false, placeholder: 'Например: test_in' %>
     <%= f.input :host, :label => 'Хост', :required => false , placeholder: 'Например: localhost' %>
-    <%= f.input :port, :label => 'Порт', :required => false , placeholder: 'Например: 61613' %>
+    <%= f.input :port, :label => 'Порт', :required => false , placeholder: 'STOMP порт, обычно: 61613' %>
     <%= f.input :user, :label => 'Имя пользователя', :required => false , placeholder: 'Например: admin' %>
     <%= f.input :password, :label => 'Пароль пользователя', :required => false , input_html: {value: 'admin'}, placeholder: 'Например: password' %>
 </div>
-<div class="col-sm-4 placeholder">
-    <%= f.input :xml, as: :text, :label => 'XML файл', :required => false, input_html: { id: 'xml_text_field', class: 'form-control', :style=> 'height: 500px; white-space: nowrap', placeholder: 'Место для XML:)' } %>
+<div class="col-sm-5 placeholder">
+    <%= f.input :xml, as: :text, :label => false, :required => false, input_html: { id: 'xml_text_field', class: 'form-control', :style=> 'height: 500px; white-space: nowrap', placeholder: 'Место для XML:)' } %>
     <%= f.input :xsd, as: :file, :label => false, :required => false, class: 'btn btn-primary'%>
     <%= f.button :submit, 'Отправить', class: 'btn btn-primary'%>
 
@@ -23,21 +23,22 @@
     <a>Опции:</a><br>
     <button onclick="Base64('decode')", class='btn btn-primary'>Decode64</button>
     <button onclick="Base64('encode')", class='btn btn-primary'>Encode64</button>
+    <button onclick="Base64('uuid')", class='btn btn-primary'>Сгенерировать ID</button>
   </div>
 </div>
   <div class="col-sm-3 placeholder" id="select_product">
 
     <%= simple_form_for :xml, :remote => true, url: 'xml_sender/put_xml', html: { class: 'form-group' } do |f| %>
-      <%= f.input :product_name,:required => false, :label => 'Выберите продукт', :collection => @product, label_method: :product_name%>
-      <div class="xml_select">
-      <%= f.input :select_xml_name, :required => false, :label => 'Выберите xml файл', :collection => @product, as: :grouped_select ,group_method: :xmls, group_label_method: :product_name, label_method: :xml_name%>
+      <%= f.input :xml_name, :label => false, :required => false, placeholder: 'Имя XML'%>
+      <%= f.input :xml_description, as: :text, :label => false, :required => false, placeholder: 'Описание XML'%>
+      <%= f.input :product_name,:required => false, :label => false, :collection => @product, label_method: :product_name, prompt: 'Выберите продукт, категорию и xml'%>
+      <div class="category_select">
+        <%= f.input :select_category_name, :required => false, :label => false, :collection => @product, as: :grouped_select ,group_method: :categories, group_label_method: :product_name, label_method: :category_name%>
       </div>
-      <%= f.button :submit, 'Вставить xml', class: 'btn btn-primary'%>
-      <%= link_to 'Добавить XML', xml_sender_new_path, 'data-no-turbolink' => true, :class => 'btn btn-primary' %>
+      <div class="xml_select">
+      <%= f.input :select_xml_name, input_html: { class: 'context-menu-one' }, :required => false, :label => false, :collection => @category, as: :grouped_select ,group_method: :xmls, group_label_method: :category_name, label_method: :xml_name%>
+      </div>
+      <%= f.button :submit, 'Вставить XML', class: 'btn btn-primary context-menu-one'%>
     <% end %>
-    <%= simple_form_for :xsd_file, :remote => true, url: 'xml_sender/tester', html: { class: 'form-group' } do |f| %>
-      <%= f.input :xsd, as: :file %>
-      <%= f.button :submit, 'Валидировать', class: 'btn btn-primary'%>
-    <% end %>
-    <%= link_to 'JavaScript', '#',:remote => true, :onclick => 'send_alert()' %>
-    </div>
+    <%= link_to 'JavaScript', '#',:remote => true, :onclick => 'get_form_data()' %>
+  </div>

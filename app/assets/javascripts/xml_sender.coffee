@@ -33,13 +33,23 @@ $(document).on 'turbolinks:load', ->
       $('#xml_select_xml_name').empty()
       $('#xml_select_xml_name').parent().hide()
 
-@changeText = (name, host, port, user, password) ->
-  $('#mq_attributes_queue').val name
-  $('#mq_attributes_host').val host
-  $('#mq_attributes_port').val port
-  $('#mq_attributes_user').val user
-  $('#mq_attributes_password').val password
+@changeText = (name, host, port, user, password, manager_type) ->
+  if manager_type == 'out'
+    $('#mq_attributes_queue').val name
+    $('#mq_attributes_host').val host
+    $('#mq_attributes_port').val port
+    $('#mq_attributes_user').val user
+    $('#mq_attributes_password').val password
+  else if manager_type == 'in'
+    $('#mq_attributes_in_queue_in').val name
+    $('#mq_attributes_in_host_in').val host
+    $('#mq_attributes_in_port_in').val port
+    $('#mq_attributes_in_user_in').val user
+    $('#mq_attributes_in_password_in').val password
+
 
 @updateXml = (xml_text, xml_name) ->
   $('#xml_text_field').val(xml_text.slice(1, -1))
   $('#xml_xml_name').val(xml_name.slice(1, -1))
+@updateInputXml = (xml_text) ->
+  $('#xml_text_in_field').val(xml_text.slice(1, -1))

@@ -21,9 +21,19 @@ function get_manager_form_data()
     form_port= document.getElementById("mq_attributes_port").value;
     form_login = document.getElementById("mq_attributes_user").value;
     form_password = document.getElementById("mq_attributes_password").value;
-    form_output_queue = document.getElementById("output_queue_output_queue").value;
-    alert(form_output_queue);
-
+    form_input_queue = document.getElementById("input_queue_input_queue").value;
+    $.ajax({
+        url: "xml_sender/get_message",
+        type: "POST",
+        dataType: "script",
+        data: { manager_form_elements: {
+                form_host: form_host,
+                form_port: form_port,
+                form_login: form_login,
+                form_password: form_password,
+                form_input_queue: form_input_queue
+            } },
+    });
 }
 function get_form_data()
 {

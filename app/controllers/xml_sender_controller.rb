@@ -62,10 +62,19 @@ class XmlSenderController < ApplicationController
   end
 
   def manager_choise
+    manager_type = ["in", "out"]
+    if (params[:manager]).present?
     select_manager = QueueManager.find_by_manager_name(params[:manager][:manager_name])
     respond_to do |format|
-      format.js { render :js => "changeText(\"#{select_manager.queue}\", \"#{select_manager.host}\", \"#{select_manager.port}\", \"#{select_manager.user}\", \"#{select_manager.password}\");" }
+      format.js { render :js => "changeText(\"#{select_manager.queue}\", \"#{select_manager.host}\", \"#{select_manager.port}\", \"#{select_manager.user}\", \"#{select_manager.password}\", \"#{manager_type[1]}\");" }
+      end
     end
+    else if (params[:manager_in]).present?
+        select_manager = QueueManager.find_by_manager_name(params[:manager_in][:manager_name_in])
+          respond_to do |format|
+            format.js { render :js => "changeText(\"#{select_manager.queue}\", \"#{select_manager.host}\", \"#{select_manager.port}\", \"#{select_manager.user}\", \"#{select_manager.password}\", \"#{manager_type[0]}\");" }
+          end
+     end
   end
   def put_xml
     select_xml = Xml.find(params[:xml][:select_xml_name])
@@ -73,9 +82,23 @@ class XmlSenderController < ApplicationController
       format.js { render :js => "updateXml('#{select_xml.xml_text.inspect}', '#{select_xml.xml_name.inspect}')" }
     end
   end
-  def redirect_to_new
-    redirect_to controller: 'xml_sender', action: 'new', params: params.require(:form_elements).permit(:form_xml, :form_category, :form_product, :form_xml_name)
+  def get_message
+    client = Stomp::Client.new(
+        params[:mq_attributes_in][:user_in],
+        params[:mq_attributes_in][:password_in],
+        params[:mq_attributes_in][:host_in],
+        params[:mq_attributes_in][:port_in])
+    message = String.new
+    inputqueue = params[:mq_attributes_in][:queue_in]
+    client.subscribe(inputqueue){|msg| message << msg.body.to_s}
+    client.join(1)
+    client.close
+    puts message.first
+    respond_to do |format|
+      format.js { render :js => "updateInputXml('#{message.inspect}')" }
+    end
   end
+
 end
 
 

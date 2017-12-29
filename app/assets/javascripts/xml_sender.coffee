@@ -48,8 +48,9 @@ $(document).on 'turbolinks:load', ->
     $('#mq_attributes_in_password_in').val password
 
 
-@updateXml = (xml_text, xml_name) ->
+@updateXml = (xml_text, xml_name, category_name) ->
   $('#xml_text_field').val(xml_text.slice(1, -1))
   $('#xml_xml_name').val(xml_name.slice(1, -1))
+  $('#xml_category_name').val(category_name)
 @updateInputXml = (xml_text) ->
   $('#xml_text_in_field').val(xml_text.slice(1, -1))

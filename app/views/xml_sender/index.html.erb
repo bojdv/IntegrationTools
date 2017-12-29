@@ -1,7 +1,7 @@
 
 <% provide(:title, "XML Sender") %>
 
-    <div class="col-sm-7 placeholder">
+    <div class="col-sm-8 placeholder">
       <ul class="nav nav-tabs" id="mqTab" role="tablist">
         <li class="nav-item">
           <a class="nav-link active" id="output-tab" data-toggle="tab" href="#output" role="tab" aria-controls="output" aria-selected="true">Исходящие сообщения</a>
@@ -65,8 +65,6 @@
   <div class="col-sm-3 placeholder" id="select_product">
 
     <%= simple_form_for :xml, :remote => true, url: 'xml_sender/put_xml', html: { class: 'form-group' } do |f| %>
-      <%= f.input :xml_name, :label => false, :required => false, placeholder: 'Имя XML'%>
-      <%= f.input :xml_description, as: :text, :label => false, :required => false, placeholder: 'Описание XML'%>
       <%= f.input :product_name,:required => false, :label => false, :collection => @product, label_method: :product_name, prompt: 'Выберите продукт, категорию и xml'%>
       <div class="category_select">
         <%= f.input :select_category_name, :required => false, :label => false, :collection => @product, as: :grouped_select ,group_method: :categories, group_label_method: :product_name, label_method: :category_name%>
@@ -74,11 +72,9 @@
       <div class="xml_select">
         <%= f.input :select_xml_name, input_html: { class: 'context-menu-one' }, :required => false, :label => false, :collection => @category, as: :grouped_select ,group_method: :xmls, group_label_method: :category_name, label_method: :xml_name%>
       </div>
-      <%= f.button :submit, 'Вставить XML', class: 'btn btn-primary context-menu-one'%>
+      <%= f.button :submit, 'Вставить XML', class: 'btn btn-primary context-menu-one btn-space'%><br>
+      <%= f.input :xml_name, :label => false, :required => false, placeholder: 'Имя XML'%>
+      <%= f.input :category_name, :label => false, :required => false, placeholder: 'Название категории'%>
+      <%= f.input :xml_description, as: :text, :label => false, :required => false, placeholder: 'Описание XML'%>
     <% end %>
-    <%=simple_form_for :output_queue, html: { class: 'form-group' }, :remote => true do |f|%>
-      <%= link_to 'Слушать очередь:', '#',:remote => true, :onclick => 'get_manager_form_data()', class: 'btn btn-primary' %>
-      <%=f.input :input_queue, :required => false, :label => false, :placeholder => 'Имя очереди'%>
-    <%end%>
-    <%= link_to 'JavaScript', '#',:remote => true, :onclick => 'get_form_data()' %>
   </div>

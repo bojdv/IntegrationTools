@@ -79,7 +79,7 @@ class XmlSenderController < ApplicationController
   def put_xml
     select_xml = Xml.find(params[:xml][:select_xml_name])
     respond_to do |format|
-      format.js { render :js => "updateXml('#{select_xml.xml_text.inspect}', '#{select_xml.xml_name.inspect}')" }
+      format.js { render :js => "updateXml('#{select_xml.xml_text.inspect}', '#{select_xml.xml_name.inspect}', '#{select_xml.category.category_name}')" }
     end
   end
   def get_message

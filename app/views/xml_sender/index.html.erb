@@ -73,8 +73,10 @@
         <%= f.input :select_xml_name, input_html: { class: 'context-menu-one' }, :required => false, :label => false, :collection => @category, as: :grouped_select ,group_method: :xmls, group_label_method: :category_name, label_method: :xml_name%>
       </div>
       <%= f.button :submit, 'Вставить XML', class: 'btn btn-primary context-menu-one btn-space'%><br>
+      <div id="xml_description">
       <%= f.input :xml_name, :label => false, :required => false, placeholder: 'Имя XML'%>
       <%= f.input :category_name, :label => false, :required => false, placeholder: 'Название категории'%>
       <%= f.input :xml_description, as: :text, :label => false, :required => false, placeholder: 'Описание XML'%>
+      </div>
     <% end %>
   </div>

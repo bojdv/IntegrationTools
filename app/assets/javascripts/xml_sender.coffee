@@ -6,14 +6,18 @@ $(document).on 'turbolinks:load', ->
   jQuery ->
   $('#xml_select_xml_name').parent().hide()
   $('#xml_select_category_name').parent().hide()
+  $('#xml_description').hide()
   xml = $('#xml_select_xml_name').html()
   category = $('#xml_select_category_name').html()
+  val = $('#xml_select_category_name').filter(':selected').text()
 
   $('#xml_product_name').change ->
     product = $('#xml_product_name :selected').text()
     options = $(category).filter("optgroup[label = '#{product}']").html()
     if options
       $('#xml_select_category_name').parent().show()
+      $('#xml_description').show()
+      $('#xml_category_name').val val
       $('#xml_select_xml_name').parent().hide()
       $('#xml_select_category_name').html(options)
       $('#xml_select_xml_name').empty()
@@ -22,6 +26,7 @@ $(document).on 'turbolinks:load', ->
       $('#xml_select_xml_name').empty()
       $('#xml_select_category_name').parent().hide()
       $('#xml_select_xml_name').parent().hide()
+      $('#xml_description').hide()
 
   $('#xml_select_category_name').click ->
     category_select = $('#xml_select_category_name :selected').text()

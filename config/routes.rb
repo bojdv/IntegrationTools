@@ -13,7 +13,8 @@ Rails.application.routes.draw do
   post '/xml_sender/delete_xml' => 'xml_sender#delete_xml'
   post '/xml_sender/save_xml' => 'xml_sender#save_xml'
   post '/xml_sender/get_message' => 'xml_sender#get_message'
-
+  post '/xml_sender/create_category' => 'xml_sender#create_category'
+  post '/xml_sender/delete_category' => 'xml_sender#delete_category'
 
   root 'main_page#index'
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html

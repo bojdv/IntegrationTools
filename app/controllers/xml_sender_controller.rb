@@ -17,6 +17,18 @@ class XmlSenderController < ApplicationController
       end
     end
   end
+  def create_category
+    new_category_save = Category.new(new_category_params)
+    if new_category_save.save
+      respond_to do |format|
+        format.js{ render :js => "send_alert('Сохранили категорию в базу')" }
+      end
+    else
+      respond_to do |format|
+        format.js{ render :js => "send_alert(#{new_category_save.errors.full_messages.inspect})" }
+      end
+    end
+  end
   def delete_xml
     xml_delete = Xml.find(params[:form_elements][:id])
     if xml_delete.destroy
@@ -26,6 +38,18 @@ class XmlSenderController < ApplicationController
     else
       respond_to do |format|
         format.js{ render :js => "send_alert(#{xml_delete.errors.full_messages.inspect})" }
+      end
+    end
+  end
+  def delete_category
+    category_delete = Category.find(params[:form_elements][:id])
+    if category_delete.destroy
+      respond_to do |format|
+        format.js{ render :js => "send_alert('Удалили категорию!')" }
+      end
+    else
+      respond_to do |format|
+        format.js{ render :js => "send_alert(#{category_delete.errors.full_messages.inspect})" }
       end
     end
   end
@@ -68,13 +92,13 @@ class XmlSenderController < ApplicationController
     respond_to do |format|
       format.js { render :js => "changeText(\"#{select_manager.queue}\", \"#{select_manager.host}\", \"#{select_manager.port}\", \"#{select_manager.user}\", \"#{select_manager.password}\", \"#{manager_type[1]}\");" }
       end
-    end
     else if (params[:manager_in]).present?
         select_manager = QueueManager.find_by_manager_name(params[:manager_in][:manager_name_in])
           respond_to do |format|
             format.js { render :js => "changeText(\"#{select_manager.queue}\", \"#{select_manager.host}\", \"#{select_manager.port}\", \"#{select_manager.user}\", \"#{select_manager.password}\", \"#{manager_type[0]}\");" }
           end
      end
+    end
   end
   def put_xml
     select_xml = Xml.find(params[:xml][:select_xml_name])
@@ -107,5 +131,7 @@ private
 
 def new_xml_params
   params.require(:form_elements).permit(:xml_text, :category_id, :xml_name, :id)
-  #params.require(:xml).permit(:xml_text, :xml_name, :product_id)
+end
+def new_category_params
+  params.require(:form_elements).permit(:category_name, :product_id)
 end

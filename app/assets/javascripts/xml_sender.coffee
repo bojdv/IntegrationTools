@@ -9,7 +9,6 @@ $(document).on 'turbolinks:load', ->
   $('#xml_description').hide()
   xml = $('#xml_select_xml_name').html()
   category = $('#xml_select_category_name').html()
-  val = $('#xml_select_category_name').filter(':selected').text()
 
   $('#xml_product_name').change ->
     product = $('#xml_product_name :selected').text()
@@ -17,7 +16,6 @@ $(document).on 'turbolinks:load', ->
     if options
       $('#xml_select_category_name').parent().show()
       $('#xml_description').show()
-      $('#xml_category_name').val val
       $('#xml_select_xml_name').parent().hide()
       $('#xml_select_category_name').html(options)
       $('#xml_select_xml_name').empty()
@@ -30,6 +28,7 @@ $(document).on 'turbolinks:load', ->
 
   $('#xml_select_category_name').click ->
     category_select = $('#xml_select_category_name :selected').text()
+    $('#xml_category_name').val category_select
     options2 = $(xml).filter("optgroup[label = '#{category_select}']").html()
     if options2
       $('#xml_select_xml_name').parent().show()

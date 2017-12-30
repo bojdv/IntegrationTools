@@ -40,12 +40,14 @@ function get_form_data()
     form_xml = document.getElementById("xml_text_field").value;
     form_product = document.getElementById("xml_product_name").value;
     form_category = document.getElementById("xml_select_category_name").value;
+    form_category_user = document.getElementById("xml_category_name").value;
     form_xml_name = document.getElementById("xml_xml_name").value;
     form_xml_selected_name = document.getElementById("xml_select_xml_name").value;
     return {
         form_xml: form_xml,
         form_product: form_product,
         form_category: form_category,
+        form_category_user: form_category_user,
         form_xml_name: form_xml_name,
         form_xml_selected_name: form_xml_selected_name
     };
@@ -148,6 +150,40 @@ $(function() {
             "save": {name: "Сохранить изменения", icon: "edit"},
             "new": {name: "Сохранить,как новую", icon: "edit"},
             "delete": {name: "Удалить", icon: "delete"},
+        }
+    });
+});
+$(function() {
+    $.contextMenu({
+        selector: '.context-menu-category',
+        callback: function(key, options) {
+            form_elements = get_form_data();
+            if (key == 'new'){
+                $.ajax({
+                    url: "xml_sender/create_category",
+                    type: "POST",
+                    dataType: "script",
+                    data: { form_elements: {
+                            category_name: form_elements.form_category_user,
+                            product_id: form_elements.form_category
+                        } },
+                });
+            }
+            if (key == 'delete'){
+                $.ajax({
+                    url: "xml_sender/delete_category",
+                    type: "POST",
+                    dataType: "script",
+                    data: { form_elements: {
+                            id: form_elements.form_category
+                        } },
+                });
+            }
+
+        },
+        items: {
+            "new": {name: "Добавить категорию", icon: "edit"},
+            "delete": {name: "Удалить категорию", icon: "delete"},
         }
     });
 });

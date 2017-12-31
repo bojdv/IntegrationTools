@@ -17,23 +17,20 @@ function send_alert(message)
 }
 function get_manager_form_data()
 {
+    form_settings_name = document.getElementById("mq_attributes_settings_name").value;
     form_host = document.getElementById("mq_attributes_host").value;
     form_port= document.getElementById("mq_attributes_port").value;
     form_login = document.getElementById("mq_attributes_user").value;
     form_password = document.getElementById("mq_attributes_password").value;
-    form_input_queue = document.getElementById("input_queue_input_queue").value;
-    $.ajax({
-        url: "xml_sender/get_message",
-        type: "POST",
-        dataType: "script",
-        data: { manager_form_elements: {
-                form_host: form_host,
-                form_port: form_port,
-                form_login: form_login,
-                form_password: form_password,
-                form_input_queue: form_input_queue
-            } },
-    });
+    form_output_queue = document.getElementById("mq_attributes_queue").value;
+    return {
+        form_settings_name: form_settings_name,
+        form_host: form_host,
+        form_port: form_port,
+        form_login: form_login,
+        form_password: form_password,
+        form_output_queue: form_output_queue
+    };
 }
 function get_form_data()
 {
@@ -184,6 +181,46 @@ $(function() {
         items: {
             "new": {name: "Добавить категорию", icon: "edit"},
             "delete": {name: "Удалить категорию", icon: "delete"},
+        }
+    });
+});
+$(function() {
+    $.contextMenu({
+        selector: '.context-menu-manager-settings',
+        callback: function(key, options) {
+            form_elements = get_manager_form_data();
+            if (key == 'new'){
+                mode = 'new';
+                $.ajax({
+                    url: "xml_sender/crud_mq_settings",
+                    type: "POST",
+                    dataType: "script",
+                    data: { form_elements: {
+                            manager_name: form_elements.form_settings_name,
+                            queue: form_elements.form_output_queue,
+                            host: form_elements.form_host,
+                            port: form_elements.form_port,
+                            user: form_elements.form_login,
+                            password: form_elements.form_password,
+                            mode: mode
+                        } },
+                });
+            }
+            if (key == 'delete'){
+                $.ajax({
+                    url: "xml_sender/delete_mq_settings",
+                    type: "POST",
+                    dataType: "script",
+                    data: { form_elements: {
+                            id: form_elements.form_category
+                        } },
+                });
+            }
+
+        },
+        items: {
+            "new": {name: "Сохранить настройки", icon: "edit"},
+            "delete": {name: "Удалить настройку", icon: "delete"},
         }
     });
 });

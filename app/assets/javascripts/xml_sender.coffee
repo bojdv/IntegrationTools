@@ -37,8 +37,9 @@ $(document).on 'turbolinks:load', ->
       $('#xml_select_xml_name').empty()
       $('#xml_select_xml_name').parent().hide()
 
-@changeText = (name, host, port, user, password, manager_type) ->
+@changeText = (manager_name, name, host, port, user, password, manager_type) ->
   if manager_type == 'out'
+    $('#mq_attributes_settings_name').val manager_name
     $('#mq_attributes_queue').val name
     $('#mq_attributes_host').val host
     $('#mq_attributes_port').val port

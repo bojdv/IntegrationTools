@@ -16,11 +16,12 @@
           <div class="row">
             <div class="col-sm-3 placeholder">
               <%= simple_form_for :manager, :remote => true, url: 'xml_sender/manager_choise', html: { class: 'form-group' } do |f| %>
-                <%= f.input :manager_name, :required => false, :label => false, :collection => @qm, prompt: 'Шаблоны настроек' %>
+                <%= f.input :manager_name, :required => false, :label => false, :collection => @qm, prompt: 'Шаблоны настроек', input_html: { class: 'context-menu-manager-settings' } %>
                 <%= f.button :submit, 'Получить настройки', class: 'btn btn-primary'%>
               <% end %>
 
               <%= simple_form_for :mq_attributes, remote: true, url: xml_sender_send_to_queue_path, html: {class: 'form-group' } do |f| %>
+                <%= f.input :settings_name, :label => 'Название настройки', :required => false, placeholder: 'Заполнить при сохранении' %>
                 <%= f.input :queue, :label => 'Куда отправить', :required => false, placeholder: 'Например: test_in' %>
                 <%= f.input :host, :label => 'Хост', :required => false , placeholder: 'Например: localhost' %>
                 <%= f.input :port, :label => 'Порт', :required => false , placeholder: 'STOMP порт, обычно: 61613' %>

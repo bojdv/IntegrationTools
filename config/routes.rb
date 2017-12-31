@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  get 'users/new'
+
   get 'product' => 'product#index'
   get '/xml_sender/new' => 'xml_sender#new'
   post '/xml_sender/new' => 'xml_sender#new'
@@ -15,6 +17,9 @@ Rails.application.routes.draw do
   post '/xml_sender/get_message' => 'xml_sender#get_message'
   post '/xml_sender/create_category' => 'xml_sender#create_category'
   post '/xml_sender/delete_category' => 'xml_sender#delete_category'
+  post '/xml_sender/crud_mq_settings' => 'xml_sender#crud_mq_settings'
+  get 'signup' => 'users#new'
+  resources :users
 
   root 'main_page#index'
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html

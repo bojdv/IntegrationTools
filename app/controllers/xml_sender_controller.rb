@@ -65,6 +65,23 @@ class XmlSenderController < ApplicationController
       end
     end
   end
+  def crud_mq_settings
+    if (params[:form_elements][:mode]) == 'new'
+      new_settings = QueueManager.new(settings_params)
+      if new_settings.save
+        respond_to do |format|
+          format.js{ render :js => "send_alert('Сохранили настройки в базу')" }
+        end
+      else
+        respond_to do |format|
+          format.js{ render :js => "send_alert(#{new_settings.errors.full_messages.inspect})" }
+        end
+      end
+    else if (params[:form_elements][:mode]) == 'delete'
+
+         end
+    end
+  end
   def send_to_queue
     if (params[:mq_attributes][:xsd]).present?
       puts "xsd"
@@ -90,7 +107,7 @@ class XmlSenderController < ApplicationController
     if (params[:manager]).present?
     select_manager = QueueManager.find_by_manager_name(params[:manager][:manager_name])
     respond_to do |format|
-      format.js { render :js => "changeText(\"#{select_manager.queue}\", \"#{select_manager.host}\", \"#{select_manager.port}\", \"#{select_manager.user}\", \"#{select_manager.password}\", \"#{manager_type[1]}\");" }
+      format.js { render :js => "changeText(\"#{select_manager.manager_name}\",\"#{select_manager.queue}\", \"#{select_manager.host}\", \"#{select_manager.port}\", \"#{select_manager.user}\", \"#{select_manager.password}\", \"#{manager_type[1]}\");" }
       end
     else if (params[:manager_in]).present?
         select_manager = QueueManager.find_by_manager_name(params[:manager_in][:manager_name_in])
@@ -134,4 +151,7 @@ def new_xml_params
 end
 def new_category_params
   params.require(:form_elements).permit(:category_name, :product_id)
+end
+def settings_params
+  params.require(:form_elements).permit(:manager_name, :queue, :host, :port, :user, :password)
 end

@@ -15,6 +15,9 @@
   <div class="row">
     <%= render 'layouts/left_menu' %>
     <main role="main" class="col-sm-9 ml-sm-auto col-md-10 pt-3">
+      <% flash.each do |message_type, message| %>
+      <div class="alert alert-<%= message_type %>"><%= message %></div>
+      <% end %>
       <h2><%= yield(:title)%></h2>
       <section class="row text-left placeholders">
           <%= yield %>

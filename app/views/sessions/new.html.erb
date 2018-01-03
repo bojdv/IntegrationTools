@@ -1,0 +1,9 @@
+<% provide(:title, "Авторизация") %>
+<div class="col-sm-3 offset-2">
+  <%= simple_form_for :session, :url => login_path, html: { class: 'form-group' } do |f| %>
+    <%= f.input :email, :label => 'E-mail', :required => false , placeholder: 'Адрес почты BSS: имя_пользователя@bssys.com' %>
+    <%= f.input :password, :label => 'Пароль', :required => false , placeholder: 'Пароль' %>
+    <%= f.button :submit, 'Войти', class: 'btn btn-primary'%>
+  <% end %>
+  <p>Не зарегистрированы? <%= link_to "Зарегистрироваться!", signup_path %></p>
+</div>

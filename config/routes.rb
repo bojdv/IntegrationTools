@@ -1,8 +1,6 @@
 Rails.application.routes.draw do
   get 'sessions/new'
-
   get 'users/new'
-
   get 'product' => 'product#index'
   get '/xml_sender/new' => 'xml_sender#new'
   post '/xml_sender/new' => 'xml_sender#new'

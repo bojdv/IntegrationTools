@@ -39,6 +39,8 @@ function get_form_data()
     form_category = document.getElementById("xml_select_category_name").value;
     form_category_user = document.getElementById("xml_category_name").value;
     form_xml_name = document.getElementById("xml_xml_name").value;
+    form_xml_description = document.getElementById("xml_xml_description").value;
+    form_xml_private = document.getElementById("xml_private_xml").checked;
     form_xml_selected_name = document.getElementById("xml_select_xml_name").value;
     return {
         form_xml: form_xml,
@@ -46,6 +48,8 @@ function get_form_data()
         form_category: form_category,
         form_category_user: form_category_user,
         form_xml_name: form_xml_name,
+        form_xml_description: form_xml_description,
+        form_xml_private: form_xml_private,
         form_xml_selected_name: form_xml_selected_name
     };
 }
@@ -95,22 +99,27 @@ function test_call()
         data: { product: { name: "Filip", description: "whatever" } },
     });
 }
+/** Контекстное меню xml*/
 $(function() {
     $.contextMenu({
         selector: '.context-menu-one',
         callback: function(key, options) {
             form_elements = get_form_data();
+            request = { form_elements: {
+                    xml_text: form_elements.form_xml,
+                    category_id: form_elements.form_category,
+                    form_product: form_elements.form_product,
+                    xml_name: form_elements.form_xml_name,
+                    xml_description: form_xml_description,
+                    private: form_xml_private,
+                    id: form_elements.form_xml_selected_name
+                } }
             if (key == 'new'){
                 $.ajax({
                     url: "xml_sender/create_xml",
                     type: "POST",
                     dataType: "script",
-                    data: { form_elements: {
-                        xml_text: form_elements.form_xml,
-                        category_id: form_elements.form_category,
-                        form_product: form_elements.form_product,
-                        xml_name: form_elements.form_xml_name
-                        } },
+                    data: request
                 });
             }
             if (key == 'delete'){
@@ -118,13 +127,7 @@ $(function() {
                     url: "xml_sender/delete_xml",
                     type: "POST",
                     dataType: "script",
-                    data: { form_elements: {
-                            xml_text: form_elements.form_xml,
-                            category_id: form_elements.form_category,
-                            form_product: form_elements.form_product,
-                            xml_name: form_elements.form_xml_name,
-                            id: form_elements.form_xml_selected_name
-                        } },
+                    data: request
                 });
             }
             if (key == 'save'){
@@ -132,13 +135,7 @@ $(function() {
                     url: "xml_sender/save_xml",
                     type: "POST",
                     dataType: "script",
-                    data: { form_elements: {
-                            xml_text: form_elements.form_xml,
-                            category_id: form_elements.form_category,
-                            form_product: form_elements.form_product,
-                            xml_name: form_elements.form_xml_name,
-                            id: form_elements.form_xml_selected_name
-                        } },
+                    data: request
                 });
             }
 
@@ -150,6 +147,7 @@ $(function() {
         }
     });
 });
+/** Контекстное меню категории*/
 $(function() {
     $.contextMenu({
         selector: '.context-menu-category',

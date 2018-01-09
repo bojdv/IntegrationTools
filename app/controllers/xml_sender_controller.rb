@@ -18,9 +18,7 @@ class XmlSenderController < ApplicationController
     end
   end
   def create_category
-    newnewparams = new_category_params.merge(:creator_id => current_user.id.to_s)
-    puts newnewparams
-    new_category_save = Category.new(newnewparams)
+    new_category_save = Category.new(new_category_params)
     if new_category_save.save
       respond_to do |format|
         format.js{ render :js => "send_alert('Сохранили категорию в базу')" }
@@ -122,7 +120,7 @@ class XmlSenderController < ApplicationController
   def put_xml
     select_xml = Xml.find(params[:xml][:select_xml_name])
     respond_to do |format|
-      format.js { render :js => "updateXml('#{select_xml.xml_text.inspect}', '#{select_xml.xml_name.inspect}', '#{select_xml.category.category_name}')" }
+      format.js { render :js => "updateXml('#{select_xml.xml_text.inspect}', '#{select_xml.xml_name}', '#{select_xml.category.category_name}', '#{select_xml.xml_description}', '#{select_xml.private}', '#{select_xml.user.email}')" }
     end
   end
   def get_message
@@ -149,10 +147,10 @@ end
 private
 
 def new_xml_params
-  params.require(:form_elements).permit(:xml_text, :category_id, :xml_name, :id, :creator_id => current_user)
+  params.require(:form_elements).permit(:xml_text, :category_id, :xml_name, :id, :xml_description, :private).merge(:user_id => current_user.id)
 end
 def new_category_params
-  params.require(:form_elements).permit(:category_name, :product_id, :creator_id)
+  params.require(:form_elements).permit(:category_name, :product_id).merge(:user_id => current_user.id)
 end
 def settings_params
   params.require(:form_elements).permit(:manager_name, :queue, :host, :port, :user, :password)

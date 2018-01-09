@@ -79,11 +79,13 @@
       <div class="xml_select">
         <%= f.input :select_xml_name, :required => false, :label => false, :collection => @category, as: :grouped_select ,group_method: :xmls, group_label_method: :category_name, label_method: :xml_name%>
       </div>
-      <%= f.button :submit, 'Вставить XML', class: 'btn btn-primary context-menu-one btn-space'%><br>
+      <%= f.button :submit, 'Вставить XML', class: 'btn btn-primary'%><br>
       <div id="xml_description">
-      <%= f.input :xml_name, :label => false, input_html: { class: 'context-menu-one' }, :required => false, placeholder: 'Имя XML'%>
-      <%= f.input :category_name, :label => false, input_html: { class: 'context-menu-category' }, :required => false, placeholder: 'Название категории'%>
-      <%= f.input :xml_description, as: :text, :label => false, :required => false, placeholder: 'Описание XML'%>
+      <%= f.input :xml_name, :label => 'Название XML', input_html: { class: 'context-menu-one' }, :required => false, placeholder: 'Имя XML'%>
+      <%= f.input :category_name, :label => 'Название категории', input_html: { class: 'context-menu-category' }, :required => false, placeholder: 'Название категории'%>
+      <%= f.input :xml_description, as: :text, :label => 'Описание XML', :required => false, placeholder: 'Описание XML'%>
+      <%= f.input :autor, :label => 'Автор XML', :required => false, placeholder: 'Автор XML', :disabled => true%>
+      <%= f.input :private_xml, as: :boolean, :label => 'Эту XML вижу только я', checked_value: true, unchecked_value: false, input_html: {checked: true} %>
       </div>
     <% end %>
   </div>

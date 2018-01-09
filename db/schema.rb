@@ -10,14 +10,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180109103945) do
+ActiveRecord::Schema.define(version: 20180109170021) do
 
   create_table "categories", force: :cascade do |t|
     t.integer "product_id", limit: 10, precision: 10
     t.string "category_name"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.integer "creator_id", limit: 10, precision: 10
+    t.integer "user_id", limit: 10, precision: 10
+    t.boolean "private"
     t.index ["product_id"], name: "index_categories_on_product_id"
   end
 
@@ -53,7 +54,9 @@ ActiveRecord::Schema.define(version: 20180109103945) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.integer "category_id", limit: 10, precision: 10
-    t.integer "creator_id", limit: 10, precision: 10
+    t.integer "user_id", limit: 10, precision: 10
+    t.boolean "private"
+    t.text "xml_description"
   end
 
 end

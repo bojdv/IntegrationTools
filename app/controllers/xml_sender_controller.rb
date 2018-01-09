@@ -18,7 +18,9 @@ class XmlSenderController < ApplicationController
     end
   end
   def create_category
-    new_category_save = Category.new(new_category_params)
+    newnewparams = new_category_params.merge(:creator_id => current_user.id.to_s)
+    puts newnewparams
+    new_category_save = Category.new(newnewparams)
     if new_category_save.save
       respond_to do |format|
         format.js{ render :js => "send_alert('Сохранили категорию в базу')" }
@@ -147,10 +149,10 @@ end
 private
 
 def new_xml_params
-  params.require(:form_elements).permit(:xml_text, :category_id, :xml_name, :id)
+  params.require(:form_elements).permit(:xml_text, :category_id, :xml_name, :id, :creator_id => current_user)
 end
 def new_category_params
-  params.require(:form_elements).permit(:category_name, :product_id)
+  params.require(:form_elements).permit(:category_name, :product_id, :creator_id)
 end
 def settings_params
   params.require(:form_elements).permit(:manager_name, :queue, :host, :port, :user, :password)

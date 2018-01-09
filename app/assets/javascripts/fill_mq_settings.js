@@ -162,7 +162,7 @@ $(function() {
                     dataType: "script",
                     data: { form_elements: {
                             category_name: form_elements.form_category_user,
-                            product_id: form_elements.form_category
+                            product_id: form_elements.form_category,
                         } },
                 });
             }

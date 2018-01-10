@@ -14,6 +14,13 @@ function changeText(name, host, port, user, password)
     function send_alert(message) {
         alert(message);
     }
+    function open_modal() {
+        text = "ПРоверка текста"
+        $('#modal-text').html(text);
+        $('#exampleModal').modal({
+            keyboard: true,
+        })
+    }
 
     function get_manager_form_data() {
         form_settings_name = document.getElementById("mq_attributes_settings_name").value;

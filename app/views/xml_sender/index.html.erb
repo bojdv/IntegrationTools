@@ -16,7 +16,9 @@
           <div class="row">
             <div class="col-sm-3 placeholder">
               <%= simple_form_for :manager, :remote => true, url: 'xml_sender/manager_choise', html: { class: 'form-group' } do |f| %>
-                <%= f.input :manager_name, :required => false, :label => false, :collection => @qm, prompt: 'Шаблоны настроек', input_html: { class: 'context-menu-manager-settings' } %>
+                <div class="<%= 'context-menu-manager-settings' if logged_in? %>">
+                  <%= f.input :manager_name, :required => false, :label => false, :collection => @qm, prompt: 'Шаблоны настроек' %>
+                </div>
                 <%= f.button :submit, 'Получить настройки', class: 'btn btn-primary'%>
               <% end %>
 
@@ -77,15 +79,25 @@
         <%= f.input :select_category_name, :required => false, :label => false, :collection => @product, as: :grouped_select ,group_method: :categories, group_label_method: :product_name, label_method: :category_name%>
       </div>
       <div class="xml_select">
-        <%= f.input :select_xml_name, :required => false, :label => false, :collection => @category, as: :grouped_select ,group_method: :xmls, group_label_method: :category_name, label_method: :xml_name%>
+        <% if logged_in? %>
+          <%= f.input :select_xml_name, :required => false, :label => false, :collection => @category, as: :grouped_select, group_method: :xmls, group_label_method: :category_name, :label_method => lambda { |xml| "#{xml.xml_name if xml.user_id==current_user.id || xml.private == false}"}, :value_method => lambda { |xml| "#{xml.id if xml.user_id==current_user.id || xml.private == false}"} %>
+        <% else %>
+          <%= f.input :select_xml_name, :required => false, :label => false, :collection => @category, as: :grouped_select, group_method: :xmls, group_label_method: :category_name, :label_method => lambda { |xml| "#{xml.xml_name if xml.private == false}"}, :value_method => lambda { |xml| "#{xml.id if xml.private == false}"} %>
+        <% end %>
       </div>
-      <%= f.button :submit, 'Вставить XML', class: 'btn btn-primary'%><br>
+      <%= f.button :submit, 'Загрузить XML', class: 'btn btn-primary'%><br>
       <div id="xml_description">
-      <%= f.input :xml_name, :label => 'Название XML', input_html: { class: 'context-menu-one' }, :required => false, placeholder: 'Имя XML'%>
-      <%= f.input :category_name, :label => 'Название категории', input_html: { class: 'context-menu-category' }, :required => false, placeholder: 'Название категории'%>
+        <div class="<%= 'context-menu-one' if logged_in? %>">
+          <%= f.input :xml_name, :label => 'Название XML', :required => false, placeholder: 'Имя XML'%>
+        </div>
+        <div class="<%= 'context-menu-category' if logged_in? %>">
+          <%= f.input :category_name, :label => 'Название категории', :required => false, placeholder: 'Название категории'%>
+        </div>
       <%= f.input :xml_description, as: :text, :label => 'Описание XML', :required => false, placeholder: 'Описание XML'%>
-      <%= f.input :autor, :label => 'Автор XML', :required => false, placeholder: 'Автор XML', :disabled => true%>
-      <%= f.input :private_xml, as: :boolean, :label => 'Эту XML вижу только я', checked_value: true, unchecked_value: false, input_html: {checked: true} %>
+      <%= f.input :autor, :label => 'Автор XML', :required => false, placeholder: logged_in? ? current_user.email : 'Авторизуйтесь для сохранения', :disabled => true%>
+      <% if logged_in? %>
+        <%= f.input :private_xml, as: :boolean, :label => 'XML доступна только автору!', checked_value: true, unchecked_value: false, input_html: {checked: true} %>
+      <% end %>
       </div>
     <% end %>
   </div>

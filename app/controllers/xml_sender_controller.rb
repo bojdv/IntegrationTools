@@ -55,7 +55,7 @@ class XmlSenderController < ApplicationController
   end
   def save_xml
     xml_edit = Xml.find(params[:form_elements][:id])
-    if xml_edit.update_attributes(new_xml_params)
+    if xml_edit.update_attributes(save_xml_params)
       respond_to do |format|
         format.js{ render :js => "send_alert('Сохранили изменения!')" }
       end
@@ -78,7 +78,16 @@ class XmlSenderController < ApplicationController
         end
       end
     else if (params[:form_elements][:mode]) == 'delete'
-
+           delete_setting = QueueManager.find_by_manager_name(params[:form_elements][:manager_name])
+           if delete_setting.destroy
+             respond_to do |format|
+               format.js{ render :js => "send_alert('Удалили настройку #{params[:form_elements][:manager_name]}!')" }
+             end
+           else
+             respond_to do |format|
+               format.js{ render :js => "send_alert(#{delete_setting.errors.full_messages.inspect})" }
+             end
+           end
          end
     end
   end
@@ -111,8 +120,10 @@ class XmlSenderController < ApplicationController
       end
     else if (params[:manager_in]).present?
         select_manager = QueueManager.find_by_manager_name(params[:manager_in][:manager_name_in])
+        puts select_manager
+        puts manager_type[0]
           respond_to do |format|
-            format.js { render :js => "changeText(\"#{select_manager.queue}\", \"#{select_manager.host}\", \"#{select_manager.port}\", \"#{select_manager.user}\", \"#{select_manager.password}\", \"#{manager_type[0]}\");" }
+            format.js { render :js => "changeText(\"#{select_manager.manager_name}\",\"#{select_manager.queue}\", \"#{select_manager.host}\", \"#{select_manager.port}\", \"#{select_manager.user}\", \"#{select_manager.password}\", \"#{manager_type[0]}\");" }
           end
      end
     end
@@ -120,7 +131,7 @@ class XmlSenderController < ApplicationController
   def put_xml
     select_xml = Xml.find(params[:xml][:select_xml_name])
     respond_to do |format|
-      format.js { render :js => "updateXml('#{select_xml.xml_text.inspect}', '#{select_xml.xml_name}', '#{select_xml.category.category_name}', '#{select_xml.xml_description}', '#{select_xml.private}', '#{select_xml.user.email}')" }
+      format.js { render :js => "updateXml('#{select_xml.xml_text.inspect}', '#{select_xml.xml_name}', '#{select_xml.category.category_name}', '#{select_xml.xml_description.inspect}', '#{select_xml.private}', '#{select_xml.user.email}')" }
     end
   end
   def get_message
@@ -147,7 +158,10 @@ end
 private
 
 def new_xml_params
-  params.require(:form_elements).permit(:xml_text, :category_id, :xml_name, :id, :xml_description, :private).merge(:user_id => current_user.id)
+  params.require(:form_elements).permit(:xml_text, :category_id, :xml_name, :xml_description, :private).merge(:user_id => current_user.id)
+end
+def save_xml_params
+  params.require(:form_elements).permit(:xml_text, :category_id, :xml_name, :id, :xml_description, :private)
 end
 def new_category_params
   params.require(:form_elements).permit(:category_name, :product_id).merge(:user_id => current_user.id)

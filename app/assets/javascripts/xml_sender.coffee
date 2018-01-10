@@ -2,8 +2,8 @@
 # All this logic will automatically be available in application.js.
 # You can use CoffeeScript in this file: http://coffeescript.org/
 
-$(document).on 'turbolinks:load', ->
-  jQuery ->
+$(window).load ->
+jQuery ->
   $('#xml_select_xml_name').parent().hide()
   $('#xml_select_category_name').parent().hide()
   $('#xml_description').hide()
@@ -32,7 +32,7 @@ $(document).on 'turbolinks:load', ->
     options2 = $(xml).filter("optgroup[label = '#{category_select}']").html()
     if options2
       $('#xml_select_xml_name').parent().show()
-      $('#xml_select_xml_name').html(options2)
+      $('#xml_select_xml_name').html(options2.split("<option value=\"\"></option>").join(""))
     else
       $('#xml_select_xml_name').empty()
       $('#xml_select_xml_name').parent().hide()
@@ -58,7 +58,7 @@ $(document).on 'turbolinks:load', ->
   $('#xml_text_field').val(xml_text.slice(1, -1))
   $('#xml_xml_name').val(xml_name)
   $('#xml_category_name').val(category_name)
-  $('#xml_xml_description').val(xml_description)
+  $('#xml_xml_description').val(xml_description.slice(1, -1))
   $('#xml_private_xml').prop('checked', checked)
   $('#xml_autor').val(xml_autor)
 @updateInputXml = (xml_text) ->

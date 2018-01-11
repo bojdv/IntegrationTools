@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/IntegrationUI.iml" filepath="$PROJECT_DIR$/.idea/IntegrationUI.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/IntegrationTools.iml" filepath="$PROJECT_DIR$/.idea/IntegrationTools.iml" />
     </modules>
   </component>
 </project>

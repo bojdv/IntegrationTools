@@ -99,17 +99,17 @@ class XmlSenderController < ApplicationController
       xsd = Nokogiri::XML::Schema(params[:mq_attributes][:xsd])
       xmlt = Nokogiri::XML(params[:mq_attributes][:xml])
       result = xsd.validate(xmlt)
-      response_ajax("#{result.join('<br/>')}", 10000) if result.any?
+      response_ajax("#{result.join('<br/>')}", 10000) and return if result.any?
     end
     client = Stomp::Client.new(
         params[:mq_attributes][:user],
         params[:mq_attributes][:password],
         params[:mq_attributes][:host],
         params[:mq_attributes][:port])
-    # НЕ РАБОТАЕТ ОПОВЕЩЕНИЕ!
-    response_ajax('Отправили сообщение', '1500') if client.publish("/queue/#{params[:mq_attributes][:queue]}", params[:mq_attributes][:xml]) #Кидаем запрос в очередь
+    client.publish("/queue/#{params[:mq_attributes][:queue]}", params[:mq_attributes][:xml]) #Кидаем запрос в очередь
+    response_ajax('Отправили сообщение', '1500')
     rescue Exception => msg
-    response_ajax("Случилось непредвиденное:<br/> #{msg.message}")
+    response_ajax("Случилось непредвиденное: #{msg.class} <br/> #{msg.message}")
     ensure
     client.close if !client.nil?
     end

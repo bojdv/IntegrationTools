@@ -31,7 +31,7 @@
                 <%= f.input :password, :label => 'Пароль пользователя', :required => false , input_html: {value: 'admin'}, placeholder: 'Например: password' %>
                 </div>
             <div class="col-sm-9 placeholder">
-              <%= f.input :xml, as: :text, :label => false, :required => false, input_html: { id: 'xml_text_field', class: 'form-control context-menu-xml', :style=> 'height: 500px; white-space: nowrap', placeholder: 'Место для исходящей XML' } %>
+              <%= f.input :xml, as: :text, :label => false, :required => false, input_html: { id: 'xml_text_field', class: 'form-control context-menu-xml', :style=> 'height: 600px; white-space: nowrap', placeholder: 'Место для исходящей XML' } %>
               <%= f.input :xsd, as: :file, :label => false, :required => false, class: 'btn btn-primary'%>
               <%= f.button :submit, 'Отправить', class: 'btn btn-primary'%>
               <% end %>
@@ -55,7 +55,7 @@
                 <%= f.input :password_in, :label => 'Пароль пользователя', :required => false , input_html: {value: 'admin'}, placeholder: 'Например: password' %>
                 </div>
                 <div class="col-sm-9 placeholder">
-                  <%= f.input :xml_in, as: :text, :label => false, :required => false, input_html: { id: 'xml_text_in_field', class: 'form-control', :style=> 'height: 500px; white-space: nowrap', placeholder: 'Место для входящей XML' } %>
+                  <%= f.input :xml_in, as: :text, :label => false, :required => false, input_html: { id: 'xml_text_in_field', class: 'form-control', :style=> 'height: 600px; white-space: nowrap', placeholder: 'Место для входящей XML' } %>
                   <%= f.button :submit, 'Получить сообщение', class: 'btn btn-primary'%>
               <% end %>
               </div>

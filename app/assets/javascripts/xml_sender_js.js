@@ -14,6 +14,14 @@ function changeText(name, host, port, user, password)
     function send_alert(message) {
         alert(message);
     }
+    function SaveXml(){
+        text = [document.getElementById("xml_text_field").value]
+        xml_name = document.getElementById("xml_xml_name").value
+        file_name = xml_name ? xml_name + '.xml' : 'Xml.xml'
+        var file = new File(text, file_name, {type: "text/plain;charset=utf-8"});
+        saveAs(file);
+    }
+
     function open_modal(text, time) {
         $('#modal-text').html(text);
         $('#exampleModal').modal({
@@ -228,3 +236,21 @@ function changeText(name, host, port, user, password)
             }
         });
     });
+/** Контекстное меню редактирования XML*/
+$(function () {
+    $.contextMenu({
+        selector: '.context-menu-xml',
+        callback: function (key, options) {
+            if (key == 'decode' || key == 'encode' || key == 'uuid') { Base64(key)}
+            if (key == 'clear') {$('#xml_text_field').val('');}
+            if (key == 'save_xml') {SaveXml()}
+        },
+        items: {
+            "decode": {name: "Декодировать Base64"},
+            "encode": {name: "Кодировать в Base64"},
+            "uuid": {name: "Сгенерировать ID"},
+            "save_xml": {name: "Сохранить XML в файл"},
+            "clear": {name: "Очистить XML"}
+        }
+    });
+});

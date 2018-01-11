@@ -66,6 +66,7 @@ class XmlSenderController < ApplicationController
     end
   end
   def crud_mq_settings
+    response_ajax("<h5>Не заполнены параметры:</h5>#{get_empty_values(params)}") and return if !get_empty_values(params).empty?
     if (params[:form_elements][:mode]) == 'new'
       new_settings = QueueManager.new(settings_params)
       if new_settings.save
@@ -92,27 +93,30 @@ class XmlSenderController < ApplicationController
     end
   end
   def send_to_queue
+    begin
+    response_ajax("<h5>Не заполнены параметры:</h5>#{get_empty_values(params)}") and return if !get_empty_values(params).empty?
     if (params[:mq_attributes][:xsd]).present?
-      puts "xsd"
       xsd = Nokogiri::XML::Schema(params[:mq_attributes][:xsd])
       xmlt = Nokogiri::XML(params[:mq_attributes][:xml])
       result = xsd.validate(xmlt)
-      respond_to do |format|
-        format.js { render :js => "send_alert(\"#{result}\")" }
-      end
+      response_ajax("#{result.join('<br/>')}", 10000) if result.any?
     end
-    puts "no xsd"
     client = Stomp::Client.new(
         params[:mq_attributes][:user],
         params[:mq_attributes][:password],
         params[:mq_attributes][:host],
         params[:mq_attributes][:port])
-    client.publish("/queue/#{params[:mq_attributes][:queue]}", params[:mq_attributes][:xml]) #Кидаем запрос в очередь
-    client.close
+    # НЕ РАБОТАЕТ ОПОВЕЩЕНИЕ!
+    response_ajax('Отправили сообщение', '1500') if client.publish("/queue/#{params[:mq_attributes][:queue]}", params[:mq_attributes][:xml]) #Кидаем запрос в очередь
+    rescue Exception => msg
+    response_ajax("Случилось непредвиденное:<br/> #{msg.message}")
+    ensure
+    client.close if !client.nil?
+    end
   end
 
   def manager_choise
-    response_ajax('Не выбраны настройки MQ!') and return if params[:manager][:manager_name].empty?
+    response_ajax("Не выбраны настройки MQ из списка") and return if !get_empty_values(params).empty?
     manager_type = ["in", "out"]
     if (params[:manager]).present?
     select_manager = QueueManager.find_by_manager_name(params[:manager][:manager_name])
@@ -121,8 +125,6 @@ class XmlSenderController < ApplicationController
       end
     else if (params[:manager_in]).present?
         select_manager = QueueManager.find_by_manager_name(params[:manager_in][:manager_name_in])
-        puts select_manager
-        puts manager_type[0]
           respond_to do |format|
             format.js { render :js => "changeText(\"#{select_manager.manager_name}\",\"#{select_manager.queue}\", \"#{select_manager.host}\", \"#{select_manager.port}\", \"#{select_manager.user}\", \"#{select_manager.password}\", \"#{manager_type[0]}\");" }
           end
@@ -130,12 +132,16 @@ class XmlSenderController < ApplicationController
     end
   end
   def put_xml
+    response_ajax("<h5>Не заполнены параметры:</h5>#{get_empty_values(params)}") and return if !get_empty_values(params).empty?
+    response_ajax("Не выбрана XML!") and return if params[:xml][:select_xml_name].nil?
     select_xml = Xml.find(params[:xml][:select_xml_name])
     respond_to do |format|
       format.js { render :js => "updateXml('#{select_xml.xml_text.inspect}', '#{select_xml.xml_name}', '#{select_xml.category.category_name}', '#{select_xml.xml_description.inspect}', '#{select_xml.private}', '#{select_xml.user.email}')" }
     end
   end
   def get_message
+    response_ajax("Не заполнены параметры:#{get_empty_values(params)}") and return if !get_empty_values(params).empty?
+    begin
     client = Stomp::Client.new(
         params[:mq_attributes_in][:user_in],
         params[:mq_attributes_in][:password_in],
@@ -145,20 +151,17 @@ class XmlSenderController < ApplicationController
     inputqueue = params[:mq_attributes_in][:queue_in]
     client.subscribe(inputqueue){|msg| message << msg.body.to_s}
     client.join(1)
-    client.close
-    puts message.first
+    response_ajax("Сообщения отсутствуют") and return if message.empty?
     respond_to do |format|
       format.js { render :js => "updateInputXml('#{message.inspect}')" }
     end
-  end
-  def response_ajax(text, time = 2000)
-    respond_to do |format|
-      format.js {render :js => "open_modal(#{text.inspect}, #{time.inspect});"}
+    rescue Exception => msg
+      response_ajax("Случилось непредвиденное:<br/> #{msg.message}")
+    ensure
+      client.close if !client.nil?
     end
   end
 end
-
-
 
 private
 

@@ -31,17 +31,10 @@
                 <%= f.input :password, :label => 'Пароль пользователя', :required => false , input_html: {value: 'admin'}, placeholder: 'Например: password' %>
                 </div>
             <div class="col-sm-9 placeholder">
-              <%= f.input :xml, as: :text, :label => false, :required => false, input_html: { id: 'xml_text_field', class: 'form-control', :style=> 'height: 500px; white-space: nowrap', placeholder: 'Место для XML:)' } %>
+              <%= f.input :xml, as: :text, :label => false, :required => false, input_html: { id: 'xml_text_field', class: 'form-control context-menu-xml', :style=> 'height: 500px; white-space: nowrap', placeholder: 'Место для исходящей XML' } %>
               <%= f.input :xsd, as: :file, :label => false, :required => false, class: 'btn btn-primary'%>
               <%= f.button :submit, 'Отправить', class: 'btn btn-primary'%>
               <% end %>
-              <div class="options">
-                <a>Опции:</a><br>
-                <button onclick="Base64('decode')", class='btn btn-primary'>Decode64</button>
-                <button onclick="Base64('encode')", class='btn btn-primary'>Encode64</button>
-                <button onclick="Base64('uuid')", class='btn btn-primary'>Сгенерировать ID</button>
-              </div>
-              <br>
             </div>
           </div>
          </div>
@@ -62,7 +55,7 @@
                 <%= f.input :password_in, :label => 'Пароль пользователя', :required => false , input_html: {value: 'admin'}, placeholder: 'Например: password' %>
                 </div>
                 <div class="col-sm-9 placeholder">
-                  <%= f.input :xml_in, as: :text, :label => false, :required => false, input_html: { id: 'xml_text_in_field', class: 'form-control', :style=> 'height: 500px; white-space: nowrap', placeholder: 'Место для входящей XML:)' } %>
+                  <%= f.input :xml_in, as: :text, :label => false, :required => false, input_html: { id: 'xml_text_in_field', class: 'form-control', :style=> 'height: 500px; white-space: nowrap', placeholder: 'Место для входящей XML' } %>
                   <%= f.button :submit, 'Получить сообщение', class: 'btn btn-primary'%>
               <% end %>
               </div>
@@ -100,6 +93,5 @@
       <% end %>
       </div>
     <% end %>
-    <%= link_to "Wa", '#', :onclick => "open_modal(1000)" %>
     <%= render 'layouts/modal_xml_sender' %>
   </div>

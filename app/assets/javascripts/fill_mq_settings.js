@@ -14,12 +14,12 @@ function changeText(name, host, port, user, password)
     function send_alert(message) {
         alert(message);
     }
-    function open_modal() {
-        text = "ПРоверка текста"
+    function open_modal(text, time) {
         $('#modal-text').html(text);
         $('#exampleModal').modal({
             keyboard: true,
         })
+        setTimeout(function() {$('#exampleModal').modal('hide');}, time);
     }
 
     function get_manager_form_data() {

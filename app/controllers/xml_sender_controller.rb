@@ -112,7 +112,7 @@ class XmlSenderController < ApplicationController
   end
 
   def manager_choise
-    response_ajax and return if params[:manager][:manager_name].empty?
+    response_ajax('Не выбраны настройки MQ!') and return if params[:manager][:manager_name].empty?
     manager_type = ["in", "out"]
     if (params[:manager]).present?
     select_manager = QueueManager.find_by_manager_name(params[:manager][:manager_name])
@@ -151,9 +151,9 @@ class XmlSenderController < ApplicationController
       format.js { render :js => "updateInputXml('#{message.inspect}')" }
     end
   end
-  def response_ajax
+  def response_ajax(text, time = 2000)
     respond_to do |format|
-      format.js {render :js => "open_modal('Не выбрана настройка менеджера очередей!', '2000');"}
+      format.js {render :js => "open_modal(#{text.inspect}, #{time.inspect});"}
     end
   end
 end

@@ -9,9 +9,18 @@ default: &default
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
   timeout: 5000
 
+#development:
+#      adapter: jdbc
+#      driver: oracle.jdbc.OracleDriver
+#      url: jdbc:oracle:thin:@vm-corint:1521:corint
+#      username: ruby
+#      password: ruby
+
 development:
       adapter: oracle_enhanced
-      database: //vm-corint:1521/corint.bss.lan
+      host: vm-corint
+      port: 1521
+      database: corint
       username: ruby
       password: ruby
 

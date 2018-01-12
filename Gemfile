@@ -9,7 +9,7 @@ end
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 5.1.4'
 # Use sqlite3 as the database for Active Record
-gem 'sqlite3'
+#gem 'sqlite3'
 # Use Puma as the app server
 gem 'puma', '~> 3.7'
 # Use SCSS for stylesheets
@@ -40,7 +40,6 @@ end
 
 group :development do
   # Access an IRB console on exception pages or by using <%= console %> anywhere in the code.
-  gem 'web-console', '>= 3.3.0'
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
@@ -53,7 +52,7 @@ group :test do
   gem 'capybara'
 end
 gem 'stomp'
-gem 'ruby-oci8'
+#gem 'ruby-oci8'
 gem 'activerecord-oracle_enhanced-adapter'
 gem 'simple_form'
 gem 'rspec-rails', '3.7.2'
@@ -64,3 +63,4 @@ gem 'ffi', :platforms => [:mswin, :mingw]
 gem 'nokogiri'
 gem 'jquery_context_menu-rails'
 gem 'bcrypt'
+gem 'shutup'

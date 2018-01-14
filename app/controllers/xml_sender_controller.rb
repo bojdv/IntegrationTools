@@ -66,7 +66,8 @@ class XmlSenderController < ApplicationController
     end
   end
   def crud_mq_settings
-    response_ajax("<h5>Не заполнены параметры:</h5>#{get_empty_values(params)}") and return if !get_empty_values(params).empty?
+    a = params.require(:form_elements).permit(:manager_name, :queue_out, :host, :port, :user, :password, :manager_type, :amq_protocol) if params[:form_elements].has_value?('Active MQ')
+    response_ajax("<h5>Не заполнены параметры:</h5>#{get_empty_values(a)}") and return if !get_empty_values(a).empty?
     if (params[:form_elements][:mode]) == 'new'
       new_settings = QueueManager.new(settings_params)
       if new_settings.save
@@ -92,27 +93,9 @@ class XmlSenderController < ApplicationController
          end
     end
   end
+
   def send_to_queue
-    begin
-    response_ajax("<h5>Не заполнены параметры:</h5>#{get_empty_values(params)}") and return if !get_empty_values(params).empty?
-    if (params[:mq_attributes][:xsd]).present?
-      xsd = Nokogiri::XML::Schema(params[:mq_attributes][:xsd])
-      xmlt = Nokogiri::XML(params[:mq_attributes][:xml])
-      result = xsd.validate(xmlt)
-      response_ajax("#{result.join('<br/>')}", 10000) and return if result.any?
-    end
-    client = Stomp::Client.new(
-        params[:mq_attributes][:user],
-        params[:mq_attributes][:password],
-        params[:mq_attributes][:host],
-        params[:mq_attributes][:port])
-    client.publish("/queue/#{params[:mq_attributes][:queue]}", params[:mq_attributes][:xml]) #Кидаем запрос в очередь
-    response_ajax('Отправили сообщение', '1500')
-    rescue Exception => msg
-    response_ajax("Случилось непредвиденное: #{msg.class} <br/> #{msg.message}")
-    ensure
-    client.close if !client.nil?
-    end
+    send_to_amq_openwire
   end
 
   def manager_choise
@@ -121,7 +104,7 @@ class XmlSenderController < ApplicationController
     if (params[:manager]).present?
     select_manager = QueueManager.find_by_manager_name(params[:manager][:manager_name])
     respond_to do |format|
-      format.js { render :js => "changeText(\"#{select_manager.manager_name}\",\"#{select_manager.queue}\", \"#{select_manager.host}\", \"#{select_manager.port}\", \"#{select_manager.user}\", \"#{select_manager.password}\", \"#{manager_type[1]}\");" }
+      format.js { render :js => "changeText(\"#{select_manager.manager_name}\",\"#{select_manager.queue_out}\", \"#{select_manager.host}\", \"#{select_manager.port}\", \"#{select_manager.user}\", \"#{select_manager.password}\", \"#{manager_type[1]}\");" }
       end
     else if (params[:manager_in]).present?
         select_manager = QueueManager.find_by_manager_name(params[:manager_in][:manager_name_in])
@@ -175,5 +158,5 @@ def new_category_params
   params.require(:form_elements).permit(:category_name, :product_id).merge(:user_id => current_user.id)
 end
 def settings_params
-  params.require(:form_elements).permit(:manager_name, :queue, :host, :port, :user, :password)
+  params.require(:form_elements).permit(:manager_name, :queue_out, :host, :port, :user, :password, :manager_type, :amq_protocol, :channel_manager, :channel).merge(:user_id => current_user.id)
 end

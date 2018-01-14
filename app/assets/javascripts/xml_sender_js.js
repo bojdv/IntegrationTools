@@ -37,13 +37,21 @@ function changeText(name, host, port, user, password)
         form_login = document.getElementById("mq_attributes_user").value;
         form_password = document.getElementById("mq_attributes_password").value;
         form_output_queue = document.getElementById("mq_attributes_queue").value;
+        form_manager_type = document.getElementById("mq_attributes_manager_type").value;
+        form_amq_protocol = document.getElementById("mq_attributes_protocol").value;
+        form_channel_manager = document.getElementById("mq_attributes_channel_manager").value;
+        form_channel = document.getElementById("mq_attributes_channel").value;
         return {
             form_settings_name: form_settings_name,
             form_host: form_host,
             form_port: form_port,
             form_login: form_login,
             form_password: form_password,
-            form_output_queue: form_output_queue
+            form_output_queue: form_output_queue,
+            form_manager_type: form_manager_type,
+            form_amq_protocol: form_amq_protocol,
+            form_channel_manager: form_channel_manager,
+            form_channel: form_channel
         };
     }
 
@@ -212,20 +220,37 @@ function changeText(name, host, port, user, password)
             selector: '.context-menu-manager-settings',
             callback: function (key, options) {
                 form_elements = get_manager_form_data();
+                elements = [
+                    form_elements.form_settings_name,
+                    form_elements.form_output_queue,
+                    form_elements.form_host,
+                    form_elements.form_port,
+                    form_elements.form_login,
+                    form_elements.form_password,
+                    form_elements.form_manager_type,
+                    form_elements.form_amq_protocol,
+                    form_elements.form_channel_manager,
+                    form_elements.form_channel,
+                    key
+                    ]
                 $.ajax({
                   url: "xml_sender/crud_mq_settings",
                   type: "POST",
                   dataType: "script",
                   data: {
                   form_elements: {
-                       manager_name: form_elements.form_settings_name,
-                       queue: form_elements.form_output_queue,
-                       host: form_elements.form_host,
-                       port: form_elements.form_port,
-                       user: form_elements.form_login,
-                       password: form_elements.form_password,
-                       mode: key
-                   }
+                      manager_name: form_elements.form_settings_name,
+                      queue_out: form_elements.form_output_queue,
+                      host: form_elements.form_host,
+                      port: form_elements.form_port,
+                      user: form_elements.form_login,
+                      password: form_elements.form_password,
+                      manager_type: form_elements.form_manager_type,
+                      amq_protocol: form_elements.form_amq_protocol,
+                      channel_manager: form_elements.form_channel_manager,
+                      channel: form_elements.form_channel,
+                      mode: key
+                   },
                   },
                  });
 

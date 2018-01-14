@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180112051418) do
+ActiveRecord::Schema.define(version: 20180114143639) do
 
   create_table "categories", force: :cascade do |t|
     t.integer "product_id", limit: 10, precision: 10
@@ -30,13 +30,19 @@ ActiveRecord::Schema.define(version: 20180112051418) do
 
   create_table "queue_managers", force: :cascade do |t|
     t.string "manager_name"
-    t.string "queue"
+    t.string "queue_out"
     t.string "host"
     t.string "port"
     t.string "user"
     t.string "password"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.string "manager_type"
+    t.string "amq_protocol"
+    t.string "channel_manager"
+    t.string "channel"
+    t.string "queue_in"
+    t.integer "user_id", limit: 10, precision: 10
   end
 
   create_table "users", force: :cascade do |t|

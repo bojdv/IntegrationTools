@@ -7,8 +7,26 @@ jQuery ->
   $('#xml_select_xml_name').parent().hide()
   $('#xml_select_category_name').parent().hide()
   $('#xml_description').hide()
+  $('#wmq_fields').hide()
+  $("#autorization").hide()
   xml = $('#xml_select_xml_name').html()
   category = $('#xml_select_category_name').html()
+
+  $("#mq_attributes_manager_type").change ->
+    if $(this).val() is "Active MQ"
+      $("#protocol_select").show()
+      $('#wmq_fields').hide()
+    else
+      $("#protocol_select").hide()
+      $('#wmq_fields').show()
+
+  $("#mq_attributes_autorization").change ->
+    if ($(this).is(':checked'))
+      $("#autorization").show()
+      $('#autorization').show()
+    else
+      $("#autorization").hide()
+      $('#autorization').hide()
 
   $('#xml_product_name').change ->
     product = $('#xml_product_name :selected').text()

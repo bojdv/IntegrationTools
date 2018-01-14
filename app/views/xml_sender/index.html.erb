@@ -24,11 +24,23 @@
 
               <%= simple_form_for :mq_attributes, remote: true, url: xml_sender_send_to_queue_path, html: {class: 'form-group' } do |f| %>
                 <%= f.input :settings_name, :label => 'Название настройки', :required => false, placeholder: 'Заполнить при сохранении' %>
+                <%= f.input :manager_type, label: 'Выберите менеджер очередей', required: false, collection: ['Active MQ', 'WebSphere MQ'], selected: :collection[0] %>
+                <div id="protocol_select">
+                  <%= f.input :protocol, label: 'Выберите протокол', required: false, collection: ['OpenWire', 'STOMP'], selected: :collection[0]%>
+                </div>
+                <div id="wmq_fields">
+                  <%= f.input :channel_manager, label: 'Менеджер канала', required: false%>
+                  <%= f.input :channel, label: 'Канал', required: false, placeholder: 'Канал соединения с сервером'%>
+                </div>
                 <%= f.input :queue, :label => 'Куда отправить', :required => false, placeholder: 'Например: test_in' %>
                 <%= f.input :host, :label => 'Хост', :required => false , placeholder: 'Например: localhost' %>
                 <%= f.input :port, :label => 'Порт', :required => false , placeholder: 'STOMP порт, обычно: 61613' %>
-                <%= f.input :user, :label => 'Имя пользователя', :required => false , placeholder: 'Например: admin' %>
-                <%= f.input :password, :label => 'Пароль пользователя', :required => false , input_html: {value: 'admin'}, placeholder: 'Например: password' %>
+                <%= f.input :correlation_id, label: 'Correlation ID', :required => false , input_html: { value: SecureRandom.uuid } %>
+                <%= f.input :autorization, as: :boolean, :label => 'Нужна авторизация?', checked_value: true, unchecked_value: false, input_html: {checked: false} %>
+                <div id="autorization">
+                <%= f.input :user, :label => 'Имя пользователя', :required => false , placeholder: 'Например: admin', disabled: true %>
+                <%= f.input :password, :label => 'Пароль пользователя', :required => false , input_html: {value: 'admin'}, placeholder: 'Например: password', disabled: true %>
+                </div>
                 </div>
             <div class="col-sm-9 placeholder">
               <%= f.input :xml, as: :text, :label => false, :required => false, input_html: { id: 'xml_text_field', class: 'form-control context-menu-xml', :style=> 'height: 600px; white-space: nowrap', placeholder: 'Место для исходящей XML' } %>

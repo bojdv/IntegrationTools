@@ -173,6 +173,16 @@ class XmlSenderController < ApplicationController
       client.close if !client.nil?
     end
   end
+  def tester
+    xsd = Nokogiri::XML::Schema(params[:tests][:xsds])
+    xmlt = Nokogiri::XML(params[:tests][:xml_hidden])
+    result = xsd.validate(xmlt)
+    puts result
+    #response_ajax("#{result.join('<br/>')}", 10000) and return if result.any?
+    respond_to do |format|
+      format.js { render :html => "open_modal('ddsdsd');" }
+    end
+  end
 end
 
 private

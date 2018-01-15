@@ -265,13 +265,27 @@ $(function () {
             if (key == 'decode' || key == 'encode' || key == 'uuid') { Base64(key)}
             if (key == 'clear') {$('#xml_text_field').val('');}
             if (key == 'save_xml') {SaveXml()}
+            if (key == 'test') {test2()}
         },
         items: {
             "decode": {name: "Декодировать Base64"},
             "encode": {name: "Кодировать в Base64"},
             "uuid": {name: "Сгенерировать ID"},
             "save_xml": {name: "Сохранить XML в файл"},
-            "clear": {name: "Очистить XML"}
+            "clear": {name: "Очистить XML"},
+            "test": {name: "TEST"},
         }
     });
 });
+function test() {
+    $("#form-send").submit();
+}
+function test2() {
+    copyFormValue();
+    $('#tests_xsds').trigger('click');
+}
+function copyFormValue(){
+    visibleElement = document.getElementById("xml_text_field");
+    hiddenElement =  document.getElementById("hidden_xml_text_field");
+    hiddenElement.value = visibleElement.value;
+}

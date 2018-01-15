@@ -45,7 +45,7 @@
                 <%= f.input :visible_all, as: :boolean, :label => 'Видна всем', checked_value: true, unchecked_value: false, input_html: {checked: false} %>
                 </div>
             <div class="col-sm-9 placeholder">
-              <%= f.input :xml, as: :text, :label => false, :required => false, input_html: { id: 'xml_text_field', class: 'form-control context-menu-xml', :style=> 'height: 600px; white-space: nowrap', placeholder: 'Место для исходящей XML' } %>
+              <%= f.input :xml, as: :text, :label => false, :required => false, input_html: {id: 'xml_text_field', class: 'form-control context-menu-xml', :style=> 'height: 600px; white-space: nowrap', placeholder: 'Место для исходящей XML' } %>
               <%= f.input :xsd, as: :file, :label => false, :required => false, class: 'btn btn-primary'%>
               <%= f.button :submit, 'Отправить', class: 'btn btn-primary'%>
               <% end %>
@@ -122,4 +122,14 @@
       </div>
     <% end %>
     <%= render 'layouts/modal_xml_sender' %>
+<!--
+    <input type="file" id="fileElem" style="display:none" onchange="upload(this.files)">
+    <label for="fileElem">Select some files</label>
+
+    -->
+    <%= simple_form_for :tests, :remote => true, url: 'xml_sender/tester', data: {type: :js}, html: { id: 'form-send' }, :authenticity_token => true do |f| %>
+      <%= f.input :xml_hidden, as: :text, :label => false, :required => false, input_html: { id: 'hidden_xml_text_field', :style=> 'display:none' } %>
+      <%= f.input :xsds, as: :file, :label => false, :required => false, class: 'btn btn-primary', id: 'upload', :input_html => { :onchange => "test()", style: "display:none", accept: ".xsd"}%>
+     <% end %>
+
   </div>

@@ -5,45 +5,48 @@ module XmlSenderHelper
     end
   end
   def get_empty_values hash
-    a = []
-    white_list = [
-        'autor',
-        'xml_description',
-        'category_name',
-        'select_category_name',
-        'xml_name',
-        'settings_name',
-        'user',
-        'password',
-        'xml_in',
-        'xsd',
-        'queue_out',
-        '@tempfile']
+    @empty_filds = []
+    # white_list = [
+    #     'autor',
+    #     'xml_description',
+    #     'category_name',
+    #     'select_category_name',
+    #     'xml_name',
+    #     'settings_name',
+    #     'user',
+    #     'password',
+    #     'xml_in',
+    #     'xsd',
+    #     'queue_out',
+    #     '@tempfile']
     #hash.reject do |k,v|
       #if v.is_a?(Hash)
     hash.reject do |key,value|
-          if !white_list.include?(key)
-            a << key if value.empty?
-          end
+          #if !white_list.include?(key)
+            @empty_filds << key if value.empty?
+          #end
         end
       #end
     #end
-    puts a
-    a.each_index do |index|
-      a[index] = 'Очередь' if ['queue','queue_in'].include?(a[index])
-      a[index] = 'Порт' if ['port','port_in'].include?(a[index])
-      a[index] = 'Хост' if ['host','host_in'].include?(a[index])
-      #a[index] = 'Пользователь' if ['user','user_in'].include?(a[index])
-      # a#[index] = 'Пароль' if ['password','password_in'].include?(a[index])
-      a[index] = 'XML сообщение' if a[index] == 'xml'
-      a[index] = 'Название настройки' if ['manager_name'].include?(a[index])
-      a[index] = 'Название продукта' if ['product_name'].include?(a[index])
-      a[index] = 'Название XML' if ['select_xml_name'].include?(a[index])
+    @empty_filds.each_index do |index|
+      @empty_filds[index] = 'Очередь' if ['queue', 'queue_in'].include?(@empty_filds[index])
+      @empty_filds[index] = 'Порт' if ['port', 'port_in'].include?(@empty_filds[index])
+      @empty_filds[index] = 'Хост' if ['host', 'host_in'].include?(@empty_filds[index])
+      @empty_filds[index] = 'Пользователь' if ['user','user_in'].include?(@empty_filds[index])
+      @empty_filds[index] = 'Пароль' if ['password','password_in'].include?(@empty_filds[index])
+      @empty_filds[index] = 'XML сообщение' if @empty_filds[index] == 'xml'
+      @empty_filds[index] = 'Название настройки' if ['manager_name'].include?(@empty_filds[index])
+      @empty_filds[index] = 'Название продукта' if ['product_name'].include?(@empty_filds[index])
+      @empty_filds[index] = 'Название XML' if ['select_xml_name'].include?(@empty_filds[index])
+      @empty_filds[index] = 'Название канала' if ['channel', 'channel_in'].include?(@empty_filds[index])
+      @empty_filds[index] = 'Название менеджера очередей' if ['channel_manager', 'channel_manager_in'].include?(@empty_filds[index])
+      @empty_filds[index] = 'Название очереди' if ['queue_out', 'queue_in'].include?(@empty_filds[index])
     end
-    a.map! {|value| '<br/>'+value}
-    return a.join
+    @empty_filds.map! {|value| '<br/>'+value}
+    return @empty_filds
   end
   def send_to_amq_openwire
+    puts 'Sending message to AMQ (OpenWire)'
     $CLASSPATH << "lib/activemq-all-5.11.1.jar"
     $CLASSPATH << "lib/log4j-1.2.17.jar"
     java_import 'org.apache.activemq.ActiveMQConnectionFactory'
@@ -83,14 +86,8 @@ module XmlSenderHelper
     end
   end
   def send_to_amq_stomp
+    puts 'Sending message to AMQ (STOMP)'
     begin
-      response_ajax("<h5>Не заполнены параметры:</h5>#{get_empty_values(params)}") and return if !get_empty_values(params).empty?
-      if (params[:mq_attributes][:xsd]).present?
-        xsd = Nokogiri::XML::Schema(params[:mq_attributes][:xsd])
-        xmlt = Nokogiri::XML(params[:mq_attributes][:xml])
-        result = xsd.validate(xmlt)
-        response_ajax("#{result.join('<br/>')}", 10000) and return if result.any?
-      end
       client = Stomp::Client.new(
           params[:mq_attributes][:user],
           params[:mq_attributes][:password],
@@ -106,6 +103,7 @@ module XmlSenderHelper
   end
 
   def send_to_wmq
+    puts 'Sending message to WMQ'
     $CLASSPATH << "lib/javax.jms-3.1.2.2.jar"
     $CLASSPATH << "lib/com.ibm.mqjms.jar"
     $CLASSPATH << "lib/com.ibm.mq.jar"

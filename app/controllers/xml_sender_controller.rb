@@ -1,6 +1,7 @@
 class XmlSenderController < ApplicationController
   def index
-    @qm = QueueManager.pluck(:manager_name)
+
+    logged_in? ? @qm = QueueManager.where(user_id: current_user.id).pluck(:manager_name) : @qm = QueueManager.pluck(:manager_name)
     @product = Product.all
     @category = Category.all
   end
@@ -65,65 +66,93 @@ class XmlSenderController < ApplicationController
       end
     end
   end
+  # Создание, редактирование, удаление настроек менеджера очередей
   def crud_mq_settings
-    a = params.require(:form_elements).permit(:manager_name, :queue_out, :host, :port, :user, :password, :manager_type, :amq_protocol) if params[:form_elements].has_value?('Active MQ')
-    response_ajax("<h5>Не заполнены параметры:</h5>#{get_empty_values(a)}") and return if !get_empty_values(a).empty?
-    if (params[:form_elements][:mode]) == 'new'
-      new_settings = QueueManager.new(settings_params)
+    begin
+    if (params[:form_elements][:mode]) == 'new' # Создание настройки
+      response_ajax("<h5>Не заполнены параметры:</h5>#{@empty_filds.join}") and return if !get_empty_values(manager_params).empty?
+      new_settings = QueueManager.new(manager_params)
       if new_settings.save
-        respond_to do |format|
-          format.js{ render :js => "send_alert('Сохранили настройки в базу')" }
-        end
+        response_ajax("Создали настройки для #{manager_params[:manager_name]}", 1500) and return
       else
-        respond_to do |format|
-          format.js{ render :js => "send_alert(#{new_settings.errors.full_messages.inspect})" }
-        end
+        response_ajax("#{new_settings.errors.full_messages.inspect}") and return
       end
-    else if (params[:form_elements][:mode]) == 'delete'
+    else if (params[:form_elements][:mode]) == 'edit' # Редактирование настройки
+           response_ajax("<h5>Не заполнены параметры:</h5>#{@empty_filds.join}") and return if !get_empty_values(manager_params).empty?
+           edit_manager = QueueManager.find_by_manager_name(manager_params[:manager_name])
+           puts manager_params
+           if edit_manager.update_attributes(manager_params)
+             response_ajax("Отредактировали настройки для #{manager_params[:manager_name]}", 1500) and return
+           else
+             response_ajax("#{new_settings.errors.full_messages.inspect}") and return
+           end
+    else if (params[:form_elements][:mode]) == 'delete' # Удаление настройки
+           response_ajax("Не выбрана настройка для удаления!") and return if params[:form_elements][:manager_name].empty?
            delete_setting = QueueManager.find_by_manager_name(params[:form_elements][:manager_name])
            if delete_setting.destroy
-             respond_to do |format|
-               format.js{ render :js => "send_alert('Удалили настройку #{params[:form_elements][:manager_name]}!')" }
-             end
+             response_ajax("Удалили настройку #{manager_params[:manager_name]}", 1500) and return
            else
-             respond_to do |format|
-               format.js{ render :js => "send_alert(#{delete_setting.errors.full_messages.inspect})" }
-             end
+             response_ajax("#{new_settings.errors.full_messages.inspect}") and return
            end
          end
+       end
+    end
+    rescue Exception => msg
+      response_ajax("Случилось непредвиденное:<br/> #{msg.message}", 5000)
+    ensure
+      puts 'ensure'
     end
   end
 
   def send_to_queue
-    send_to_amq_openwire
+    response_ajax("<h5>Не заполнены параметры:</h5>#{@empty_filds.join}") and return if !get_empty_values(send_to_queue_params).empty?
+    if (params[:mq_attributes][:xsd]).present?
+      xsd = Nokogiri::XML::Schema(params[:mq_attributes][:xsd])
+      xmlt = Nokogiri::XML(params[:mq_attributes][:xml])
+      result = xsd.validate(xmlt)
+      response_ajax("#{result.join('<br/>')}", 10000) and return if result.any?
+    end
+    if (params[:mq_attributes][:manager_type]) == 'Active MQ'
+      if (params[:mq_attributes][:protocol]) == 'OpenWire'
+        send_to_amq_openwire
+      else
+        send_to_amq_stomp
+      end
+    else
+      send_to_wmq
+    end
   end
 
-  def manager_choise
-    response_ajax("Не выбраны настройки MQ из списка") and return if !get_empty_values(params).empty?
-    manager_type = ["in", "out"]
-    if (params[:manager]).present?
-    select_manager = QueueManager.find_by_manager_name(params[:manager][:manager_name])
-    respond_to do |format|
-      format.js { render :js => "changeText(\"#{select_manager.manager_name}\",\"#{select_manager.queue_out}\", \"#{select_manager.host}\", \"#{select_manager.port}\", \"#{select_manager.user}\", \"#{select_manager.password}\", \"#{manager_type[1]}\");" }
+  def manager_choise # Заполнение параметров менеджера очередей
+    manager_in_out = ["in", "out"]
+    if (params[:manager]).present? # Исходящие параметры
+      new_params = params.require(:manager).permit(:manager_name)
+      response_ajax("Не выбраны настройки MQ из списка") and return if !get_empty_values(new_params).empty?
+      select_manager = QueueManager.find_by_manager_name(params[:manager][:manager_name])
+      respond_to do |format|
+        format.js { render :js => "changeText(\"#{select_manager.manager_name}\",\"#{select_manager.queue_out}\", \"#{select_manager.host}\", \"#{select_manager.port}\", \"#{select_manager.user}\", \"#{select_manager.password}\", \"#{select_manager.manager_type}\", \"#{select_manager.channel_manager}\", \"#{select_manager.channel}\", \"#{select_manager.amq_protocol}\", \"#{select_manager.visible_all}\", \"#{manager_in_out[1]}\");" }
       end
-    else if (params[:manager_in]).present?
-        select_manager = QueueManager.find_by_manager_name(params[:manager_in][:manager_name_in])
-          respond_to do |format|
-            format.js { render :js => "changeText(\"#{select_manager.manager_name}\",\"#{select_manager.queue}\", \"#{select_manager.host}\", \"#{select_manager.port}\", \"#{select_manager.user}\", \"#{select_manager.password}\", \"#{manager_type[0]}\");" }
+    else if (params[:manager_in]).present? # Входящие параметры
+           new_params = params.require(:manager_in).permit(:manager_name_in)
+           response_ajax("Не выбраны настройки MQ из списка") and return if !get_empty_values(new_params).empty?
+           select_manager = QueueManager.find_by_manager_name(params[:manager_in][:manager_name_in])
+           respond_to do |format|
+             format.js { render :js => "changeText(\"#{select_manager.manager_name}\",\"#{select_manager.queue_in}\", \"#{select_manager.host}\", \"#{select_manager.port}\", \"#{select_manager.user}\", \"#{select_manager.password}\", \"#{select_manager.manager_type}\", \"#{select_manager.channel_manager}\", \"#{select_manager.channel}\", \"#{select_manager.amq_protocol}\", \"#{select_manager.visible_all}\",\"#{manager_in_out[0]}\");" }
           end
      end
     end
   end
   def put_xml
-    response_ajax("<h5>Не заполнены параметры:</h5>#{get_empty_values(params)}") and return if !get_empty_values(params).empty?
+    new_params = params.require(:xml).permit(:product_name, :select_xml_name)
+    response_ajax("<h5>Не заполнены параметры:</h5>#{@empty_filds.join}") and return if !get_empty_values(new_params).empty?
     response_ajax("Не выбрана XML!") and return if params[:xml][:select_xml_name].nil?
     select_xml = Xml.find(params[:xml][:select_xml_name])
     respond_to do |format|
       format.js { render :js => "updateXml('#{select_xml.xml_text.inspect}', '#{select_xml.xml_name}', '#{select_xml.category.category_name}', '#{select_xml.xml_description.inspect}', '#{select_xml.private}', '#{select_xml.user.email}')" }
     end
   end
-  def get_message
-    response_ajax("Не заполнены параметры:#{get_empty_values(params)}") and return if !get_empty_values(params).empty?
+  def get_message # Получение сообщение из очереди
+    response_ajax("Не заполнены параметры:#{@empty_filds.join}") and return if !get_empty_values(receive_queue_params).empty?
     begin
     client = Stomp::Client.new(
         params[:mq_attributes_in][:user_in],
@@ -149,14 +178,56 @@ end
 private
 
 def new_xml_params
-  params.require(:form_elements).permit(:xml_text, :category_id, :xml_name, :xml_description, :private).merge(:user_id => current_user.id)
+  params.require(:form_elements).permit(:xml_text, :category_id, :xml_name, :xml_description, :private).merge(:user_id => current_user.id.inspect)
 end
 def save_xml_params
   params.require(:form_elements).permit(:xml_text, :category_id, :xml_name, :id, :xml_description, :private)
 end
 def new_category_params
-  params.require(:form_elements).permit(:category_name, :product_id).merge(:user_id => current_user.id)
+  params.require(:form_elements).permit(:category_name, :product_id).merge(:user_id => current_user.id.inspect)
 end
-def settings_params
-  params.require(:form_elements).permit(:manager_name, :queue_out, :host, :port, :user, :password, :manager_type, :amq_protocol, :channel_manager, :channel).merge(:user_id => current_user.id)
+def manager_params
+  if params[:form_elements].has_value?('Active MQ')
+    if params[:form_elements][:autorization] == 'true'
+      params.require(:form_elements).permit(:manager_name, :queue_out, :host, :port, :user, :password, :manager_type, :amq_protocol, :visible_all).merge(:user_id => current_user.id.inspect)
+    else
+      params.require(:form_elements).permit(:manager_name, :queue_out, :host, :port, :manager_type, :amq_protocol, :visible_all).merge(:user_id => current_user.id.inspect)
+    end
+  else
+    if params[:form_elements][:autorization] == 'true'
+      params.require(:form_elements).permit(:manager_name, :queue_out, :host, :port, :user, :password, :manager_type, :channel, :channel_manager, :visible_all).merge(:user_id => current_user.id.inspect)
+    else
+      params.require(:form_elements).permit(:manager_name, :queue_out, :host, :port, :manager_type, :channel, :channel_manager, :visible_all).merge(:user_id => current_user.id.inspect)
+    end
+  end
+end
+def send_to_queue_params
+  if params[:mq_attributes].has_value?('Active MQ')
+    if params[:mq_attributes][:autorization] == 'true'
+      params.require(:mq_attributes).permit(:manager_type, :protocol, :amq_protocol, :queue, :host, :port, :correlation_id, :xml, :user, :password)
+    else
+      params.require(:mq_attributes).permit(:manager_type, :protocol, :amq_protocol, :queue, :host, :port, :correlation_id, :xml)
+    end
+  else
+    if params[:mq_attributes][:autorization] == 'true'
+      params.require(:mq_attributes).permit(:manager_type, :protocol, :queue, :host, :port, :correlation_id, :xml, :channel, :channel_manager, :user, :password)
+    else
+      params.require(:mq_attributes).permit(:manager_type, :protocol, :queue, :host, :port, :correlation_id, :xml, :channel, :channel_manager)
+    end
+  end
+end
+def receive_queue_params
+  if params[:mq_attributes_in].has_value?('Active MQ')
+    if params[:mq_attributes_in][:autorization_in] == 'true'
+      params.require(:mq_attributes_in).permit(:manager_type_in, :protocol_in, :amq_protocol_in, :queue_in, :host_in, :port_in, :user_in, :password_in)
+    else
+      params.require(:mq_attributes_in).permit(:manager_type_in, :protocol_in, :amq_protocol_in, :queue_in, :host_in, :port_in)
+    end
+  else
+    if params[:mq_attributes_in][:autorization] == 'true'
+      params.require(:mq_attributes_in).permit(:manager_type_in, :protocol_in, :queue_in, :host_in, :port_in, :channel_in, :channel_manager_in, :user_in, :password_in)
+    else
+      params.require(:mq_attributes_in).permit(:manager_type_in, :protocol_in, :queue_in, :host_in, :port_in, :channel_in, :channel_manager_in)
+    end
+  end
 end

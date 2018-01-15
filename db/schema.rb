@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180114143639) do
+ActiveRecord::Schema.define(version: 20180115114208) do
 
   create_table "categories", force: :cascade do |t|
     t.integer "product_id", limit: 10, precision: 10
@@ -43,6 +43,7 @@ ActiveRecord::Schema.define(version: 20180114143639) do
     t.string "channel"
     t.string "queue_in"
     t.integer "user_id", limit: 10, precision: 10
+    t.boolean "visible_all", default: false
   end
 
   create_table "users", force: :cascade do |t|

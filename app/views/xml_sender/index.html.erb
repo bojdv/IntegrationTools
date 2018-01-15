@@ -10,6 +10,7 @@
           <a class="nav-link" id="input-tab" data-toggle="tab" href="#input" role="tab" aria-controls="input" aria-selected="false">Входящие сообщения</a>
         </li>
       </ul>
+      <!-- Первая вкладка -->
       <div class="tab-content" id="myTabContent">
         <div class="tab-pane fade show active" id="output" role="tabpanel" aria-labelledby="output-tab">
           <br>
@@ -34,13 +35,14 @@
                 </div>
                 <%= f.input :queue, :label => 'Куда отправить', :required => false, placeholder: 'Например: test_in' %>
                 <%= f.input :host, :label => 'Хост', :required => false , placeholder: 'Например: localhost' %>
-                <%= f.input :port, :label => 'Порт', :required => false , placeholder: 'STOMP порт, обычно: 61613' %>
+                <%= f.input :port, :label => 'Порт', :required => false %>
                 <%= f.input :correlation_id, label: 'Correlation ID', :required => false , input_html: { value: SecureRandom.uuid } %>
                 <%= f.input :autorization, as: :boolean, :label => 'Нужна авторизация?', checked_value: true, unchecked_value: false, input_html: {checked: false} %>
                 <div id="autorization">
-                <%= f.input :user, :label => 'Имя пользователя', :required => false , placeholder: 'Например: admin', disabled: true %>
-                <%= f.input :password, :label => 'Пароль пользователя', :required => false , input_html: {value: 'admin'}, placeholder: 'Например: password', disabled: true %>
+                <%= f.input :user, :label => 'Имя пользователя', :required => false , placeholder: 'Например: admin' %>
+                <%= f.input :password, :label => 'Пароль пользователя', :required => false , input_html: {value: 'admin'}, placeholder: 'Например: password' %>
                 </div>
+                <%= f.input :visible_all, as: :boolean, :label => 'Видна всем', checked_value: true, unchecked_value: false, input_html: {checked: false} %>
                 </div>
             <div class="col-sm-9 placeholder">
               <%= f.input :xml, as: :text, :label => false, :required => false, input_html: { id: 'xml_text_field', class: 'form-control context-menu-xml', :style=> 'height: 600px; white-space: nowrap', placeholder: 'Место для исходящей XML' } %>
@@ -50,6 +52,7 @@
             </div>
           </div>
          </div>
+        <!-- Вторая вкладка -->
         <div class="tab-pane fade" id="input" role="tabpanel" aria-labelledby="input-tab">
           <br>
           <div class="row">
@@ -60,11 +63,22 @@
               <% end %>
 
               <%= simple_form_for :mq_attributes_in, remote: true, url: xml_sender_get_message_path, html: {class: 'form-group' } do |f| %>
+                <%= f.input :manager_type_in, label: 'Выберите менеджер очередей', required: false, collection: ['Active MQ', 'WebSphere MQ'], selected: :collection[0] %>
+                <div id="protocol_select_in">
+                  <%= f.input :protocol_in, label: 'Выберите протокол', required: false, collection: ['OpenWire', 'STOMP'], selected: :collection[0]%>
+                </div>
+                <div id="wmq_fields_in">
+                  <%= f.input :channel_manager_in, label: 'Менеджер канала', required: false%>
+                  <%= f.input :channel_in, label: 'Канал', required: false, placeholder: 'Канал соединения с сервером'%>
+                </div>
                 <%= f.input :queue_in, :label => 'Откуда получить', :required => false, placeholder: 'Например: test_out' %>
                 <%= f.input :host_in, :label => 'Хост', :required => false , placeholder: 'Например: localhost' %>
                 <%= f.input :port_in, :label => 'Порт', :required => false , placeholder: 'STOMP порт, обычно: 61613' %>
+                <%= f.input :autorization_in, as: :boolean, :label => 'Нужна авторизация?', checked_value: true, unchecked_value: false, input_html: {checked: false} %>
+                <div id="autorization_in">
                 <%= f.input :user_in, :label => 'Имя пользователя', :required => false , placeholder: 'Например: admin' %>
                 <%= f.input :password_in, :label => 'Пароль пользователя', :required => false , input_html: {value: 'admin'}, placeholder: 'Например: password' %>
+                </div>
                 </div>
                 <div class="col-sm-9 placeholder">
                   <%= f.input :xml_in, as: :text, :label => false, :required => false, input_html: { id: 'xml_text_in_field', class: 'form-control', :style=> 'height: 600px; white-space: nowrap', placeholder: 'Место для входящей XML' } %>
@@ -76,6 +90,7 @@
       </div>
 
   </div>
+  <!-- Выбор продукта -->
   <div class="col-sm-3 placeholder" id="select_product">
 
     <%= simple_form_for :xml, :remote => true, url: 'xml_sender/put_xml', html: { class: 'form-group' } do |f| %>
@@ -91,6 +106,7 @@
         <% end %>
       </div>
       <%= f.button :submit, 'Загрузить XML', class: 'btn btn-primary'%><br>
+      <!-- Данные XML -->
       <div id="xml_description">
         <div class="<%= 'context-menu-one' if logged_in? %>">
           <%= f.input :xml_name, :label => 'Название XML', :required => false, placeholder: 'Имя XML'%>

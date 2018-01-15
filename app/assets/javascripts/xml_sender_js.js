@@ -24,6 +24,8 @@ function changeText(name, host, port, user, password)
 
     function open_modal(text, time) {
         $('#modal-text').html(text);
+        setInterval(function() {$('#modal-timer').html(time); time = time -1000;}, 1000);
+        /**var timerId = setTimeout(function tick() {$('#modal-timer').html(time); timerId = setTimeout(tick, 1000); time = time -1000}, 1000);*/
         $('#exampleModal').modal({
             keyboard: true,
         })
@@ -41,6 +43,8 @@ function changeText(name, host, port, user, password)
         form_amq_protocol = document.getElementById("mq_attributes_protocol").value;
         form_channel_manager = document.getElementById("mq_attributes_channel_manager").value;
         form_channel = document.getElementById("mq_attributes_channel").value;
+        form_autorization = document.getElementById("mq_attributes_autorization").checked;
+        form_visible_all = document.getElementById("mq_attributes_visible_all").checked;
         return {
             form_settings_name: form_settings_name,
             form_host: form_host,
@@ -51,7 +55,9 @@ function changeText(name, host, port, user, password)
             form_manager_type: form_manager_type,
             form_amq_protocol: form_amq_protocol,
             form_channel_manager: form_channel_manager,
-            form_channel: form_channel
+            form_channel: form_channel,
+            form_autorization: form_autorization,
+            form_visible_all: form_visible_all
         };
     }
 
@@ -220,19 +226,6 @@ function changeText(name, host, port, user, password)
             selector: '.context-menu-manager-settings',
             callback: function (key, options) {
                 form_elements = get_manager_form_data();
-                elements = [
-                    form_elements.form_settings_name,
-                    form_elements.form_output_queue,
-                    form_elements.form_host,
-                    form_elements.form_port,
-                    form_elements.form_login,
-                    form_elements.form_password,
-                    form_elements.form_manager_type,
-                    form_elements.form_amq_protocol,
-                    form_elements.form_channel_manager,
-                    form_elements.form_channel,
-                    key
-                    ]
                 $.ajax({
                   url: "xml_sender/crud_mq_settings",
                   type: "POST",
@@ -249,6 +242,8 @@ function changeText(name, host, port, user, password)
                       amq_protocol: form_elements.form_amq_protocol,
                       channel_manager: form_elements.form_channel_manager,
                       channel: form_elements.form_channel,
+                      autorization: form_elements.form_autorization,
+                      visible_all: form_elements.form_visible_all,
                       mode: key
                    },
                   },
@@ -256,8 +251,9 @@ function changeText(name, host, port, user, password)
 
             },
             items: {
-                "new": {name: "Сохранить настройки", icon: "edit"},
-                "delete": {name: "Удалить настройку", icon: "delete"},
+                "new": {name: "Создать новую"},
+                "edit": {name: "Отредактировать"},
+                "delete": {name: "Удалить", icon: "delete"},
             }
         });
     });

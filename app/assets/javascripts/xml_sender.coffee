@@ -145,6 +145,5 @@ jQuery ->
 @updateInputXml = (xml_text) ->
   $('#xml_text_in_field').val(xml_text.slice(1, -1))
 @updateOutputXml = (xml_text) ->
-  alert(xml_text)
   $('#xml_text_field').val(xml_text.slice(1, -1))
 

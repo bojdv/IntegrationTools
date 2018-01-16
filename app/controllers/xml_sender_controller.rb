@@ -176,7 +176,7 @@ class XmlSenderController < ApplicationController
         response_ajax("Нет xml для валидации.") and return if params[:xml].empty?
         validate(params[:xml])
       else if params[:mode] == 'pretty'
-             xml = Nokogiri::XML(params[:xml],&:noblanks)
+             xml = Nokogiri::XML(params[:xml])
              respond_to do |format|
                format.js { render :js => "updateOutputXml('#{xml.to_xml.inspect}')" }
              end

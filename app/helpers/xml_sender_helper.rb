@@ -20,13 +20,13 @@ module XmlSenderHelper
     #     'queue_out',
     #     '@tempfile']
     #hash.reject do |k,v|
-      #if v.is_a?(Hash)
+    #if v.is_a?(Hash)
     hash.reject do |key,value|
-          #if !white_list.include?(key)
-            @empty_filds << key if value.empty?
-          #end
-        end
+      #if !white_list.include?(key)
+      @empty_filds << key if value.empty?
       #end
+    end
+    #end
     #end
     @empty_filds.each_index do |index|
       @empty_filds[index] = 'Очередь' if ['queue', 'queue_in'].include?(@empty_filds[index])
@@ -122,46 +122,66 @@ module XmlSenderHelper
     java_import 'com.ibm.mq.MQMessage'
     java_import 'com.ibm.mq.jms.MQQueueConnectionFactory'
     java_import 'com.ibm.mq.jms.JMSC'
-      begin
-        puts "Setting Factory ...."
-        factory = MQQueueConnectionFactory.new
-        factory.setHostName("kc-14-52")
+    begin
+      puts "Setting Factory ...."
+      factory = MQQueueConnectionFactory.new
+      factory.setHostName("kc-14-52")
 
-        factory.setQueueManager("local")
-        factory.setChannel("local.server")
-        factory.setPort(1414)
-        factory.setClientID('mqm')
-        factory.setTransportType(JMSC.MQJMS_TP_CLIENT_MQ_TCPIP)
+      factory.setQueueManager("local")
+      factory.setChannel("local.server")
+      factory.setPort(1414)
+      factory.setClientID('mqm')
+      factory.setTransportType(JMSC.MQJMS_TP_CLIENT_MQ_TCPIP)
 
-        puts "Creating Connection ...."
-        connection = factory.createQueueConnection('', '')
+      puts "Creating Connection ...."
+      connection = factory.createQueueConnection('', '')
 
-        puts "Creating Session ...."
-        session = connection.createQueueSession(false, QueueSession::AUTO_ACKNOWLEDGE)
+      puts "Creating Session ...."
+      session = connection.createQueueSession(false, QueueSession::AUTO_ACKNOWLEDGE)
 
-        puts "Receiving Response ...."
-        receiver = session.createReceiver(session.createQueue("test_out"))
-        puts "Send Request ...."
-        sender = session.createSender(session.createQueue("test_in"))
-        textMessage = session.createTextMessage("put some message here")
-        textMessage.setJMSType("mcd://xmlns")
-        textMessage.setJMSCorrelationID('TEST')
-        textMessage.setJMSExpiration(2*1000)
+      puts "Receiving Response ...."
+      receiver = session.createReceiver(session.createQueue("test_out"))
+      puts "Send Request ...."
+      sender = session.createSender(session.createQueue("test_in"))
+      textMessage = session.createTextMessage("put some message here")
+      textMessage.setJMSType("mcd://xmlns")
+      textMessage.setJMSCorrelationID('TEST')
+      textMessage.setJMSExpiration(2*1000)
 
-        connection.start
+      connection.start
 
-        sender.send(textMessage)
+      sender.send(textMessage)
 
-        sender.close
-        receiver.close
-        session.close
-        connection.close
-      rescue => e
-        puts e.message
-      ensure
-        receiver.close if receiver
-        session.close if session
-        connection.close if connection
-      end
+      sender.close
+      receiver.close
+      session.close
+      connection.close
+    rescue => e
+      puts e.message
+    ensure
+      receiver.close if receiver
+      session.close if session
+      connection.close if connection
     end
   end
+end
+# Валидация по XSD
+def validate_xsd(xsd, xml)
+  xsd = Nokogiri::XML::Schema(xsd)
+  xml = Nokogiri::XML(xml)
+  result = xsd.validate(xml)
+  if result.any?
+    response_ajax("#{result.join('<br/>')}", 20000) and return
+  else
+    response_ajax("Валидация прошла успешно!") and return
+  end
+end
+# Валидация синтаксиса
+def validate(xml)
+  xml = Nokogiri::XML(xml)
+  if xml.errors.any?
+    response_ajax("XML не валидна:<br/> #{xml.errors.join('<br/>')}", 20000) and return
+  else
+    response_ajax("Валидация прошла успешно!") and return
+  end
+end

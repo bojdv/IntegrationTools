@@ -56,7 +56,7 @@ jQuery ->
       $('#xml_select_category_name').parent().show()
       $('#xml_description').show()
       $('#xml_select_xml_name').parent().hide()
-      $('#xml_select_category_name').html(options)
+      $('#xml_select_category_name').html(options.split("<option value=\"\"></option>").join(""))
       $('#xml_select_xml_name').empty()
     else
       $('#xml_select_category_name').empty()
@@ -144,4 +144,7 @@ jQuery ->
   $('#xml_autor').val(xml_autor)
 @updateInputXml = (xml_text) ->
   $('#xml_text_in_field').val(xml_text.slice(1, -1))
+@updateOutputXml = (xml_text) ->
+  alert(xml_text)
+  $('#xml_text_field').val(xml_text.slice(1, -1))
 

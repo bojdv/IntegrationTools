@@ -29,11 +29,11 @@ function changeText(name, host, port, user, password)
             time = time -1000;
             $('#modal-close-button').html('Закрыть ('+time/1000+')');
             }, 1000);
-        $('#exampleModal').modal({
+        $('#messageModal').modal({
             keyboard: true,
         })
-        setTimeout(function() {$('#exampleModal').modal('hide');}, time);
-        $('#exampleModal').on('hide.bs.modal hidden.bs.modal', function () {
+        setTimeout(function() {$('#messageModal').modal('hide');}, time);
+        $('#messageModal').on('hide.bs.modal hidden.bs.modal', function () {
             clearTimeout(timerId);
         })
     }
@@ -128,15 +128,6 @@ function changeText(name, host, port, user, password)
         $("#list").load(window.location.href + " #list");
     }
 
-    function test_call() {
-        $.ajax({
-            url: "/xml_sender/tester",
-            type: "POST",
-            remote: false,
-            data: {product: {name: "Filip", description: "whatever"}},
-        });
-    }
-
     /** Контекстное меню xml*/
        $(function () {
         $.contextMenu({
@@ -201,7 +192,7 @@ function changeText(name, host, port, user, password)
                         data: {
                             form_elements: {
                                 category_name: form_elements.form_category_user,
-                                product_id: form_elements.form_category,
+                                product_id: form_elements.form_product,
                             }
                         },
                     });
@@ -271,14 +262,20 @@ $(function () {
             if (key == 'decode' || key == 'encode' || key == 'uuid') { Base64(key)}
             if (key == 'clear') {$('#xml_text_field').val('');}
             if (key == 'save_xml') {SaveXml()}
-            if (key == 'validate') {xsd_upload()}
+            if (key == 'validate') {validate_xml(mode = 'validate')}
+            if (key == 'validate_xsd') {xsd_upload()}
+            if (key == 'prefix') {prefixModal()}
+            if (key == 'pretty') {validate_xml(mode = 'pretty')}
         },
         items: {
+            "pretty": {name: "Выровнить XML"},
             "decode": {name: "Декодировать Base64"},
             "encode": {name: "Кодировать в Base64"},
             "uuid": {name: "Сгенерировать ID"},
+            "prefix": {name: "Добавить префикс"},
+            "validate": {name: "Валидировать XML"},
+            "validate_xsd": {name: "Валидировать по XSD"},
             "save_xml": {name: "Сохранить XML в файл"},
-            "validate": {name: "Валидировать по XSD"},
             "clear": {name: "Очистить XML"}
         }
     });
@@ -289,4 +286,20 @@ function xsd_upload() {
     hiddenElement =  document.getElementById("hidden_xml_text_field");
     hiddenElement.value = visibleElement.value;
     $('#xsd_choice_xsd').trigger('click');
+}
+/** Отправка содержимого XML*/
+function prefixModal() {
+    visibleElement = document.getElementById("xml_text_field");
+    hiddenElement =  document.getElementById("modal_prefix_hidden_xml");
+    hiddenElement.value = visibleElement.value;
+    $('#prefixModal').modal();
+}
+function validate_xml(mode) {
+    xml = document.getElementById("xml_text_field").value;
+    $.ajax({
+        url: "xml_sender/validate_xml",
+        type: "POST",
+        dataType: "script",
+        data: {xml: xml, mode: mode},
+    });
 }

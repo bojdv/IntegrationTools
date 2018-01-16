@@ -55,48 +55,44 @@ class XmlSenderController < ApplicationController
     end
   end
   def save_xml
-    xml_edit = Xml.find(params[:form_elements][:id])
-    if xml_edit.update_attributes(save_xml_params)
-      respond_to do |format|
-        format.js{ render :js => "send_alert('Сохранили изменения!')" }
-      end
-    else
-      respond_to do |format|
-        format.js{ render :js => "send_alert(#{xml_edit.errors.full_messages.inspect})" }
-      end
+    begin
+      xml_edit = Xml.find(params[:form_elements][:id])
+      xml_edit.update_attributes(save_xml_params)
+    rescue Exception => msg
+      response_ajax("Случилось непредвиденное:<br/> #{msg.message}")
     end
   end
   # Создание, редактирование, удаление настроек менеджера очередей
   def crud_mq_settings
     begin
-    if (params[:form_elements][:mode]) == 'new' # Создание настройки
-      response_ajax("<h5>Не заполнены параметры:</h5>#{@empty_filds.join}") and return if !get_empty_values(manager_params).empty?
-      new_settings = QueueManager.new(manager_params)
-      if new_settings.save
-        response_ajax("Создали настройки для #{manager_params[:manager_name]}", 1500) and return
-      else
-        response_ajax("#{new_settings.errors.full_messages.inspect}") and return
+      if (params[:form_elements][:mode]) == 'new' # Создание настройки
+        response_ajax("<h5>Не заполнены параметры:</h5>#{@empty_filds.join}") and return if !get_empty_values(manager_params).empty?
+        new_settings = QueueManager.new(manager_params)
+        if new_settings.save
+          response_ajax("Создали настройки для #{manager_params[:manager_name]}", 1500) and return
+        else
+          response_ajax("#{new_settings.errors.full_messages.inspect}") and return
+        end
+      else if (params[:form_elements][:mode]) == 'edit' # Редактирование настройки
+             response_ajax("<h5>Не заполнены параметры:</h5>#{@empty_filds.join}") and return if !get_empty_values(manager_params).empty?
+             edit_manager = QueueManager.find_by_manager_name(manager_params[:manager_name])
+             puts manager_params
+             if edit_manager.update_attributes(manager_params)
+               response_ajax("Отредактировали настройки для #{manager_params[:manager_name]}", 1500) and return
+             else
+               response_ajax("#{new_settings.errors.full_messages.inspect}") and return
+             end
+           else if (params[:form_elements][:mode]) == 'delete' # Удаление настройки
+                  response_ajax("Не выбрана настройка для удаления!") and return if params[:form_elements][:manager_name].empty?
+                  delete_setting = QueueManager.find_by_manager_name(params[:form_elements][:manager_name])
+                  if delete_setting.destroy
+                    response_ajax("Удалили настройку #{manager_params[:manager_name]}", 1500) and return
+                  else
+                    response_ajax("#{new_settings.errors.full_messages.inspect}") and return
+                  end
+                end
+           end
       end
-    else if (params[:form_elements][:mode]) == 'edit' # Редактирование настройки
-           response_ajax("<h5>Не заполнены параметры:</h5>#{@empty_filds.join}") and return if !get_empty_values(manager_params).empty?
-           edit_manager = QueueManager.find_by_manager_name(manager_params[:manager_name])
-           puts manager_params
-           if edit_manager.update_attributes(manager_params)
-             response_ajax("Отредактировали настройки для #{manager_params[:manager_name]}", 1500) and return
-           else
-             response_ajax("#{new_settings.errors.full_messages.inspect}") and return
-           end
-    else if (params[:form_elements][:mode]) == 'delete' # Удаление настройки
-           response_ajax("Не выбрана настройка для удаления!") and return if params[:form_elements][:manager_name].empty?
-           delete_setting = QueueManager.find_by_manager_name(params[:form_elements][:manager_name])
-           if delete_setting.destroy
-             response_ajax("Удалили настройку #{manager_params[:manager_name]}", 1500) and return
-           else
-             response_ajax("#{new_settings.errors.full_messages.inspect}") and return
-           end
-         end
-       end
-    end
     rescue Exception => msg
       response_ajax("Случилось непредвиденное:<br/> #{msg.message}", 5000)
     ensure
@@ -110,7 +106,7 @@ class XmlSenderController < ApplicationController
       xsd = Nokogiri::XML::Schema(params[:mq_attributes][:xsd])
       xmlt = Nokogiri::XML(params[:mq_attributes][:xml])
       result = xsd.validate(xmlt)
-      response_ajax("#{result.join('<br/>')}", 10000) and return if result.any?
+      response_ajax("#{result.join('<br/>')}", 20000) and return if result.any?
     end
     if (params[:mq_attributes][:manager_type]) == 'Active MQ'
       if (params[:mq_attributes][:protocol]) == 'OpenWire'
@@ -138,8 +134,8 @@ class XmlSenderController < ApplicationController
            select_manager = QueueManager.find_by_manager_name(params[:manager_in][:manager_name_in])
            respond_to do |format|
              format.js { render :js => "changeText(\"#{select_manager.manager_name}\",\"#{select_manager.queue_in}\", \"#{select_manager.host}\", \"#{select_manager.port}\", \"#{select_manager.user}\", \"#{select_manager.password}\", \"#{select_manager.manager_type}\", \"#{select_manager.channel_manager}\", \"#{select_manager.channel}\", \"#{select_manager.amq_protocol}\", \"#{select_manager.visible_all}\",\"#{manager_in_out[0]}\");" }
-          end
-     end
+           end
+         end
     end
   end
   def put_xml
@@ -154,38 +150,59 @@ class XmlSenderController < ApplicationController
   def get_message # Получение сообщение из очереди
     response_ajax("Не заполнены параметры:#{@empty_filds.join}") and return if !get_empty_values(receive_queue_params).empty?
     begin
-    client = Stomp::Client.new(
-        params[:mq_attributes_in][:user_in],
-        params[:mq_attributes_in][:password_in],
-        params[:mq_attributes_in][:host_in],
-        params[:mq_attributes_in][:port_in])
-    message = String.new
-    inputqueue = params[:mq_attributes_in][:queue_in]
-    client.subscribe(inputqueue){|msg| message << msg.body.to_s}
-    client.join(1)
-    response_ajax("Сообщения отсутствуют") and return if message.empty?
-    respond_to do |format|
-      format.js { render :js => "updateInputXml('#{message.inspect}')" }
-    end
+      client = Stomp::Client.new(
+          params[:mq_attributes_in][:user_in],
+          params[:mq_attributes_in][:password_in],
+          params[:mq_attributes_in][:host_in],
+          params[:mq_attributes_in][:port_in])
+      message = String.new
+      inputqueue = params[:mq_attributes_in][:queue_in]
+      client.subscribe(inputqueue){|msg| message << msg.body.to_s}
+      client.join(1)
+      response_ajax("Сообщения отсутствуют") and return if message.empty?
+      respond_to do |format|
+        format.js { render :js => "updateInputXml('#{message.inspect}')" }
+      end
     rescue Exception => msg
       response_ajax("Случилось непредвиденное:<br/> #{msg.message}")
     ensure
       client.close if !client.nil?
     end
   end
-  def validate_xsd
-    begin
-    response_ajax("Нет xml для валидации.") and return if params[:xsd_choice][:xml_hidden].empty?
-    xsd = Nokogiri::XML::Schema(params[:xsd_choice][:xsd])
-    xmlt = Nokogiri::XML(params[:xsd_choice][:xml_hidden])
-    result = xsd.validate(xmlt)
-    if result.any?
-      response_ajax("#{result.join('<br/>')}", 10000) and return
-    else
-      response_ajax("Валидация прошла успешно!") and return
+  # Валидация XML по XSD и просто
+  def validate_xml
+    if params[:xml].present?
+      if params[:mode] == 'validate'
+        response_ajax("Нет xml для валидации.") and return if params[:xml].empty?
+        validate(params[:xml])
+      else if params[:mode] == 'pretty'
+             xml = Nokogiri::XML(params[:xml],&:noblanks)
+             respond_to do |format|
+               format.js { render :js => "updateOutputXml('#{xml.to_xml.inspect}')" }
+             end
+           end
+      end
+    else if params[:xsd_choice].present?
+           response_ajax("Нет xml для валидации.") and return if params[:xsd_choice][:xml_hidden].empty?
+           validate_xsd(params[:xsd_choice][:xsd], params[:xsd_choice][:xml_hidden])
+         end
     end
-    rescue Exception => msg
-      response_ajax("Случилось непредвиденное:<br/> #{msg.message}")
+  end
+
+  def add_prefix
+    xml_in = params[:prefix_choice][:modal_prefix_hidden_xml]
+    xml_out = String.new
+    prefix = params[:prefix_choice][:prefix]
+    xml_in.each_line do |line|
+      line.gsub!("<", "<#{prefix}:")
+      line.gsub!("<#{prefix}:/", "</#{prefix}:")
+      line.gsub!("xmlns=", "xmlns:#{prefix}=")
+      line.gsub!("xmlns:Dbo", "xmlns:#{prefix}Dbo")
+      line.gsub!("<#{prefix}:?xml", "<?xml")
+      xml_out << line
+    end
+    respond_to do |format|
+      format.js { render :js => "updateOutputXml('#{xml_out.inspect}')" }
     end
   end
 end

@@ -1,135 +1,132 @@
 
 <% provide(:title, "XML Sender") %>
 
-    <div class="col-sm-8 placeholder">
-      <ul class="nav nav-tabs" id="mqTab" role="tablist">
-        <li class="nav-item">
-          <a class="nav-link active" id="output-tab" data-toggle="tab" href="#output" role="tab" aria-controls="output" aria-selected="true">Исходящие сообщения</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" id="input-tab" data-toggle="tab" href="#input" role="tab" aria-controls="input" aria-selected="false">Входящие сообщения</a>
-        </li>
-      </ul>
-      <!-- Первая вкладка -->
-      <div class="tab-content" id="myTabContent">
-        <div class="tab-pane fade show active" id="output" role="tabpanel" aria-labelledby="output-tab">
-          <br>
-          <div class="row">
-            <div class="col-sm-3 placeholder">
-              <%= simple_form_for :manager, :remote => true, url: 'xml_sender/manager_choise', html: { class: 'form-group' } do |f| %>
-                <div class="<%= 'context-menu-manager-settings' if logged_in? %>">
-                  <%= f.input :manager_name, :required => false, :label => false, :collection => @qm, prompt: 'Шаблоны настроек' %>
-                </div>
-                <%= f.button :submit, 'Получить настройки', class: 'btn btn-primary'%>
-              <% end %>
+<div class="col-sm-8 placeholder">
+  <ul class="nav nav-tabs" id="mqTab" role="tablist">
+    <li class="nav-item">
+      <a class="nav-link active" id="output-tab" data-toggle="tab" href="#output" role="tab" aria-controls="output" aria-selected="true">Исходящие сообщения</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="input-tab" data-toggle="tab" href="#input" role="tab" aria-controls="input" aria-selected="false">Входящие сообщения</a>
+    </li>
+  </ul>
+  <!-- Первая вкладка -->
+  <div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade show active" id="output" role="tabpanel" aria-labelledby="output-tab">
+      <br>
+      <div class="row">
+        <div class="col-sm-3 placeholder">
+          <%= simple_form_for :manager, :remote => true, url: 'xml_sender/manager_choise', html: { class: 'form-group' } do |f| %>
+            <div class="<%= 'context-menu-manager-settings' if logged_in? %>">
+              <%= f.input :manager_name, :required => false, :label => false, :collection => @qm, prompt: 'Шаблоны настроек' %>
+            </div>
+            <%= f.button :submit, 'Получить настройки', class: 'btn btn-primary'%>
+          <% end %>
 
-              <%= simple_form_for :mq_attributes, remote: true, url: xml_sender_send_to_queue_path, html: {class: 'form-group' } do |f| %>
-                <%= f.input :settings_name, :label => 'Название настройки', :required => false, placeholder: 'Заполнить при сохранении' %>
-                <%= f.input :manager_type, label: 'Выберите менеджер очередей', required: false, collection: ['Active MQ', 'WebSphere MQ'], selected: :collection[0] %>
-                <div id="protocol_select">
-                  <%= f.input :protocol, label: 'Выберите протокол', required: false, collection: ['OpenWire', 'STOMP'], selected: :collection[0]%>
-                </div>
-                <div id="wmq_fields">
-                  <%= f.input :channel_manager, label: 'Менеджер канала', required: false%>
-                  <%= f.input :channel, label: 'Канал', required: false, placeholder: 'Канал соединения с сервером'%>
-                </div>
-                <%= f.input :queue, :label => 'Куда отправить', :required => false, placeholder: 'Например: test_in' %>
-                <%= f.input :host, :label => 'Хост', :required => false , placeholder: 'Например: localhost' %>
-                <%= f.input :port, :label => 'Порт', :required => false %>
-                <%= f.input :correlation_id, label: 'Correlation ID', :required => false , input_html: { value: SecureRandom.uuid } %>
-                <%= f.input :autorization, as: :boolean, :label => 'Нужна авторизация?', checked_value: true, unchecked_value: false, input_html: {checked: false} %>
-                <div id="autorization">
-                <%= f.input :user, :label => 'Имя пользователя', :required => false , placeholder: 'Например: admin' %>
-                <%= f.input :password, :label => 'Пароль пользователя', :required => false , input_html: {value: 'admin'}, placeholder: 'Например: password' %>
-                </div>
-                <%= f.input :visible_all, as: :boolean, :label => 'Видна всем', checked_value: true, unchecked_value: false, input_html: {checked: false} %>
-                </div>
+          <%= simple_form_for :mq_attributes, remote: true, url: xml_sender_send_to_queue_path, html: {class: 'form-group' } do |f| %>
+            <%= f.input :settings_name, :label => 'Название настройки', :required => false, placeholder: 'Заполнить при сохранении' %>
+            <%= f.input :manager_type, label: 'Выберите менеджер очередей', required: false, collection: ['Active MQ', 'WebSphere MQ'], selected: :collection[0] %>
+            <div id="protocol_select">
+              <%= f.input :protocol, label: 'Выберите протокол', required: false, collection: ['OpenWire', 'STOMP'], selected: :collection[0]%>
+            </div>
+            <div id="wmq_fields">
+              <%= f.input :channel_manager, label: 'Менеджер канала', required: false%>
+              <%= f.input :channel, label: 'Канал', required: false, placeholder: 'Канал соединения с сервером'%>
+            </div>
+            <%= f.input :queue, :label => 'Куда отправить', :required => false, placeholder: 'Например: test_in' %>
+            <%= f.input :host, :label => 'Хост', :required => false , placeholder: 'Например: localhost' %>
+            <%= f.input :port, :label => 'Порт', :required => false %>
+            <%= f.input :correlation_id, label: 'Correlation ID', :required => false , input_html: { value: SecureRandom.uuid } %>
+            <%= f.input :autorization, as: :boolean, :label => 'Нужна авторизация?', checked_value: true, unchecked_value: false, input_html: {checked: false} %>
+            <div id="autorization">
+              <%= f.input :user, :label => 'Имя пользователя', :required => false , placeholder: 'Например: admin' %>
+              <%= f.input :password, :label => 'Пароль пользователя', :required => false , input_html: {value: 'admin'}, placeholder: 'Например: password' %>
+            </div>
+            <%= f.input :visible_all, as: :boolean, :label => 'Видна всем', checked_value: true, unchecked_value: false, input_html: {checked: false} %>
+            </div>
             <div class="col-sm-9 placeholder">
               <%= f.input :xml, as: :text, :label => false, :required => false, input_html: {id: 'xml_text_field', class: 'form-control context-menu-xml', :style=> 'height: 600px; white-space: nowrap', placeholder: 'Место для исходящей XML' } %>
               <%= f.button :submit, 'Отправить', class: 'btn btn-primary'%>
-              <% end %>
+          <% end %>
+          </div>
+          </div>
+    </div>
+    <!-- Вторая вкладка -->
+    <div class="tab-pane fade" id="input" role="tabpanel" aria-labelledby="input-tab">
+      <br>
+      <div class="row">
+        <div class="col-sm-3 placeholder">
+          <%= simple_form_for :manager_in, :remote => true, url: 'xml_sender/manager_choise', html: { class: 'form-group' } do |f| %>
+            <%= f.input :manager_name_in, :required => false, :label => false, :collection => @qm, prompt: 'Шаблоны настроек' %>
+            <%= f.button :submit, 'Получить настройки', class: 'btn btn-primary'%>
+          <% end %>
+
+          <%= simple_form_for :mq_attributes_in, remote: true, url: xml_sender_get_message_path, html: {class: 'form-group' } do |f| %>
+            <%= f.input :manager_type_in, label: 'Выберите менеджер очередей', required: false, collection: ['Active MQ', 'WebSphere MQ'], selected: :collection[0] %>
+            <div id="protocol_select_in">
+              <%= f.input :protocol_in, label: 'Выберите протокол', required: false, collection: ['OpenWire', 'STOMP'], selected: :collection[0]%>
             </div>
+            <div id="wmq_fields_in">
+              <%= f.input :channel_manager_in, label: 'Менеджер канала', required: false%>
+              <%= f.input :channel_in, label: 'Канал', required: false, placeholder: 'Канал соединения с сервером'%>
+            </div>
+            <%= f.input :queue_in, :label => 'Откуда получить', :required => false, placeholder: 'Например: test_out' %>
+            <%= f.input :host_in, :label => 'Хост', :required => false , placeholder: 'Например: localhost' %>
+            <%= f.input :port_in, :label => 'Порт', :required => false , placeholder: 'STOMP порт, обычно: 61613' %>
+            <%= f.input :autorization_in, as: :boolean, :label => 'Нужна авторизация?', checked_value: true, unchecked_value: false, input_html: {checked: false} %>
+            <div id="autorization_in">
+              <%= f.input :user_in, :label => 'Имя пользователя', :required => false , placeholder: 'Например: admin' %>
+              <%= f.input :password_in, :label => 'Пароль пользователя', :required => false , input_html: {value: 'admin'}, placeholder: 'Например: password' %>
+            </div>
+            </div>
+            <div class="col-sm-9 placeholder">
+              <%= f.input :xml_in, as: :text, :label => false, :required => false, input_html: { id: 'xml_text_in_field', class: 'form-control', :style=> 'height: 600px; white-space: nowrap', placeholder: 'Место для входящей XML' } %>
+              <%= f.button :submit, 'Получить сообщение', class: 'btn btn-primary'%>
+          <% end %>
           </div>
-         </div>
-        <!-- Вторая вкладка -->
-        <div class="tab-pane fade" id="input" role="tabpanel" aria-labelledby="input-tab">
-          <br>
-          <div class="row">
-            <div class="col-sm-3 placeholder">
-              <%= simple_form_for :manager_in, :remote => true, url: 'xml_sender/manager_choise', html: { class: 'form-group' } do |f| %>
-                <%= f.input :manager_name_in, :required => false, :label => false, :collection => @qm, prompt: 'Шаблоны настроек' %>
-                <%= f.button :submit, 'Получить настройки', class: 'btn btn-primary'%>
-              <% end %>
-
-              <%= simple_form_for :mq_attributes_in, remote: true, url: xml_sender_get_message_path, html: {class: 'form-group' } do |f| %>
-                <%= f.input :manager_type_in, label: 'Выберите менеджер очередей', required: false, collection: ['Active MQ', 'WebSphere MQ'], selected: :collection[0] %>
-                <div id="protocol_select_in">
-                  <%= f.input :protocol_in, label: 'Выберите протокол', required: false, collection: ['OpenWire', 'STOMP'], selected: :collection[0]%>
-                </div>
-                <div id="wmq_fields_in">
-                  <%= f.input :channel_manager_in, label: 'Менеджер канала', required: false%>
-                  <%= f.input :channel_in, label: 'Канал', required: false, placeholder: 'Канал соединения с сервером'%>
-                </div>
-                <%= f.input :queue_in, :label => 'Откуда получить', :required => false, placeholder: 'Например: test_out' %>
-                <%= f.input :host_in, :label => 'Хост', :required => false , placeholder: 'Например: localhost' %>
-                <%= f.input :port_in, :label => 'Порт', :required => false , placeholder: 'STOMP порт, обычно: 61613' %>
-                <%= f.input :autorization_in, as: :boolean, :label => 'Нужна авторизация?', checked_value: true, unchecked_value: false, input_html: {checked: false} %>
-                <div id="autorization_in">
-                <%= f.input :user_in, :label => 'Имя пользователя', :required => false , placeholder: 'Например: admin' %>
-                <%= f.input :password_in, :label => 'Пароль пользователя', :required => false , input_html: {value: 'admin'}, placeholder: 'Например: password' %>
-                </div>
-                </div>
-                <div class="col-sm-9 placeholder">
-                  <%= f.input :xml_in, as: :text, :label => false, :required => false, input_html: { id: 'xml_text_in_field', class: 'form-control', :style=> 'height: 600px; white-space: nowrap', placeholder: 'Место для входящей XML' } %>
-                  <%= f.button :submit, 'Получить сообщение', class: 'btn btn-primary'%>
-              <% end %>
-              </div>
           </div>
-        </div>
-      </div>
-
+    </div>
   </div>
-  <!-- Выбор продукта -->
-  <div class="col-sm-3 placeholder" id="select_product">
 
-    <%= simple_form_for :xml, :remote => true, url: 'xml_sender/put_xml', html: { class: 'form-group' } do |f| %>
-      <%= f.input :product_name,:required => false, :label => false, :collection => @product, label_method: :product_name, prompt: 'Выберите продукт, категорию и xml'%>
-      <div class="category_select">
-        <%= f.input :select_category_name, :required => false, :label => false, :collection => @product, as: :grouped_select ,group_method: :categories, group_label_method: :product_name, label_method: :category_name%>
+</div>
+<!-- Выбор продукта -->
+<div class="col-sm-3 placeholder" id="select_product">
+
+  <%= simple_form_for :xml, :remote => true, url: 'xml_sender/put_xml', html: { class: 'form-group' } do |f| %>
+    <%= f.input :product_name,:required => false, :label => false, :collection => @product, label_method: :product_name, prompt: 'Выберите продукт, категорию и xml'%>
+    <div class="category_select">
+      <%= f.input :select_category_name, :required => false, :label => false, :collection => @product, as: :grouped_select ,group_method: :categories, group_label_method: :product_name, :label_method => lambda { |category| "#{category.product_id != 10020 ? category.category_name : (category.category_name if (logged_in? && category.user_id == current_user.id))}"}, :value_method => lambda { |category| "#{category.product_id != 10020 ? category.id : (category.id if (logged_in? && category.user_id == current_user.id))}"}%>
+    </div>
+    <div class="xml_select">
+      <% if logged_in? %>
+        <%= f.input :select_xml_name, :required => false, :label => false, :collection => @category, as: :grouped_select, group_method: :xmls, group_label_method: :category_name, :label_method => lambda { |xml| "#{xml.xml_name if xml.user_id==current_user.id || xml.private == false}"}, :value_method => lambda { |xml| "#{xml.id if xml.user_id==current_user.id || xml.private == false}"} %>
+      <% else %>
+        <%= f.input :select_xml_name, :required => false, :label => false, :collection => @category, as: :grouped_select, group_method: :xmls, group_label_method: :category_name, :label_method => lambda { |xml| "#{xml.xml_name if xml.private == false}"}, :value_method => lambda { |xml| "#{xml.id if xml.private == false}"} %>
+      <% end %>
+    </div>
+    <%= f.button :submit, 'Загрузить XML', class: 'btn btn-primary'%><br>
+    <!-- Данные XML -->
+    <div id="xml_description">
+      <div class="<%= 'context-menu-one' if logged_in? %>">
+        <%= f.input :xml_name, :label => 'Название XML', :required => false, placeholder: 'Имя XML'%>
       </div>
-      <div class="xml_select">
-        <% if logged_in? %>
-          <%= f.input :select_xml_name, :required => false, :label => false, :collection => @category, as: :grouped_select, group_method: :xmls, group_label_method: :category_name, :label_method => lambda { |xml| "#{xml.xml_name if xml.user_id==current_user.id || xml.private == false}"}, :value_method => lambda { |xml| "#{xml.id if xml.user_id==current_user.id || xml.private == false}"} %>
-        <% else %>
-          <%= f.input :select_xml_name, :required => false, :label => false, :collection => @category, as: :grouped_select, group_method: :xmls, group_label_method: :category_name, :label_method => lambda { |xml| "#{xml.xml_name if xml.private == false}"}, :value_method => lambda { |xml| "#{xml.id if xml.private == false}"} %>
-        <% end %>
+      <div class="<%= 'context-menu-category' if logged_in? %>">
+        <%= f.input :category_name, :label => 'Название категории', :required => false, placeholder: 'Название категории'%>
       </div>
-      <%= f.button :submit, 'Загрузить XML', class: 'btn btn-primary'%><br>
-      <!-- Данные XML -->
-      <div id="xml_description">
-        <div class="<%= 'context-menu-one' if logged_in? %>">
-          <%= f.input :xml_name, :label => 'Название XML', :required => false, placeholder: 'Имя XML'%>
-        </div>
-        <div class="<%= 'context-menu-category' if logged_in? %>">
-          <%= f.input :category_name, :label => 'Название категории', :required => false, placeholder: 'Название категории'%>
-        </div>
       <%= f.input :xml_description, as: :text, :label => 'Описание XML', :required => false, placeholder: 'Описание XML'%>
       <%= f.input :autor, :label => 'Автор XML', :required => false, placeholder: logged_in? ? current_user.email : 'Авторизуйтесь для сохранения', :disabled => true%>
       <% if logged_in? %>
         <%= f.input :private_xml, as: :boolean, :label => 'XML доступна только автору!', checked_value: true, unchecked_value: false, input_html: {checked: true} %>
       <% end %>
-      </div>
-    <% end %>
-    <%= render 'layouts/modal_xml_sender' %>
-<!--
-    <input type="file" id="fileElem" style="display:none" onchange="upload(this.files)">
-    <label for="fileElem">Select some files</label>
+    </div>
+  <% end %>
 
-    -->
-    <%= simple_form_for :xsd_choice, :remote => true, url: 'xml_sender/validate_xsd', data: {type: :js}, html: { id: 'form-xsd-choice' }, :authenticity_token => true do |f| %>
-      <%= f.input :xml_hidden, as: :text, :label => false, :required => false, input_html: { id: 'hidden_xml_text_field', :style=> 'display:none' } %>
-      <%= f.input :xsd, as: :file, :label => false, :required => false, class: 'btn btn-primary', id: 'upload_xsd', :input_html => { :onchange => "$('#submit_xsd').trigger('click');$('#xsd_choice_xsd').val('')", style: "display:none", accept: ".xsd"}%>
-      <%= f.button :submit, 'Загрузить XSD', class: 'btn btn-primary', id: "submit_xsd", style: "display:none"%>
-    <% end %>
+  <%= simple_form_for :xsd_choice, :remote => true, url: 'xml_sender/validate_xml', data: {type: :js}, html: { id: 'form-xsd-choice' }, :authenticity_token => true do |f| %>
+    <%= f.input :xml_hidden, as: :text, :label => false, :required => false, input_html: { id: 'hidden_xml_text_field', :style=> 'display:none' } %>
+    <%= f.input :xsd, as: :file, :label => false, :required => false, class: 'btn btn-primary', id: 'upload_xsd', :input_html => { :onchange => "$('#submit_xsd').trigger('click');$('#xsd_choice_xsd').val('')", style: "display:none", accept: ".xsd"}%>
+    <%= f.button :submit, 'Загрузить XSD', class: 'btn btn-primary', id: "submit_xsd", style: "display:none"%>
+  <% end %>
 
-  </div>
+  <%= render 'layouts/modal_xml_sender' %>
+  <%= render 'layouts/modal_prefix' %>
+</div>

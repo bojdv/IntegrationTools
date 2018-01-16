@@ -1,0 +1,19 @@
+<!-- Modal -->
+<div class="modal fade" id="prefixModal" tabindex="-1" role="dialog" aria-labelledby="prefixModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="prefixModalLabel">Добавление префикса</h5>
+      </div>
+      <div class="col-md-12 text-center">
+        <div class="modal-body">
+          <%= simple_form_for :prefix_choice, :remote => true, url: 'xml_sender/add_prefix', data: {type: :js}, html: { id: 'form-prefix-choice' }, :authenticity_token => true do |f| %>
+            <%= f.input :prefix, :label => false, :required => false, input_html: { id: 'prefix_text_field'}, placeholder: 'Введите префикс' %>
+            <%= f.input :modal_prefix_hidden_xml, as: :text, :label => false, :required => false, input_html: { id: 'modal_prefix_hidden_xml', :style=> 'display:none' } %>
+            <%= f.button :submit, 'Добавить префикс', class: 'btn btn-primary', id: "submit_prefix", :onclick =>"$('.modal').modal('hide');"%>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

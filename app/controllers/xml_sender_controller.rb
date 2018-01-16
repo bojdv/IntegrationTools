@@ -173,14 +173,19 @@ class XmlSenderController < ApplicationController
       client.close if !client.nil?
     end
   end
-  def tester
-    xsd = Nokogiri::XML::Schema(params[:tests][:xsds])
-    xmlt = Nokogiri::XML(params[:tests][:xml_hidden])
+  def validate_xsd
+    begin
+    response_ajax("Нет xml для валидации.") and return if params[:xsd_choice][:xml_hidden].empty?
+    xsd = Nokogiri::XML::Schema(params[:xsd_choice][:xsd])
+    xmlt = Nokogiri::XML(params[:xsd_choice][:xml_hidden])
     result = xsd.validate(xmlt)
-    puts result
-    #response_ajax("#{result.join('<br/>')}", 10000) and return if result.any?
-    respond_to do |format|
-      format.js { render :html => "open_modal('ddsdsd');" }
+    if result.any?
+      response_ajax("#{result.join('<br/>')}", 10000) and return
+    else
+      response_ajax("Валидация прошла успешно!") and return
+    end
+    rescue Exception => msg
+      response_ajax("Случилось непредвиденное:<br/> #{msg.message}")
     end
   end
 end

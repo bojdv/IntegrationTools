@@ -24,12 +24,18 @@ function changeText(name, host, port, user, password)
 
     function open_modal(text, time) {
         $('#modal-text').html(text);
-        setInterval(function() {$('#modal-timer').html(time); time = time -1000;}, 1000);
-        /**var timerId = setTimeout(function tick() {$('#modal-timer').html(time); timerId = setTimeout(tick, 1000); time = time -1000}, 1000);*/
+        $('#modal-close-button').html('Закрыть ('+time/1000+')');
+        timerId  = setInterval(function() {
+            time = time -1000;
+            $('#modal-close-button').html('Закрыть ('+time/1000+')');
+            }, 1000);
         $('#exampleModal').modal({
             keyboard: true,
         })
         setTimeout(function() {$('#exampleModal').modal('hide');}, time);
+        $('#exampleModal').on('hide.bs.modal hidden.bs.modal', function () {
+            clearTimeout(timerId);
+        })
     }
 
     function get_manager_form_data() {
@@ -265,27 +271,22 @@ $(function () {
             if (key == 'decode' || key == 'encode' || key == 'uuid') { Base64(key)}
             if (key == 'clear') {$('#xml_text_field').val('');}
             if (key == 'save_xml') {SaveXml()}
-            if (key == 'test') {test2()}
+            if (key == 'validate') {xsd_upload()}
         },
         items: {
             "decode": {name: "Декодировать Base64"},
             "encode": {name: "Кодировать в Base64"},
             "uuid": {name: "Сгенерировать ID"},
             "save_xml": {name: "Сохранить XML в файл"},
-            "clear": {name: "Очистить XML"},
-            "test": {name: "TEST"},
+            "validate": {name: "Валидировать по XSD"},
+            "clear": {name: "Очистить XML"}
         }
     });
 });
-function test() {
-    $("#form-send").submit();
-}
-function test2() {
-    copyFormValue();
-    $('#tests_xsds').trigger('click');
-}
-function copyFormValue(){
+/** Инициация загрузки xsd*/
+function xsd_upload() {
     visibleElement = document.getElementById("xml_text_field");
     hiddenElement =  document.getElementById("hidden_xml_text_field");
     hiddenElement.value = visibleElement.value;
+    $('#xsd_choice_xsd').trigger('click');
 }

@@ -18,6 +18,7 @@ Rails.application.routes.draw do
   post '/xml_sender/create_category' => 'xml_sender#create_category'
   post '/xml_sender/delete_category' => 'xml_sender#delete_category'
   post '/xml_sender/crud_mq_settings' => 'xml_sender#crud_mq_settings'
+  post '/xml_sender/validate_xsd' => 'xml_sender#validate_xsd'
   get 'signup' => 'users#new'
   get 'login' => 'sessions#new'
   post 'login' => 'sessions#create'

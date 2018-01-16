@@ -9,8 +9,17 @@
         <a id="modal-text"></a><br/>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary" data-dismiss="modal", id="modal-close-button">Закрыть</button>
+        <button type="button" class="btn btn-primary" id="modal-close-button" onclick="closeTimer()">Отменить</button>
+        <button type="button2" class="btn btn-primary" id="modal-close-button2" onclick="$('#messageModal').modal('hide')">Закрыть</button>
       </div>
+      <script>
+        function closeTimer() {
+            clearTimeout(timerId);
+            clearTimeout(modalTimer);
+            $('#modal-close-button').hide();
+            $('#modal-close-button2').show();
+        }
+      </script>
     </div>
   </div>
 </div>

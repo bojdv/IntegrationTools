@@ -7,15 +7,16 @@ class XmlSenderController < ApplicationController
   end
 
   def create_xml
-    new_xml_save = Xml.new(new_xml_params)
-    if new_xml_save.save
-      respond_to do |format|
-        format.js{ render :js => "send_alert('Сохранили XML в базу')" }
+    response_ajax("<h5>Не заполнены параметры:</h5>#{@empty_filds.join}", 4000) and return if !get_empty_values(new_xml_params).empty?
+    begin
+      new_xml_save = Xml.new(new_xml_params)
+      if new_xml_save.save
+        response_ajax("Сохранили XML #{new_xml_params[:xml_name]} в категорию #{Category.where(category_id: new_xml_params[:category_id]).pluck(:category_name)}") and return
+      else
+        response_ajax("Сохранили XML #{new_xml_save.errors.full_messages.inspect}") and return
       end
-    else
-      respond_to do |format|
-        format.js{ render :js => "send_alert(#{new_xml_save.errors.full_messages.inspect})" }
-      end
+    rescue Exception => msg
+      response_ajax("Что-то пошло не так:<br/> #{msg.message}", 4000)
     end
   end
   def create_category

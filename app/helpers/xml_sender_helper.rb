@@ -34,10 +34,11 @@ module XmlSenderHelper
       @empty_filds[index] = 'Хост' if ['host', 'host_in'].include?(@empty_filds[index])
       @empty_filds[index] = 'Пользователь' if ['user','user_in'].include?(@empty_filds[index])
       @empty_filds[index] = 'Пароль' if ['password','password_in'].include?(@empty_filds[index])
-      @empty_filds[index] = 'XML сообщение' if @empty_filds[index] == 'xml'
+      @empty_filds[index] = 'XML сообщение' if ['xml','xml_text'].include?(@empty_filds[index])
       @empty_filds[index] = 'Название настройки' if ['manager_name'].include?(@empty_filds[index])
       @empty_filds[index] = 'Название продукта' if ['product_name'].include?(@empty_filds[index])
-      @empty_filds[index] = 'Название XML' if ['select_xml_name'].include?(@empty_filds[index])
+      @empty_filds[index] = 'Название XML' if ['select_xml_name', 'xml_name'].include?(@empty_filds[index])
+      @empty_filds[index] = 'Описание XML' if ['xml_description'].include?(@empty_filds[index])
       @empty_filds[index] = 'Название канала' if ['channel', 'channel_in'].include?(@empty_filds[index])
       @empty_filds[index] = 'Название менеджера очередей' if ['channel_manager', 'channel_manager_in'].include?(@empty_filds[index])
       @empty_filds[index] = 'Название очереди' if ['queue_out', 'queue_in'].include?(@empty_filds[index])
@@ -167,21 +168,29 @@ module XmlSenderHelper
 end
 # Валидация по XSD
 def validate_xsd(xsd, xml)
-  xsd = Nokogiri::XML::Schema(xsd)
-  xml = Nokogiri::XML(xml)
-  result = xsd.validate(xml)
-  if result.any?
-    response_ajax("#{result.join('<br/>')}", 20000) and return
-  else
-    response_ajax("Валидация прошла успешно!") and return
+  begin
+    xsd = Nokogiri::XML::Schema(xsd)
+    xml = Nokogiri::XML(xml)
+    result = xsd.validate(xml)
+    if result.any?
+      response_ajax("#{result.join('<br/>')}", 20000) and return
+    else
+      response_ajax("Валидация прошла успешно!") and return
+    end
+  rescue Exception => msg
+    response_ajax("Случилось непредвиденное:<br/> #{msg.message}")
   end
 end
 # Валидация синтаксиса
 def validate(xml)
-  xml = Nokogiri::XML(xml)
-  if xml.errors.any?
-    response_ajax("XML не валидна:<br/> #{xml.errors.join('<br/>')}", 20000) and return
-  else
-    response_ajax("Валидация прошла успешно!") and return
+  begin
+    xml = Nokogiri::XML(xml)
+    if xml.errors.any?
+      response_ajax("XML не валидна:<br/> #{xml.errors.join('<br/>')}", 20000) and return
+    else
+      response_ajax("Валидация прошла успешно!") and return
+    end
+  rescue Exception => msg
+    response_ajax("Случилось непредвиденное:<br/> #{msg.message}")
   end
 end

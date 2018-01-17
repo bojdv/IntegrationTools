@@ -23,6 +23,7 @@ jQuery ->
       $("#protocol_select").hide()
       $('#wmq_fields').show()
 
+  # Обработка скрытия флага авторизации
   $("#mq_attributes_autorization").change ->
     if ($(this).is(':checked'))
       $("#autorization").show()
@@ -30,15 +31,8 @@ jQuery ->
     else
       $("#autorization").hide()
       $('#autorization').hide()
-
-  # Обработка скрытия параметров исходящего менеджера очередей
-    $("#mq_attributes_in_manager_type_in").change ->
-      if $(this).val() is "Active MQ"
-        $("#protocol_select_in").show()
-        $('#wmq_fields_in').hide()
-      else
-        $("#protocol_select_in").hide()
-        $('#wmq_fields_in').show()
+      $('#mq_attributes_user').val('')
+      $('#mq_attributes_password').val('')
 
   $("#mq_attributes_in_autorization_in").change ->
     if ($(this).is(':checked'))
@@ -47,8 +41,20 @@ jQuery ->
     else
       $("#autorization_in").hide()
       $('#autorization_in').hide()
+      $('#mq_attributes_in_user_in').val('')
+      $('#mq_attributes_in_password_in').val('')
+
+    # Обработка скрытия параметров исходящего менеджера очередей
+    $("#mq_attributes_in_manager_type_in").change ->
+      if $(this).val() is "Active MQ"
+        $("#protocol_select_in").show()
+        $('#wmq_fields_in').hide()
+      else
+        $("#protocol_select_in").hide()
+        $('#wmq_fields_in').show()
 
 
+# Список продуктов, категорий, xml
   $('#xml_product_name').change ->
     product = $('#xml_product_name :selected').text()
     options = $(category).filter("optgroup[label = '#{product}']").html()

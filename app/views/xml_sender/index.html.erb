@@ -17,25 +17,25 @@
       <div class="row">
         <div class="col-sm-3 placeholder">
           <%= simple_form_for :manager, :remote => true, url: 'xml_sender/manager_choise', html: { class: 'form-group' } do |f| %>
-            <div class="<%= 'context-menu-manager-settings' if logged_in? %>">
               <%= f.input :manager_name, :required => false, :label => false, :collection => @qm, prompt: 'Шаблоны настроек' %>
-            </div>
             <%= f.button :submit, 'Получить настройки', class: 'btn btn-primary'%>
           <% end %>
 
           <%= simple_form_for :mq_attributes, remote: true, url: xml_sender_send_to_queue_path, html: {class: 'form-group' } do |f| %>
+            <div class="<%= 'context-menu-manager-settings' if logged_in? %>">
             <%= f.input :settings_name, :label => 'Название настройки', :required => false, placeholder: 'Заполнить при сохранении' %>
+            </div>
             <%= f.input :manager_type, label: 'Выберите менеджер очередей', required: false, collection: ['Active MQ', 'WebSphere MQ'], selected: :collection[0] %>
             <div id="protocol_select">
               <%= f.input :protocol, label: 'Выберите протокол', required: false, collection: ['OpenWire', 'STOMP'], selected: :collection[0]%>
             </div>
             <div id="wmq_fields">
-              <%= f.input :channel_manager, label: 'Менеджер канала', required: false%>
+              <%= f.input :channel_manager, label: 'Администратор очередей', required: false%>
               <%= f.input :channel, label: 'Канал', required: false, placeholder: 'Канал соединения с сервером'%>
             </div>
             <%= f.input :queue, :label => 'Куда отправить', :required => false, placeholder: 'Например: test_in' %>
             <%= f.input :host, :label => 'Хост', :required => false , placeholder: 'Например: localhost' %>
-            <%= f.input :port, :label => 'Порт', :required => false %>
+            <%= f.input :port, :label => 'Порт', :required => false, placeholder: 'Например:61616' %>
             <%= f.input :correlation_id, label: 'Correlation ID', :required => false , input_html: { value: SecureRandom.uuid } %>
             <%= f.input :autorization, as: :boolean, :label => 'Нужна авторизация?', checked_value: true, unchecked_value: false, input_html: {checked: false} %>
             <div id="autorization">
@@ -67,12 +67,12 @@
               <%= f.input :protocol_in, label: 'Выберите протокол', required: false, collection: ['OpenWire', 'STOMP'], selected: :collection[0]%>
             </div>
             <div id="wmq_fields_in">
-              <%= f.input :channel_manager_in, label: 'Менеджер канала', required: false%>
+              <%= f.input :channel_manager_in, label: 'Администратор очередей', required: false%>
               <%= f.input :channel_in, label: 'Канал', required: false, placeholder: 'Канал соединения с сервером'%>
             </div>
             <%= f.input :queue_in, :label => 'Откуда получить', :required => false, placeholder: 'Например: test_out' %>
             <%= f.input :host_in, :label => 'Хост', :required => false , placeholder: 'Например: localhost' %>
-            <%= f.input :port_in, :label => 'Порт', :required => false , placeholder: 'STOMP порт, обычно: 61613' %>
+            <%= f.input :port_in, :label => 'Порт', :required => false , placeholder: 'Например:61616' %>
             <%= f.input :autorization_in, as: :boolean, :label => 'Нужна авторизация?', checked_value: true, unchecked_value: false, input_html: {checked: false} %>
             <div id="autorization_in">
               <%= f.input :user_in, :label => 'Имя пользователя', :required => false , placeholder: 'Например: admin' %>

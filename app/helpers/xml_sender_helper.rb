@@ -40,46 +40,69 @@ module XmlSenderHelper
       @empty_filds[index] = 'Название XML' if ['select_xml_name', 'xml_name'].include?(@empty_filds[index])
       @empty_filds[index] = 'Описание XML' if ['xml_description'].include?(@empty_filds[index])
       @empty_filds[index] = 'Название канала' if ['channel', 'channel_in'].include?(@empty_filds[index])
-      @empty_filds[index] = 'Название менеджера очередей' if ['channel_manager', 'channel_manager_in'].include?(@empty_filds[index])
+      @empty_filds[index] = 'Название Администратора очередей' if ['channel_manager', 'channel_manager_in'].include?(@empty_filds[index])
       @empty_filds[index] = 'Название очереди' if ['queue_out', 'queue_in'].include?(@empty_filds[index])
     end
     @empty_filds.map! {|value| '<br/>'+value}
     return @empty_filds
   end
-  def send_to_amq_openwire
-    puts 'Sending message to AMQ (OpenWire)'
-    $CLASSPATH << "lib/activemq-all-5.11.1.jar"
-    $CLASSPATH << "lib/log4j-1.2.17.jar"
+  def send_to_amq_openwire # Отправка сообщений в Active MQ по протоколу OpenWire
     java_import 'org.apache.activemq.ActiveMQConnectionFactory'
     java_import 'javax.jms.Session'
     java_import 'javax.jms.TextMessage'
+    puts 'Sending message to AMQ (OpenWire)'
     begin
       puts "Create and setting Factory ...."
       factory = ActiveMQConnectionFactory.new
-      factory.setBrokerURL("tcp://127.0.0.1:61616")
+      factory.setBrokerURL("tcp://#{params[:mq_attributes][:host]}:#{params[:mq_attributes][:port]}")
       puts "Creating Connection ...."
-      connection = factory.createConnection()
+      connection = factory.createQueueConnection(params[:mq_attributes][:user], params[:mq_attributes][:password])
       puts "Creating Session ...."
       session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
       puts "Create a messages"
-      textMessage = session.createTextMessage("put some message here")
-      textMessage.setJMSCorrelationID('TEST')
-
-      puts "Receiving Response ...."
-      receiver = session.createReceiver(session.createQueue("test_out"))
+      textMessage = session.createTextMessage(params[:mq_attributes][:xml])
+      textMessage.setJMSCorrelationID(params[:mq_attributes][:correlation_id])
       puts "Send Request ...."
-      sender = session.createSender(session.createQueue("test_in"))
-
+      sender = session.createSender(session.createQueue(params[:mq_attributes][:queue]))
       connection.start
-
       sender.send(textMessage)
-
+      response_ajax("Отправили сообщение в очередь: #{params[:mq_attributes][:queue]}") and return
       sender.close
+      session.close
+      connection.close
+    rescue => msg
+      response_ajax("Случилось непредвиденное:<br/> #{msg.message}", 5000)
+    ensure
+      session.close if session
+      connection.close if connection
+    end
+  end
+  def receive_from_amq_openwire # Получение сообщений из Active MQ по протоколу OpenWire
+    java_import 'org.apache.activemq.ActiveMQConnectionFactory'
+    java_import 'javax.jms.Session'
+    java_import 'javax.jms.TextMessage'
+    puts 'Receive message from AMQ (OpenWire)'
+    begin
+      puts "Create and setting Factory ...."
+      factory = ActiveMQConnectionFactory.new
+      factory.setBrokerURL("tcp://#{params[:mq_attributes_in][:host_in]}:#{params[:mq_attributes_in][:port_in]}")
+      puts "Creating Connection ...."
+      connection = factory.createQueueConnection(params[:mq_attributes_in][:user_in], params[:mq_attributes_in][:password_in])
+      puts "Creating Session ...."
+      session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+      puts "Receiving Response ...."
+      receiver = session.createReceiver(session.createQueue(params[:mq_attributes_in][:queue_in]))
+      connection.start
+      xml = receiver.receive(1000)
+      response_ajax("Сообщения не найдены") and return if xml.nil?
+      respond_to do |format|
+        format.js { render :js => "updateInputXml('#{xml.getText.inspect}')" }
+      end
       receiver.close
       session.close
       connection.close
-    rescue => e
-      puts e.message
+    rescue => msg
+      response_ajax("Случилось непредвиденное:<br/> #{msg.message}", 5000)
     ensure
       receiver.close if receiver
       session.close if session
@@ -94,25 +117,35 @@ module XmlSenderHelper
           params[:mq_attributes][:password],
           params[:mq_attributes][:host],
           params[:mq_attributes][:port])
-      client.publish("/queue/#{params[:mq_attributes][:queue]}", params[:mq_attributes][:xml]) #Кидаем запрос в очередь
-      response_ajax('Отправили сообщение', '1500')
+      client.publish("/queue/#{params[:mq_attributes][:queue]}", params[:mq_attributes][:xml], headers = {'correlation-id'=>params[:mq_attributes][:correlation_id]}) #Кидаем запрос в очередь
+      response_ajax("Отправили сообщение в очередь: #{params[:mq_attributes][:queue]}") and return
     rescue Exception => msg
       response_ajax("Случилось непредвиденное: #{msg.class} <br/> #{msg.message}")
-    ensure
-      client.close if !client.nil?
+    end
+  end
+  def receive_from_amq_stomp
+    puts 'Receive message from AMQ (STOMP)'
+    begin
+      client = Stomp::Client.new(
+          params[:mq_attributes_in][:user_in],
+          params[:mq_attributes_in][:password_in],
+          params[:mq_attributes_in][:host_in],
+          params[:mq_attributes_in][:port_in])
+      message = String.new
+      inputqueue = params[:mq_attributes_in][:queue_in]
+      client.subscribe(inputqueue){|msg| message << msg.body.to_s}
+      client.join(1)
+      response_ajax("Сообщения отсутствуют") and return if message.empty?
+      respond_to do |format|
+        format.js { render :js => "updateInputXml('#{message.inspect}')" }
+      end
+    rescue Exception => msg
+      response_ajax("Случилось непредвиденное: #{msg.class} <br/> #{msg.message}")
     end
   end
 
   def send_to_wmq
     puts 'Sending message to WMQ'
-    $CLASSPATH << "lib/javax.jms-3.1.2.2.jar"
-    $CLASSPATH << "lib/com.ibm.mqjms.jar"
-    $CLASSPATH << "lib/com.ibm.mq.jar"
-    $CLASSPATH << "lib/dhbcore.jar"
-    $CLASSPATH << "lib/javax.resource.jar"
-    $CLASSPATH << "lib/javax.transaction.jar"
-    $CLASSPATH << "com.ibm.msg.client.osgi.wmq_7.0.1.3.jar"
-
     java_import 'javax.jms.JMSException'
     java_import 'javax.jms.QueueConnection'
     java_import 'javax.jms.QueueSender'
@@ -126,71 +159,105 @@ module XmlSenderHelper
     begin
       puts "Setting Factory ...."
       factory = MQQueueConnectionFactory.new
-      factory.setHostName("kc-14-52")
-
-      factory.setQueueManager("local")
-      factory.setChannel("local.server")
+      factory.setHostName(params[:mq_attributes][:host])
+      factory.setQueueManager(params[:mq_attributes][:channel_manager])
+      factory.setChannel(params[:mq_attributes][:channel])
       factory.setPort(1414)
       factory.setClientID('mqm')
       factory.setTransportType(JMSC.MQJMS_TP_CLIENT_MQ_TCPIP)
-
       puts "Creating Connection ...."
-      connection = factory.createQueueConnection('', '')
-
+      connection = factory.createQueueConnection(params[:mq_attributes][:user], params[:mq_attributes][:password])
       puts "Creating Session ...."
       session = connection.createQueueSession(false, QueueSession::AUTO_ACKNOWLEDGE)
-
-      puts "Receiving Response ...."
-      receiver = session.createReceiver(session.createQueue("test_out"))
       puts "Send Request ...."
-      sender = session.createSender(session.createQueue("test_in"))
-      textMessage = session.createTextMessage("put some message here")
+      sender = session.createSender(session.createQueue(params[:mq_attributes][:queue]))
+      textMessage = session.createTextMessage(params[:mq_attributes][:xml])
       textMessage.setJMSType("mcd://xmlns")
-      textMessage.setJMSCorrelationID('TEST')
+      textMessage.setJMSCorrelationID(params[:mq_attributes][:correlation_id])
       textMessage.setJMSExpiration(2*1000)
-
       connection.start
-
       sender.send(textMessage)
-
       sender.close
+      session.close
+      connection.close
+      response_ajax("Отправили сообщение в очередь: #{params[:mq_attributes][:queue]}") and return
+    rescue => msg
+      response_ajax("Случилось непредвиденное: #{msg.class} <br/> #{msg.message}")
+    ensure
+      session.close if session
+      connection.close if connection
+    end
+  end
+  def receive_from_wmq
+    puts 'Sending message to WMQ'
+    java_import 'javax.jms.JMSException'
+    java_import 'javax.jms.QueueConnection'
+    java_import 'javax.jms.QueueSender'
+    java_import 'javax.jms.QueueReceiver'
+    java_import 'javax.jms.QueueSession'
+    java_import 'javax.jms.Session'
+    java_import 'javax.jms.TextMessage'
+    java_import 'com.ibm.mq.MQMessage'
+    java_import 'com.ibm.mq.jms.MQQueueConnectionFactory'
+    java_import 'com.ibm.mq.jms.JMSC'
+    begin
+      puts "Setting Factory ...."
+      factory = MQQueueConnectionFactory.new
+      factory.setHostName(params[:mq_attributes_in][:host_in])
+      factory.setQueueManager(params[:mq_attributes_in][:channel_manager_in])
+      factory.setChannel(params[:mq_attributes_in][:channel_in])
+      factory.setPort(params[:mq_attributes_in][:port_in].to_i)
+      factory.setClientID('mqm')
+      factory.setTransportType(JMSC.MQJMS_TP_CLIENT_MQ_TCPIP)
+      puts "Creating Connection ...."
+      connection = factory.createQueueConnection(params[:mq_attributes_in][:user_in], params[:mq_attributes_in][:password_in])
+      puts "Creating Session ...."
+      session = connection.createQueueSession(false, QueueSession::AUTO_ACKNOWLEDGE)
+      puts "Receiving Response ...."
+      receiver = session.createReceiver(session.createQueue(params[:mq_attributes_in][:queue_in]))
+      connection.start
+      xml = receiver.receive(1000)
+      response_ajax("Сообщения не найдены") and return if xml.nil?
+      respond_to do |format|
+        format.js { render :js => "updateInputXml('#{xml.getText.inspect}')" }
+      end
       receiver.close
       session.close
       connection.close
-    rescue => e
-      puts e.message
+    rescue => msg
+      response_ajax("Случилось непредвиденное: #{msg.class} <br/> #{msg.message}")
     ensure
       receiver.close if receiver
       session.close if session
       connection.close if connection
     end
   end
-end
 # Валидация по XSD
-def validate_xsd(xsd, xml)
-  begin
-    xsd = Nokogiri::XML::Schema(xsd)
-    xml = Nokogiri::XML(xml)
-    result = xsd.validate(xml)
-    if result.any?
-      response_ajax("#{result.join('<br/>')}", 20000) and return
-    else
-      response_ajax("Валидация прошла успешно!") and return
+  def validate_xsd(xsd, xml)
+    begin
+      xsd = Nokogiri::XML::Schema(xsd)
+      xml = Nokogiri::XML(xml)
+      result = xsd.validate(xml)
+      if result.any?
+        response_ajax("#{result.join('<br/>')}", 20000) and return
+      else
+        response_ajax("Валидация прошла успешно!") and return
+      end
+    rescue Exception => msg
+      response_ajax("Случилось непредвиденное:<br/> #{msg.message}")
     end
-  rescue Exception => msg
-    response_ajax("Случилось непредвиденное:<br/> #{msg.message}")
   end
-end
 # Валидация синтаксиса
-def validate(xml)
-  begin
-    xml = Nokogiri::XML(xml)
-    if xml.errors.any?
-      response_ajax("XML не валидна:<br/> #{xml.errors.join('<br/>')}", 20000) and return
-    else
-      response_ajax("Валидация прошла успешно!") and return
+  def validate(xml)
+    begin
+      xml = Nokogiri::XML(xml)
+      if xml.errors.any?
+        response_ajax("XML не валидна:<br/> #{xml.errors.join('<br/>')}", 20000) and return
+      else
+        response_ajax("Валидация прошла успешно!") and return
+      end
+    rescue Exception => msg
+      response_ajax("Случилось непредвиденное:<br/> #{msg.message}")
     end
-  rescue Exception => msg
-    response_ajax("Случилось непредвиденное:<br/> #{msg.message}")
   end
 end

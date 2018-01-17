@@ -54,7 +54,7 @@ jQuery ->
         $('#wmq_fields_in').show()
 
 
-# Список продуктов, категорий, xml
+  # Список продуктов, категорий, xml
   $('#xml_product_name').change ->
     product = $('#xml_product_name :selected').text()
     options = $(category).filter("optgroup[label = '#{product}']").html()
@@ -152,4 +152,3 @@ jQuery ->
   $('#xml_text_in_field').val(xml_text.slice(1, -1))
 @updateOutputXml = (xml_text) ->
   $('#xml_text_field').val(xml_text.slice(1, -1))
-

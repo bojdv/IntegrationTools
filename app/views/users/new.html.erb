@@ -1,7 +1,6 @@
 <% provide(:title, "Регистрация") %>
 <div class="col-sm-3 offset-2">
   <%= simple_form_for @user, html: { class: 'form-group' } do |f| %>
-    <%= render 'shared/error_messages' %>
     <%= f.input :email, :label => 'E-mail', :required => false , placeholder: 'Адрес почты BSS: имя_пользователя@bssys.com' %>
     <%= f.input :password, :label => 'Пароль', :required => false , placeholder: 'Пароль' %>
     <%= f.input :password_confirmation, :label => 'Пароль еще раз', :required => false , placeholder: 'Пароль еще раз' %>

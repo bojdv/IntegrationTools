@@ -1,7 +1,7 @@
 
 <% provide(:title, "XML Sender") %>
 
-<div class="col-sm-8 placeholder">
+<div class="col">
   <ul class="nav nav-tabs" id="mqTab" role="tablist">
     <li class="nav-item">
       <a class="nav-link active" id="output-tab" data-toggle="tab" href="#output" role="tab" aria-controls="output" aria-selected="true">Исходящие сообщения</a>
@@ -15,7 +15,7 @@
     <div class="tab-pane fade show active" id="output" role="tabpanel" aria-labelledby="output-tab">
       <br>
       <div class="row">
-        <div class="col-sm-3 placeholder">
+        <div class="col-md-3 placeholder">
           <%= simple_form_for :manager, :remote => true, url: 'xml_sender/manager_choise', html: { class: 'form-group' } do |f| %>
               <%= f.input :manager_name, :required => false, :label => false, :collection => @qm, prompt: 'Шаблоны настроек' %>
             <%= f.button :submit, 'Получить настройки', class: 'btn btn-primary'%>
@@ -44,7 +44,7 @@
             </div>
             <%= f.input :visible_all, as: :boolean, :label => 'Видна всем', checked_value: true, unchecked_value: false, input_html: {checked: false} %>
             </div>
-            <div class="col-sm-9 placeholder">
+            <div class="col-md placeholder">
               <%= f.input :xml, as: :text, :label => false, :required => false, input_html: {id: 'xml_text_field', class: 'form-control context-menu-xml', :style=> 'height: 600px; white-space: nowrap', placeholder: 'Место для исходящей XML' } %>
               <%= f.button :submit, 'Отправить', class: 'btn btn-primary'%>
           <% end %>
@@ -55,7 +55,7 @@
     <div class="tab-pane fade" id="input" role="tabpanel" aria-labelledby="input-tab">
       <br>
       <div class="row">
-        <div class="col-sm-3 placeholder">
+        <div class="col-md-3 placeholder">
           <%= simple_form_for :manager_in, :remote => true, url: 'xml_sender/manager_choise', html: { class: 'form-group' } do |f| %>
             <%= f.input :manager_name_in, :required => false, :label => false, :collection => @qm, prompt: 'Шаблоны настроек' %>
             <%= f.button :submit, 'Получить настройки', class: 'btn btn-primary'%>
@@ -79,7 +79,7 @@
               <%= f.input :password_in, :label => 'Пароль пользователя', :required => false , input_html: {value: 'admin'}, placeholder: 'Например: password' %>
             </div>
             </div>
-            <div class="col-sm-9 placeholder">
+            <div class="col-md placeholder">
               <%= f.input :xml_in, as: :text, :label => false, :required => false, input_html: { id: 'xml_text_in_field', class: 'form-control', :style=> 'height: 600px; white-space: nowrap', placeholder: 'Место для входящей XML' } %>
               <%= f.button :submit, 'Получить сообщение', class: 'btn btn-primary'%>
           <% end %>
@@ -90,7 +90,7 @@
 
 </div>
 <!-- Выбор продукта -->
-<div class="col-sm-3 placeholder" id="select_product">
+<div class="col-md-3 placeholder" id="select_product">
 
   <%= simple_form_for :xml, :remote => true, url: 'xml_sender/put_xml', html: { class: 'form-group' } do |f| %>
     <%= f.input :product_name,:required => false, :label => false, :collection => @product, label_method: :product_name, prompt: 'Выберите продукт, категорию и xml'%>

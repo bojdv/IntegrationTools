@@ -1,4 +1,4 @@
-<nav class="col-sm-3 col-md-2 d-none d-sm-block bg-light sidebar">
+<nav class="col-sm-1 col-md-1 d-none d-sm-block bg-light sidebar">
   <ul class="nav nav-pills flex-column ">
     <li class="nav-item">
       <a class="nav-link <%= 'active' if current_page? controller: :main_page %>" <%= link_to "Главная", root_path %><span class="sr-only">(current)</span></a>
@@ -7,4 +7,5 @@
       <a class="nav-link <%= 'active' if current_page? controller: :xml_sender %>" <%= link_to "XML Sender", xml_sender_path %></a>
     </li>
   </ul>
+  <footer class="footer"></footer>
 </nav>

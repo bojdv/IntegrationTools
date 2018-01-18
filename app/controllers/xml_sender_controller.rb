@@ -1,7 +1,7 @@
 class XmlSenderController < ApplicationController
   def index
 
-    logged_in? ? @qm = QueueManager.where(user_id: current_user.id).order('manager_name').pluck(:manager_name) : @qm = QueueManager.pluck(:manager_name)
+    logged_in? ? @qm = QueueManager.where(user_id: current_user.id).or(QueueManager.where(visible_all: true)).order('manager_name').pluck(:manager_name) : @qm = QueueManager.where(visible_all: true).pluck(:manager_name)
     @product = Product.all.order('product_name')
     @category = Category.all.order('category_name')
   end
@@ -47,7 +47,7 @@ class XmlSenderController < ApplicationController
     category_delete = Category.find(params[:form_elements][:id])
     begin
       if category_delete.destroy
-        response_ajax("Удалили категорию: #{category_delete.xml_name}") and return
+        response_ajax("Удалили категорию: #{category_delete.category_name}") and return
       else
         response_ajax("Ошибка при удалении:<br/> #{category_delete.errors.full_messages.inspect}") and return
       end
@@ -81,8 +81,7 @@ class XmlSenderController < ApplicationController
       else if (params[:form_elements][:mode]) == 'edit' # Редактирование настройки
              response_ajax("<h5>Не заполнены параметры:</h5>#{@empty_filds.join}") and return if !get_empty_values(manager_params).empty?
              edit_manager = QueueManager.find_by_manager_name(params[:form_elements][:system_manager_name])
-             puts manager_params
-             if edit_manager.update_attributes(manager_params)
+             if edit_manager.update_attributes(manager_params.except(:user_id))
                response_ajax("Отредактировали настройки для #{manager_params[:manager_name]}", 2000) and return
              else
                response_ajax("#{new_settings.errors.full_messages.inspect}") and return
@@ -101,7 +100,6 @@ class XmlSenderController < ApplicationController
     rescue Exception => msg
       response_ajax("Случилось непредвиденное:<br/> #{msg.message}", 5000)
     ensure
-      puts 'ensure'
     end
   end
 

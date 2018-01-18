@@ -23,7 +23,7 @@
 
           <%= simple_form_for :mq_attributes, remote: true, url: xml_sender_send_to_queue_path, html: {class: 'form-group' } do |f| %>
             <div class="<%= 'context-menu-manager-settings' if logged_in? %>">
-            <%= f.input :settings_name, :label => 'Название настройки', :required => false, placeholder: 'Заполнить при сохранении' %>
+            <%= f.input :settings_name, :label => 'Название настройки', :required => false, input_html: {style: "background-color: #b3ffcc"}, placeholder: 'Заполнить при сохранении' %>
             </div>
             <%= f.input :manager_type, label: 'Выберите менеджер очередей', required: false, collection: ['Active MQ', 'WebSphere MQ'], selected: :collection[0] %>
             <div id="protocol_select">
@@ -108,10 +108,10 @@
     <!-- Данные XML -->
     <div id="xml_description">
       <div class="<%= 'context-menu-one' if logged_in? %>">
-        <%= f.input :xml_name, :label => 'Название XML', :required => false, placeholder: 'Имя XML'%>
+        <%= f.input :xml_name, :label => 'Название XML', :required => false, input_html: {style: "background-color: #b3ffcc"}, placeholder: 'Имя XML'%>
       </div>
       <div class="<%= 'context-menu-category' if logged_in? %>">
-        <%= f.input :category_name, :label => 'Название категории', :required => false, placeholder: 'Название категории'%>
+        <%= f.input :category_name, :label => 'Название категории', :required => false, input_html: {style: "background-color: #b3ffcc"}, placeholder: 'Название категории'%>
       </div>
       <%= f.input :xml_description, as: :text, :label => 'Описание XML', :required => false, placeholder: 'Описание XML'%>
       <%= f.input :autor, :label => 'Автор XML', :required => false, placeholder: logged_in? ? current_user.email : 'Авторизуйтесь для сохранения', :disabled => true%>

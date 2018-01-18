@@ -45,7 +45,7 @@
             <%= f.input :visible_all, as: :boolean, :label => 'Видна всем', checked_value: true, unchecked_value: false, input_html: {checked: false} %>
             </div>
             <div class="col-md placeholder">
-              <%= f.input :xml, as: :text, :label => false, :required => false, input_html: {id: 'xml_text_field', class: 'form-control context-menu-xml', :style=> 'height: 600px; white-space: nowrap', placeholder: 'Место для исходящей XML' } %>
+              <%= f.input :xml, as: :text, :label => false, :required => false, input_html: {id: 'xml_text_field', class: 'form-control context-menu-xml', :style=> 'height: 600px;', placeholder: 'Место для исходящей XML' } %>
               <%= f.button :submit, 'Отправить', class: 'btn btn-primary'%>
           <% end %>
           </div>

@@ -81,6 +81,7 @@ module XmlSenderHelper
     java_import 'org.apache.activemq.ActiveMQConnectionFactory'
     java_import 'javax.jms.Session'
     java_import 'javax.jms.TextMessage'
+    java_import 'org.apache.activemq.command.ActiveMQDestination'
     puts 'Receive message from AMQ (OpenWire)'
     begin
       puts "Create and setting Factory ...."
@@ -99,6 +100,7 @@ module XmlSenderHelper
         format.js { render :js => "updateInputXml('#{xml.getText.inspect}')" }
       end
       receiver.close
+      connection.destroyDestination(session.createQueue(params[:mq_attributes_in][:queue_in])) # Удаляем очередь.
       session.close
       connection.close
     rescue => msg

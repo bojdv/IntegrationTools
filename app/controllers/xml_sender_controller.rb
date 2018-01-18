@@ -31,13 +31,13 @@ class XmlSenderController < ApplicationController
       response_ajax("Что-то пошло не так:<br/> #{msg.message}", 4000)
     end
   end
-  def delete_xml
-    xml_delete = Xml.find(params[:form_elements][:id])
+  def edit_category
+    category_edit = Category.find(params[:form_elements][:id])
     begin
-      if xml_delete.destroy
-        response_ajax("Удалили XML: #{xml_delete.xml_name}") and return
+      if category_edit.update_attributes(category_name: params[:form_elements][:category_name])
+        response_ajax("Отредактировали категорию: #{category_edit.category_name}") and return
       else
-        response_ajax("Ошибка при удалении:<br/> #{xml_delete.errors.full_messages.inspect}") and return
+        response_ajax("Ошибка при редактировании:<br/> #{category_edit.errors.full_messages.inspect}") and return
       end
     rescue Exception => msg
       response_ajax("Что-то пошло не так:<br/> #{msg.message}", 4000)
@@ -50,6 +50,18 @@ class XmlSenderController < ApplicationController
         response_ajax("Удалили категорию: #{category_delete.category_name}") and return
       else
         response_ajax("Ошибка при удалении:<br/> #{category_delete.errors.full_messages.inspect}") and return
+      end
+    rescue Exception => msg
+      response_ajax("Что-то пошло не так:<br/> #{msg.message}", 4000)
+    end
+  end
+  def delete_xml
+    xml_delete = Xml.find(params[:form_elements][:id])
+    begin
+      if xml_delete.destroy
+        response_ajax("Удалили XML: #{xml_delete.xml_name}") and return
+      else
+        response_ajax("Ошибка при удалении:<br/> #{xml_delete.errors.full_messages.inspect}") and return
       end
     rescue Exception => msg
       response_ajax("Что-то пошло не так:<br/> #{msg.message}", 4000)
@@ -126,6 +138,12 @@ class XmlSenderController < ApplicationController
     else
       receive_from_wmq
     end
+  end
+  def purge_queue
+    response_ajax("Не заполнены параметры:#{@empty_filds.join}") and return if !get_empty_values(purgeQueueParams).empty?
+    puts purgeQueueParams[:manager_name]
+    manager = QueueManager.find_by_manager_name(purgeQueueParams[:system_manager_name])
+    purgeQueue(manager, purgeQueueParams[:queue])
   end
 
   def manager_choise # Заполнение параметров менеджера очередей
@@ -250,4 +268,7 @@ def receive_queue_params
       params.require(:mq_attributes_in).permit(:manager_type_in, :protocol_in, :queue_in, :host_in, :port_in, :channel_in, :channel_manager_in)
     end
   end
+end
+def purgeQueueParams
+  params.permit(:system_manager_name, :queue)
 end

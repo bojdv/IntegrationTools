@@ -36,6 +36,7 @@ module XmlSenderHelper
       @empty_filds[index] = 'Пароль' if ['password','password_in'].include?(@empty_filds[index])
       @empty_filds[index] = 'XML сообщение' if ['xml','xml_text'].include?(@empty_filds[index])
       @empty_filds[index] = 'Название настройки' if ['manager_name'].include?(@empty_filds[index])
+      @empty_filds[index] = 'Не выбран менеджер' if ['system_manager_name'].include?(@empty_filds[index])
       @empty_filds[index] = 'Название продукта' if ['product_name'].include?(@empty_filds[index])
       @empty_filds[index] = 'Название XML' if ['select_xml_name', 'xml_name'].include?(@empty_filds[index])
       @empty_filds[index] = 'Описание XML' if ['xml_description'].include?(@empty_filds[index])
@@ -261,5 +262,75 @@ module XmlSenderHelper
     rescue Exception => msg
       response_ajax("Случилось непредвиденное:<br/> #{msg.message}")
     end
+  end
+  def purgeQueue(manager, queue)
+    if manager.manager_type == 'Active MQ'
+      java_import 'org.apache.activemq.ActiveMQConnectionFactory'
+      java_import 'javax.jms.Session'
+      java_import 'javax.jms.TextMessage'
+      java_import 'org.apache.activemq.command.ActiveMQDestination'
+      begin
+        factory = ActiveMQConnectionFactory.new
+        factory.setBrokerURL("tcp://#{manager.host}:#{manager.port}")
+        connection = factory.createQueueConnection(manager.user, manager.password)
+        session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+        connection.start
+        connection.destroyDestination(session.createQueue(queue)) # Удаляем очередь.
+        response_ajax("Очистили очередь") and return
+        session.close
+        connection.close
+      rescue => msg
+        response_ajax("Случилось непредвиденное:<br/> #{msg.message}", 5000)
+      ensure
+        session.close if session
+        connection.close if connection
+      end
+    end
+      else if manager.manager_type == 'WebSphere MQ'
+             java_import 'javax.jms.JMSException'
+             java_import 'javax.jms.QueueConnection'
+             java_import 'javax.jms.QueueSender'
+             java_import 'javax.jms.QueueReceiver'
+             java_import 'javax.jms.QueueSession'
+             java_import 'javax.jms.Session'
+             java_import 'javax.jms.TextMessage'
+             java_import 'com.ibm.mq.MQMessage'
+             java_import 'com.ibm.mq.jms.MQQueueConnectionFactory'
+             java_import 'com.ibm.mq.jms.JMSC'
+             begin
+               factory = MQQueueConnectionFactory.new
+               factory.setHostName(manager.host)
+               factory.setQueueManager(manager.channel_manager)
+               factory.setChannel(manager.channel)
+               factory.setPort(manager.port.to_i)
+               factory.setClientID('mqm')
+               factory.setTransportType(JMSC.MQJMS_TP_CLIENT_MQ_TCPIP)
+               manager.user.nil? ? user ='' : user=manager.user
+               manager.password.nil? ? password ='' : password=manager.password
+               connection = factory.createQueueConnection(user, password)
+               session = connection.createQueueSession(false, QueueSession::AUTO_ACKNOWLEDGE)
+               receiver = session.createReceiver(session.createQueue(queue))
+               connection.start
+               count = 0
+               while count < 50
+                 xml = receiver.receive(100)
+                 if xml.nil?
+                   response_ajax("Очистили очередь.<br/>Удалили #{count} сообщений") and return
+                   return false
+                 end
+                 count +=1
+               end
+               response_ajax("Невозможно удалить больше 50 сообщений:(") if count == 3
+               receiver.close
+               session.close
+               connection.close
+             rescue => msg
+               response_ajax("Случилось непредвиденное: #{msg.class} <br/> #{msg.message}")
+             ensure
+               receiver.close if receiver
+               session.close if session
+               connection.close if connection
+             end
+           end
   end
 end

@@ -82,6 +82,7 @@
             <div class="col-md placeholder">
               <%= f.input :xml_in, as: :text, :label => false, :required => false, input_html: { id: 'xml_text_in_field', class: 'form-control', :style=> 'height: 600px; white-space: nowrap', placeholder: 'Место для входящей XML' } %>
               <%= f.button :submit, 'Получить сообщение', class: 'btn btn-primary'%>
+              <button type="button" class="btn btn-danger", onclick="get_manager_in_form_data()">Очистить очередь</button>
           <% end %>
           </div>
           </div>

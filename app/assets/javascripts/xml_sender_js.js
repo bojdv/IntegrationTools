@@ -43,7 +43,7 @@
             clearTimeout(timerId);
         })
     }
-
+    //* Получение настроек исходящего менеджера очередей */
     function get_manager_form_data() {
         form_settings_name = document.getElementById("mq_attributes_settings_name").value;
         form_system_settings_name = document.getElementById("manager_manager_name").value;
@@ -73,6 +73,19 @@
             form_autorization: form_autorization,
             form_visible_all: form_visible_all
         };
+    }
+    //* Получение настроек входящего менеджера очередей */
+    function get_manager_in_form_data() {
+        form_in_system_settings_name = document.getElementById("manager_in_manager_name_in").value;
+        form_in_input_queue = document.getElementById("mq_attributes_in_queue_in").value;
+        $.ajax({
+            url: "xml_sender/purge_queue",
+            type: "POST",
+            dataType: "script",
+            data: {system_manager_name: form_in_system_settings_name,
+                   queue: form_in_input_queue
+                },
+        });
     }
 
     function get_form_data() {
@@ -205,6 +218,19 @@
                         },
                     });
                 }
+                if (key == 'edit') {
+                    $.ajax({
+                        url: "xml_sender/edit_category",
+                        type: "POST",
+                        dataType: "script",
+                        data: {
+                            form_elements: {
+                                id: form_elements.form_category,
+                                category_name: form_elements.form_category_user,
+                            }
+                        },
+                    });
+                }
                 if (key == 'delete') {
                     $.ajax({
                         url: "xml_sender/delete_category",
@@ -221,6 +247,7 @@
             },
             items: {
                 "new": {name: "Добавить категорию", icon: "edit"},
+                "edit": {name: "Сохранить новое имя", icon: "edit"},
                 "delete": {name: "Удалить категорию", icon: "delete"},
             }
         });

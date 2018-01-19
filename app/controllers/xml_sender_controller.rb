@@ -200,10 +200,23 @@ class XmlSenderController < ApplicationController
     end
   end
   def requests_from_browser
-    if params[:get_in_manager][:system_manager_name].present? # Получаем настройки входного менеджера
+    puts params[:simpletest_data_request]
+    if !params[:get_in_manager].nil? # Получаем настройки входного менеджера
       manager = QueueManager.find_by_manager_name(params[:get_in_manager][:system_manager_name])
       respond_to do |format|
         format.js { render :js => "put_in_queue('#{manager.queue_in}')" }
+      end
+    elsif !params[:simpletest_data].nil? # Получаем данные для SimpleTest
+      response_ajax("Не заполнены параметры:#{@empty_filds.join}") and return if !get_empty_values(simpleTest_params).empty?
+      manager_id = QueueManager.find_by_manager_name(simpleTest_params[:system_manager_name])
+      begin
+        if SimpleTest.find_or_initialize_by(xml_id: simpleTest_params[:xml_id]).update_attributes!(queue_manager_id: manager_id.id)
+          response_ajax("Сохранили Simple Test для xml: #{Xml.find(simpleTest_params[:xml_id]).xml_name}") and return
+        else
+          response_ajax("Ошибка при сохранении:<br/> #{newSimpleTest.errors.full_messages.inspect}") and return
+        end
+      rescue Exception => msg
+        response_ajax("Случилось непредвиденное:<br/> #{msg.message}")
       end
     end
   end
@@ -252,4 +265,7 @@ def send_to_queue_params
 end
 def receive_queue_params
   params.require(:mq_attributes_in).permit(:manager_name_in, :queue_in)
+end
+def simpleTest_params
+  params.require(:simpletest_data).permit(:xml_id, :system_manager_name)
 end

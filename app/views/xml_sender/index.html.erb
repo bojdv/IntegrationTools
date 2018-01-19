@@ -17,7 +17,7 @@
       <div class="row">
         <div class="col-md-3 placeholder">
           <%= simple_form_for :manager, :remote => true, url: 'xml_sender/manager_choise', html: { class: 'form-group' } do |f| %>
-            <%= f.input :manager_name, :required => false, :label => false, :collection => @qm, input_html: { onchange: "get_manager_out_form_data()"}, prompt: 'Шаблоны настроек' %>
+            <%= f.input :manager_name, :required => false, :label => false, :collection => @qm, input_html: { onchange: "get_manager_out_form_data()"}, prompt: 'Шаблоны настроек'%>
           <% end %>
 
           <%= simple_form_for :mq_attributes, remote: true, url: xml_sender_send_to_queue_path, html: {class: 'form-group' } do |f| %>

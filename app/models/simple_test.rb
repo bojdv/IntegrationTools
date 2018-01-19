@@ -1,0 +1,2 @@
+class SimpleTest < ApplicationRecord
+end

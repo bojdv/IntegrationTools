@@ -149,6 +149,17 @@ function get_choice_xml() { //* Получение настроек исходя
         };
     }
 
+    function get_simple_test_data() {
+       category_id = document.getElementById("xml_select_category_name").value;
+       xml_id = document.getElementById("xml_select_xml_name").value;
+       manager_name = document.getElementById("manager_manager_name").value;
+       return {
+           category_id: category_id,
+           xml_id: xml_id,
+           manager_name: manager_name
+    };
+}
+
     function addElement(text) {
         $('#list').html(text);
     }
@@ -195,6 +206,7 @@ function get_choice_xml() { //* Получение настроек исходя
             selector: '.context-menu-one',
             callback: function (key, options) {
                 form_elements = get_form_data();
+                simpletest_data = get_simple_test_data();
                 request = {
                     form_elements: {
                         xml_text: form_elements.form_xml,
@@ -214,14 +226,6 @@ function get_choice_xml() { //* Получение настроек исходя
                         data: request
                     });
                 }
-                if (key == 'delete') {
-                    $.ajax({
-                        url: "xml_sender/delete_xml",
-                        type: "POST",
-                        dataType: "script",
-                        data: request
-                    });
-                }
                 if (key == 'save') {
                     $.ajax({
                         url: "xml_sender/save_xml",
@@ -230,11 +234,34 @@ function get_choice_xml() { //* Получение настроек исходя
                         data: request
                     });
                 }
+                if (key == 'simpletest') {
+                    $.ajax({
+                        url: "xml_sender/requests_from_browser",
+                        type: "POST",
+                        dataType: "script",
+                        data: {
+                            simpletest_data: {
+                                xml_id: simpletest_data.xml_id,
+                                category_id: simpletest_data.category_id,
+                                system_manager_name: simpletest_data.manager_name
+                            }
+                        },
+                });
+                }
+                if (key == 'delete') {
+                    $.ajax({
+                        url: "xml_sender/delete_xml",
+                        type: "POST",
+                        dataType: "script",
+                        data: request
+                    });
+                }
 
             },
             items: {
-                "save": {name: "Сохранить изменения", icon: "edit"},
                 "new": {name: "Сохранить,как новую", icon: "edit"},
+                "save": {name: "Сохранить изменения", icon: "edit"},
+                "simpletest": {name: "Сохранить Simple Test", icon: "edit"},
                 "delete": {name: "Удалить", icon: "delete"},
             }
         });

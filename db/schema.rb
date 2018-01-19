@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180115114208) do
+ActiveRecord::Schema.define(version: 20180119161214) do
 
   create_table "categories", force: :cascade do |t|
     t.integer "product_id", limit: 10, precision: 10
@@ -44,6 +44,14 @@ ActiveRecord::Schema.define(version: 20180115114208) do
     t.string "queue_in"
     t.integer "user_id", limit: 10, precision: 10
     t.boolean "visible_all", default: false
+  end
+
+  create_table "simple_tests", force: :cascade do |t|
+    t.integer "xml_id", limit: 10, precision: 10
+    t.integer "queue_manager_id", limit: 10, precision: 10
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["xml_id"], name: "index_simple_tests_on_xml_id", unique: true
   end
 
   create_table "users", force: :cascade do |t|

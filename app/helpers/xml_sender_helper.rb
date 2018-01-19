@@ -53,17 +53,12 @@ module XmlSenderHelper
     java_import 'javax.jms.TextMessage'
     puts 'Sending message to AMQ (OpenWire)'
     begin
-      puts "Create and setting Factory ...."
       factory = ActiveMQConnectionFactory.new
       factory.setBrokerURL("tcp://#{params[:mq_attributes][:host]}:#{params[:mq_attributes][:port]}")
-      puts "Creating Connection ...."
       connection = factory.createQueueConnection(params[:mq_attributes][:user], params[:mq_attributes][:password])
-      puts "Creating Session ...."
       session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-      puts "Create a messages"
       textMessage = session.createTextMessage(params[:mq_attributes][:xml])
       textMessage.setJMSCorrelationID(params[:mq_attributes][:correlation_id])
-      puts "Send Request ...."
       sender = session.createSender(session.createQueue(params[:mq_attributes][:queue]))
       connection.start
       sender.send(textMessage)
@@ -110,7 +105,6 @@ module XmlSenderHelper
           count +=1
           response_ajax("Невозможно удалить больше 50 сообщений:(") and return if count > 49
         end
-        puts "xml_text" + xml_text
         respond_to do |format|
           format.js { render :js => "updateInputXml('#{xml_text}')" }
         end
@@ -184,7 +178,6 @@ module XmlSenderHelper
     java_import 'com.ibm.mq.jms.MQQueueConnectionFactory'
     java_import 'com.ibm.mq.jms.JMSC'
     begin
-      puts "Setting Factory ...."
       factory = MQQueueConnectionFactory.new
       factory.setHostName(params[:mq_attributes][:host])
       factory.setQueueManager(params[:mq_attributes][:channel_manager])
@@ -192,11 +185,8 @@ module XmlSenderHelper
       factory.setPort(1414)
       factory.setClientID('mqm')
       factory.setTransportType(JMSC.MQJMS_TP_CLIENT_MQ_TCPIP)
-      puts "Creating Connection ...."
       connection = factory.createQueueConnection(params[:mq_attributes][:user], params[:mq_attributes][:password])
-      puts "Creating Session ...."
       session = connection.createQueueSession(false, QueueSession::AUTO_ACKNOWLEDGE)
-      puts "Send Request ...."
       sender = session.createSender(session.createQueue(params[:mq_attributes][:queue]))
       textMessage = session.createTextMessage(params[:mq_attributes][:xml])
       textMessage.setJMSType("mcd://xmlns")
@@ -228,7 +218,6 @@ module XmlSenderHelper
     java_import 'com.ibm.mq.jms.MQQueueConnectionFactory'
     java_import 'com.ibm.mq.jms.JMSC'
     begin
-      puts "Setting Factory ...."
       factory = MQQueueConnectionFactory.new
       factory.setHostName(manager.host)
       factory.setQueueManager(manager.channel_manager)
@@ -259,7 +248,6 @@ module XmlSenderHelper
           count +=1
           response_ajax("Невозможно удалить больше 50 сообщений:(") and return if count > 49
         end
-        puts "xml_text" + xml_text
         respond_to do |format|
           format.js { render :js => "updateInputXml('#{xml_text}')" }
         end

@@ -148,31 +148,19 @@ class XmlSenderController < ApplicationController
   end
 
   def manager_choise # Заполнение параметров менеджера очередей
-    manager_in_out = ["in", "out"]
-    if (params[:manager]).present? # Исходящие параметры
-      new_params = params.require(:manager).permit(:manager_name)
-      response_ajax("Не выбраны настройки MQ из списка") and return if !get_empty_values(new_params).empty?
-      select_manager = QueueManager.find_by_manager_name(params[:manager][:manager_name])
-      respond_to do |format|
-        format.js { render :js => "changeText(\"#{select_manager.manager_name}\",\"#{select_manager.queue_out}\", \"#{select_manager.host}\", \"#{select_manager.port}\", \"#{select_manager.user}\", \"#{select_manager.password}\", \"#{select_manager.manager_type}\", \"#{select_manager.channel_manager}\", \"#{select_manager.channel}\", \"#{select_manager.amq_protocol}\", \"#{select_manager.visible_all}\", \"#{manager_in_out[1]}\");" }
-      end
-    else if (params[:manager_in]).present? # Входящие параметры
-           new_params = params.require(:manager_in).permit(:manager_name_in)
-           response_ajax("Не выбраны настройки MQ из списка") and return if !get_empty_values(new_params).empty?
-           select_manager = QueueManager.find_by_manager_name(params[:manager_in][:manager_name_in])
-           respond_to do |format|
-             format.js { render :js => "changeText(\"#{select_manager.manager_name}\",\"#{select_manager.queue_in}\", \"#{select_manager.host}\", \"#{select_manager.port}\", \"#{select_manager.user}\", \"#{select_manager.password}\", \"#{select_manager.manager_type}\", \"#{select_manager.channel_manager}\", \"#{select_manager.channel}\", \"#{select_manager.amq_protocol}\", \"#{select_manager.visible_all}\",\"#{manager_in_out[0]}\");" }
-           end
-         end
+    new_params = params.require(:manager).permit(:manager_name)
+    response_ajax("Не выбраны настройки MQ из списка") and return if !get_empty_values(new_params).empty?
+    select_manager = QueueManager.find_by_manager_name(params[:manager][:manager_name])
+    respond_to do |format|
+      format.js { render :js => "changeText(\"#{select_manager.manager_name}\",\"#{select_manager.queue_out}\", \"#{select_manager.host}\", \"#{select_manager.port}\", \"#{select_manager.user}\", \"#{select_manager.password}\", \"#{select_manager.manager_type}\", \"#{select_manager.channel_manager}\", \"#{select_manager.channel}\", \"#{select_manager.amq_protocol}\", \"#{select_manager.visible_all}\");" }
     end
   end
   def put_xml
-    new_params = params.require(:xml).permit(:product_name, :select_xml_name)
-    response_ajax("<h5>Не заполнены параметры:</h5>#{@empty_filds.join}") and return if !get_empty_values(new_params).empty?
-    response_ajax("Не выбрана XML!") and return if params[:xml][:select_xml_name].nil?
-    select_xml = Xml.find(params[:xml][:select_xml_name])
-    respond_to do |format|
-      format.js { render :js => "updateXml('#{select_xml.xml_text.inspect}', '#{select_xml.xml_name}', '#{select_xml.category.category_name}', '#{select_xml.xml_description.inspect}', '#{select_xml.private}', '#{select_xml.user.email}')" }
+    if !params[:choice_xml].empty?
+      select_xml = Xml.find(params[:choice_xml])
+      respond_to do |format|
+        format.js { render :js => "updateXml('#{select_xml.xml_text.inspect}', '#{select_xml.xml_name}', '#{select_xml.category.category_name}', '#{select_xml.xml_description.inspect}', '#{select_xml.private}', '#{select_xml.user.email}')" }
+      end
     end
   end
 

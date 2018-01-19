@@ -74,8 +74,8 @@
             form_visible_all: form_visible_all
         };
     }
-    //* Получение настроек входящего менеджера очередей */
-    function get_manager_in_form_data() {
+
+    function get_manager_in_form_data() { //* Получение настроек входящего менеджера очередей */
         form_in_system_settings_name = document.getElementById("mq_attributes_in_manager_name_in").value;
         form_in_input_queue = document.getElementById("mq_attributes_in_queue_in").value;
         $.ajax({
@@ -90,7 +90,19 @@
                 }
         }});
     }
-    function get_in_manager() {
+function get_manager_out_form_data() { //* Получение настроек исходящего менеджера очередей */
+    form_system_settings_name = document.getElementById("manager_manager_name").value;
+    $.ajax({
+        url: "xml_sender/manager_choise",
+        type: "POST",
+        dataType: "script",
+        data: {
+            manager: {
+                manager_name: form_system_settings_name
+            }
+        }});
+}
+    function get_in_manager() { //* Получение настроек исходящего менеджера очередей */
         form_in_system_settings_name = document.getElementById("mq_attributes_in_manager_name_in").value;
         $.ajax({
             url: "xml_sender/requests_from_browser",
@@ -102,6 +114,16 @@
                 }
             }});
     }
+function get_choice_xml() { //* Получение настроек исходящего менеджера очередей */
+    choice_xml = document.getElementById("xml_select_xml_name").value;
+    $.ajax({
+        url: "xml_sender/put_xml",
+        type: "POST",
+        dataType: "script",
+        data: {
+            choice_xml: choice_xml
+        }});
+}
     function put_in_queue(queue) {
         document.getElementById("mq_attributes_in_queue_in").value = queue;
     }

@@ -299,4 +299,9 @@ module XmlSenderHelper
       response_ajax("Случилось непредвиденное:<br/> #{msg.message}")
     end
   end
+  def compare_xml
+    xml1 = Nokogiri::XML(open('C:\Users\Pekav\Downloads\CurrSell.xml'))
+    xml2 = Nokogiri::XML(open('C:\Users\Pekav\Downloads\CurrSell2.xml'))
+    puts CompareXML.equivalent?(xml1, xml2, {verbose: true})
+  end
 end

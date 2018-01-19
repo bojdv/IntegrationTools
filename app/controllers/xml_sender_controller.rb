@@ -146,7 +146,6 @@ class XmlSenderController < ApplicationController
       receive_from_wmq(manager, params[:mq_attributes_in][:mode])
     end
   end
-
   def manager_choise # Заполнение параметров менеджера очередей
     new_params = params.require(:manager).permit(:manager_name)
     response_ajax("Не выбраны настройки MQ из списка") and return if !get_empty_values(new_params).empty?

@@ -73,6 +73,8 @@ GEM
       coffee-script-source
       execjs
     coffee-script-source (1.12.2)
+    compare-xml (0.62)
+      nokogiri (~> 1.6)
     concurrent-ruby (1.0.5)
     concurrent-ruby (1.0.5-java)
     crass (1.0.3)
@@ -222,6 +224,7 @@ DEPENDENCIES
   capybara
   clipboard
   coffee-rails (~> 4.2)
+  compare-xml
   ffi
   jbuilder (~> 2.5)
   jquery-rails

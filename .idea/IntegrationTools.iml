@@ -46,6 +46,7 @@
     <orderEntry type="library" scope="PROVIDED" name="coffee-rails (v4.2.2, jruby-9.1.15.0-p0) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="coffee-script (v2.4.1, jruby-9.1.15.0-p0) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="coffee-script-source (v1.12.2, jruby-9.1.15.0-p0) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="compare-xml (v0.62, jruby-9.1.15.0-p0) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="concurrent-ruby (v1.0.5, jruby-9.1.15.0-p0) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="crass (v1.0.3, jruby-9.1.15.0-p0) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="diff-lcs (v1.3, jruby-9.1.15.0-p0) [gem]" level="application" />

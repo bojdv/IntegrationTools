@@ -90,24 +90,30 @@ class XmlSenderController < ApplicationController
         else
           response_ajax("#{new_settings.errors.full_messages.inspect}") and return
         end
-      else if (params[:form_elements][:mode]) == 'edit' # Редактирование настройки
-             response_ajax("<h5>Не заполнены параметры:</h5>#{@empty_filds.join}") and return if !get_empty_values(manager_params).empty?
-             edit_manager = QueueManager.find_by_manager_name(params[:form_elements][:system_manager_name])
-             if edit_manager.update_attributes(manager_params.except(:user_id))
-               response_ajax("Отредактировали настройки для #{manager_params[:manager_name]}", 2000) and return
-             else
-               response_ajax("#{new_settings.errors.full_messages.inspect}") and return
-             end
-           else if (params[:form_elements][:mode]) == 'delete' # Удаление настройки
-                  response_ajax("Не выбрана настройка для удаления!") and return if params[:form_elements][:manager_name].empty?
-                  delete_setting = QueueManager.find_by_manager_name(params[:form_elements][:manager_name])
-                  if delete_setting.destroy
-                    response_ajax("Удалили настройку #{manager_params[:manager_name]}", 2000) and return
-                  else
-                    response_ajax("#{new_settings.errors.full_messages.inspect}") and return
-                  end
-                end
-           end
+      elsif (params[:form_elements][:mode]) == 'edit' # Редактирование настройки
+        response_ajax("<h5>Не заполнены параметры:</h5>#{@empty_filds.join}") and return if !get_empty_values(manager_params).empty?
+        edit_manager = QueueManager.find_by_manager_name(params[:form_elements][:system_manager_name])
+        if edit_manager.update_attributes(manager_params.except(:user_id))
+          response_ajax("Отредактировали настройки для #{manager_params[:manager_name]}", 2000) and return
+        else
+          response_ajax("#{edit_manager.errors.full_messages.inspect}") and return
+        end
+      elsif (params[:form_elements][:mode]) == 'edit_queue' # Редактирование входной очереди
+        response_ajax("Не заполнена очередь или не выбран менеджер ") and return if (params[:form_elements][:system_manager_name].empty?)
+        edit_manager = QueueManager.find_by_manager_name(params[:form_elements][:system_manager_name])
+        if edit_manager.update_attribute(:queue_in, params[:form_elements][:queue])
+          #response_ajax("Отредактировали настройки для #{edit_manager.manager_name}", 2000) and return
+        else
+          response_ajax("#{edit_manager.errors.full_messages.inspect}") and return
+        end
+      elsif (params[:form_elements][:mode]) == 'delete' # Удаление настройки
+        response_ajax("Не выбрана настройка для удаления!") and return if params[:form_elements][:manager_name].empty?
+        delete_setting = QueueManager.find_by_manager_name(params[:form_elements][:manager_name])
+        if delete_setting.destroy
+          response_ajax("Удалили настройку #{manager_params[:manager_name]}", 2000) and return
+        else
+          response_ajax("#{new_settings.errors.full_messages.inspect}") and return
+        end
       end
     rescue Exception => msg
       response_ajax("Случилось непредвиденное:<br/> #{msg.message}", 5000)
@@ -129,21 +135,16 @@ class XmlSenderController < ApplicationController
   end
   def get_message # Получение сообщение из очереди
     response_ajax("Не заполнены параметры:#{@empty_filds.join}") and return if !get_empty_values(receive_queue_params).empty?
-    if (params[:mq_attributes_in][:manager_type_in]) == 'Active MQ'
-      if (params[:mq_attributes_in][:protocol_in]) == 'OpenWire'
-        receive_from_amq_openwire
+    manager = QueueManager.find_by_manager_name(receive_queue_params[:manager_name_in])
+    if manager.manager_type == 'Active MQ'
+      if manager.amq_protocol == 'OpenWire'
+        receive_from_amq_openwire(manager, params[:mq_attributes_in][:mode])
       else
-        receive_from_amq_stomp
+        receive_from_amq_stomp(manager, params[:mq_attributes_in][:mode])
       end
     else
-      receive_from_wmq
+      receive_from_wmq(manager, params[:mq_attributes_in][:mode])
     end
-  end
-  def purge_queue
-    response_ajax("Не заполнены параметры:#{@empty_filds.join}") and return if !get_empty_values(purgeQueueParams).empty?
-    puts purgeQueueParams[:manager_name]
-    manager = QueueManager.find_by_manager_name(purgeQueueParams[:system_manager_name])
-    purgeQueue(manager, purgeQueueParams[:queue])
   end
 
   def manager_choise # Заполнение параметров менеджера очередей
@@ -211,6 +212,14 @@ class XmlSenderController < ApplicationController
       format.js { render :js => "updateOutputXml('#{xml_out.inspect}')" }
     end
   end
+  def requests_from_browser
+    if params[:get_in_manager][:system_manager_name].present? # Получаем настройки входного менеджера
+      manager = QueueManager.find_by_manager_name(params[:get_in_manager][:system_manager_name])
+      respond_to do |format|
+        format.js { render :js => "put_in_queue('#{manager.queue_in}')" }
+      end
+    end
+  end
 end
 
 private
@@ -255,20 +264,5 @@ def send_to_queue_params
   end
 end
 def receive_queue_params
-  if params[:mq_attributes_in].has_value?('Active MQ')
-    if params[:mq_attributes_in][:autorization_in] == 'true'
-      params.require(:mq_attributes_in).permit(:manager_type_in, :protocol_in, :amq_protocol_in, :queue_in, :host_in, :port_in, :user_in, :password_in)
-    else
-      params.require(:mq_attributes_in).permit(:manager_type_in, :protocol_in, :amq_protocol_in, :queue_in, :host_in, :port_in)
-    end
-  else
-    if params[:mq_attributes_in][:autorization] == 'true'
-      params.require(:mq_attributes_in).permit(:manager_type_in, :protocol_in, :queue_in, :host_in, :port_in, :channel_in, :channel_manager_in, :user_in, :password_in)
-    else
-      params.require(:mq_attributes_in).permit(:manager_type_in, :protocol_in, :queue_in, :host_in, :port_in, :channel_in, :channel_manager_in)
-    end
-  end
-end
-def purgeQueueParams
-  params.permit(:system_manager_name, :queue)
+  params.require(:mq_attributes_in).permit(:manager_name_in, :queue_in)
 end

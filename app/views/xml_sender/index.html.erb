@@ -56,33 +56,15 @@
       <br>
       <div class="row">
         <div class="col-md-3 placeholder">
-          <%= simple_form_for :manager_in, :remote => true, url: 'xml_sender/manager_choise', html: { class: 'form-group' } do |f| %>
-            <%= f.input :manager_name_in, :required => false, :label => false, :collection => @qm, prompt: 'Шаблоны настроек' %>
-            <%= f.button :submit, 'Получить настройки', class: 'btn btn-primary'%>
-          <% end %>
 
           <%= simple_form_for :mq_attributes_in, remote: true, url: xml_sender_get_message_path, html: {class: 'form-group' } do |f| %>
-            <%= f.input :manager_type_in, label: 'Выберите менеджер очередей', required: false, collection: ['Active MQ', 'WebSphere MQ'], selected: :collection[0] %>
-            <div id="protocol_select_in">
-              <%= f.input :protocol_in, label: 'Выберите протокол', required: false, collection: ['OpenWire', 'STOMP'], selected: :collection[0]%>
-            </div>
-            <div id="wmq_fields_in">
-              <%= f.input :channel_manager_in, label: 'Администратор очередей', required: false%>
-              <%= f.input :channel_in, label: 'Канал', required: false, placeholder: 'Канал соединения с сервером'%>
-            </div>
-            <%= f.input :queue_in, :label => 'Откуда получить', :required => false, placeholder: 'Например: test_out' %>
-            <%= f.input :host_in, :label => 'Хост', :required => false , placeholder: 'Например: localhost' %>
-            <%= f.input :port_in, :label => 'Порт', :required => false , placeholder: 'Например:61616' %>
-            <%= f.input :autorization_in, as: :boolean, :label => 'Нужна авторизация?', checked_value: true, unchecked_value: false, input_html: {checked: false} %>
-            <div id="autorization_in">
-              <%= f.input :user_in, :label => 'Имя пользователя', :required => false , placeholder: 'Например: admin' %>
-              <%= f.input :password_in, :label => 'Пароль пользователя', :required => false , input_html: {value: 'admin'}, placeholder: 'Например: password' %>
-            </div>
+            <%= f.input :manager_name_in, :required => false, :label => false, :collection => @qm, input_html: { onchange: "get_in_manager()"}, prompt: 'Шаблоны настроек' %>
+            <%= f.input :queue_in, :label => 'Откуда получить', :required => false, input_html: { onchange: "get_manager_in_form_data()"}, placeholder: 'Например: test_out'%>
+            <%= f.input :mode, :required => false, label: false, selected: "Получить первое сообщение", collection: [ "Получить первое сообщение", "Получить все сообщения", "Очистить очередь"] %>
+            <%= f.button :submit, 'Поехали', class: 'btn btn-primary form-control'%>
             </div>
             <div class="col-md placeholder">
-              <%= f.input :xml_in, as: :text, :label => false, :required => false, input_html: { id: 'xml_text_in_field', class: 'form-control', :style=> 'height: 600px; white-space: nowrap', placeholder: 'Место для входящей XML' } %>
-              <%= f.button :submit, 'Получить сообщение', class: 'btn btn-primary'%>
-              <button type="button" class="btn btn-danger", onclick="get_manager_in_form_data()">Очистить очередь</button>
+              <%= f.input :xml_in, as: :text, :label => false, :required => false, input_html: { id: 'xml_text_in_field', class: 'form-control', :style=> 'height: 600px;', placeholder: 'Место для входящей XML' } %>
           <% end %>
           </div>
           </div>

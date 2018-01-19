@@ -36,7 +36,7 @@ module XmlSenderHelper
       @empty_filds[index] = 'Пароль' if ['password','password_in'].include?(@empty_filds[index])
       @empty_filds[index] = 'XML сообщение' if ['xml','xml_text'].include?(@empty_filds[index])
       @empty_filds[index] = 'Название настройки' if ['manager_name'].include?(@empty_filds[index])
-      @empty_filds[index] = 'Не выбран менеджер' if ['system_manager_name'].include?(@empty_filds[index])
+      @empty_filds[index] = 'Не выбран менеджер' if ['system_manager_name', 'manager_name_in'].include?(@empty_filds[index])
       @empty_filds[index] = 'Название продукта' if ['product_name'].include?(@empty_filds[index])
       @empty_filds[index] = 'Название XML' if ['select_xml_name', 'xml_name'].include?(@empty_filds[index])
       @empty_filds[index] = 'Описание XML' if ['xml_description'].include?(@empty_filds[index])
@@ -78,32 +78,48 @@ module XmlSenderHelper
       connection.close if connection
     end
   end
-  def receive_from_amq_openwire # Получение сообщений из Active MQ по протоколу OpenWire
+  def receive_from_amq_openwire(manager, mode) # Получение сообщений из Active MQ по протоколу OpenWire
     java_import 'org.apache.activemq.ActiveMQConnectionFactory'
     java_import 'javax.jms.Session'
     java_import 'javax.jms.TextMessage'
     java_import 'org.apache.activemq.command.ActiveMQDestination'
     puts 'Receive message from AMQ (OpenWire)'
     begin
-      puts "Create and setting Factory ...."
       factory = ActiveMQConnectionFactory.new
-      factory.setBrokerURL("tcp://#{params[:mq_attributes_in][:host_in]}:#{params[:mq_attributes_in][:port_in]}")
-      puts "Creating Connection ...."
-      connection = factory.createQueueConnection(params[:mq_attributes_in][:user_in], params[:mq_attributes_in][:password_in])
-      puts "Creating Session ...."
+      factory.setBrokerURL("tcp://#{manager.host}:#{manager.port}")
+      manager.user.nil? ? user ='' : user=manager.user
+      manager.password.nil? ? password ='' : password=manager.user
+      connection = factory.createQueueConnection(user, password)
       session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-      puts "Receiving Response ...."
-      receiver = session.createReceiver(session.createQueue(params[:mq_attributes_in][:queue_in]))
+      receiver = session.createReceiver(session.createQueue(manager.queue_in))
       connection.start
-      xml = receiver.receive(1000)
-      response_ajax("Сообщения не найдены") and return if xml.nil?
-      respond_to do |format|
-        format.js { render :js => "updateInputXml('#{xml.getText.inspect}')" }
+      if mode == 'Получить первое сообщение'
+        xml = receiver.receive(1000)
+        response_ajax("Сообщения не найдены") and return if xml.nil?
+        respond_to do |format|
+          format.js { render :js => "updateInputXml('#{xml.getText.inspect}')" }
+        end
+      elsif mode == 'Получить все сообщения'
+        count = 0
+        xml_text = String.new
+        xml = receiver.receive(100)
+        response_ajax("Сообщения не найдены") and return if xml.nil?
+        while !xml.nil?
+          xml_text << xml.getText.inspect
+          xml = receiver.receive(100)
+          count +=1
+          response_ajax("Невозможно удалить больше 50 сообщений:(") and return if count > 49
+        end
+        puts "xml_text" + xml_text
+        respond_to do |format|
+          format.js { render :js => "updateInputXml('#{xml_text}')" }
+        end
+        #response_ajax("Получили #{count} сообщений") and return
+      elsif mode == 'Очистить очередь'
+        receiver.close if receiver
+        connection.destroyDestination(session.createQueue(manager.queue_in)) # Удаляем очередь.
+        response_ajax("Очистили очередь") and return
       end
-      receiver.close
-      connection.destroyDestination(session.createQueue(params[:mq_attributes_in][:queue_in])) # Удаляем очередь.
-      session.close
-      connection.close
     rescue => msg
       response_ajax("Случилось непредвиденное:<br/> #{msg.message}", 5000)
     ensure
@@ -126,21 +142,29 @@ module XmlSenderHelper
       response_ajax("Случилось непредвиденное: #{msg.class} <br/> #{msg.message}")
     end
   end
-  def receive_from_amq_stomp
+  def receive_from_amq_stomp(manager, mode)
     puts 'Receive message from AMQ (STOMP)'
     begin
       client = Stomp::Client.new(
-          params[:mq_attributes_in][:user_in],
-          params[:mq_attributes_in][:password_in],
-          params[:mq_attributes_in][:host_in],
-          params[:mq_attributes_in][:port_in])
+          manager.user,
+          manager.password,
+          manager.host,
+          manager.port)
       message = String.new
-      inputqueue = params[:mq_attributes_in][:queue_in]
-      client.subscribe(inputqueue){|msg| message << msg.body.to_s}
-      client.join(1)
-      response_ajax("Сообщения отсутствуют") and return if message.empty?
-      respond_to do |format|
-        format.js { render :js => "updateInputXml('#{message.inspect}')" }
+      inputqueue = manager.queue_in
+      if mode == ('Получить первое сообщение' || 'Получить все сообщения')
+        client.subscribe(inputqueue){|msg| message << msg.body.to_s}
+        client.join(1)
+        client.close
+        response_ajax("Сообщения не найдены") and return if message.empty?
+        respond_to do |format|
+          format.js { render :js => "updateInputXml('#{message.inspect}')" }
+        end
+      elsif mode == 'Очистить очередь'
+        client.subscribe(inputqueue){|msg| message << msg.body.to_s}
+        client.join(1)
+        client.close
+        response_ajax("Очистили очередь") and return
       end
     rescue Exception => msg
       response_ajax("Случилось непредвиденное: #{msg.class} <br/> #{msg.message}")
@@ -191,7 +215,7 @@ module XmlSenderHelper
       connection.close if connection
     end
   end
-  def receive_from_wmq
+  def receive_from_wmq(manager, mode)
     puts 'Sending message to WMQ'
     java_import 'javax.jms.JMSException'
     java_import 'javax.jms.QueueConnection'
@@ -206,27 +230,51 @@ module XmlSenderHelper
     begin
       puts "Setting Factory ...."
       factory = MQQueueConnectionFactory.new
-      factory.setHostName(params[:mq_attributes_in][:host_in])
-      factory.setQueueManager(params[:mq_attributes_in][:channel_manager_in])
-      factory.setChannel(params[:mq_attributes_in][:channel_in])
-      factory.setPort(params[:mq_attributes_in][:port_in].to_i)
+      factory.setHostName(manager.host)
+      factory.setQueueManager(manager.channel_manager)
+      factory.setChannel(manager.channel)
+      factory.setPort(manager.port.to_i)
       factory.setClientID('mqm')
       factory.setTransportType(JMSC.MQJMS_TP_CLIENT_MQ_TCPIP)
-      puts "Creating Connection ...."
-      connection = factory.createQueueConnection(params[:mq_attributes_in][:user_in], params[:mq_attributes_in][:password_in])
-      puts "Creating Session ...."
+      manager.user.nil? ? user ='' : user=manager.user
+      manager.password.nil? ? password ='' : password=manager.user
+      connection = factory.createQueueConnection(user, password)
       session = connection.createQueueSession(false, QueueSession::AUTO_ACKNOWLEDGE)
-      puts "Receiving Response ...."
-      receiver = session.createReceiver(session.createQueue(params[:mq_attributes_in][:queue_in]))
+      receiver = session.createReceiver(session.createQueue(manager.queue_in))
       connection.start
-      xml = receiver.receive(1000)
-      response_ajax("Сообщения не найдены") and return if xml.nil?
-      respond_to do |format|
-        format.js { render :js => "updateInputXml('#{xml.getText.inspect}')" }
+      if mode == 'Получить первое сообщение'
+        xml = receiver.receive(1000)
+        response_ajax("Сообщения не найдены") and return if xml.nil?
+        respond_to do |format|
+          format.js { render :js => "updateInputXml('#{xml.getText.inspect}')" }
+        end
+      elsif mode == 'Получить все сообщения'
+        count = 0
+        xml_text = String.new
+        xml = receiver.receive(100)
+        response_ajax("Сообщения не найдены") and return if xml.nil?
+        while !xml.nil?
+          xml_text << xml.getText.inspect
+          xml = receiver.receive(100)
+          count +=1
+          response_ajax("Невозможно удалить больше 50 сообщений:(") and return if count > 49
+        end
+        puts "xml_text" + xml_text
+        respond_to do |format|
+          format.js { render :js => "updateInputXml('#{xml_text}')" }
+        end
+      elsif mode == 'Очистить очередь'
+        count = 0
+        while count < 50
+          xml = receiver.receive(100)
+          if xml.nil?
+            response_ajax("Очистили очередь.<br/>Удалили #{count} сообщений") and return
+            return false
+          end
+          count +=1
+        end
+        response_ajax("Невозможно удалить больше 50 сообщений:(") if count == 50
       end
-      receiver.close
-      session.close
-      connection.close
     rescue => msg
       response_ajax("Случилось непредвиденное: #{msg.class} <br/> #{msg.message}")
     ensure
@@ -262,75 +310,5 @@ module XmlSenderHelper
     rescue Exception => msg
       response_ajax("Случилось непредвиденное:<br/> #{msg.message}")
     end
-  end
-  def purgeQueue(manager, queue)
-    if manager.manager_type == 'Active MQ'
-      java_import 'org.apache.activemq.ActiveMQConnectionFactory'
-      java_import 'javax.jms.Session'
-      java_import 'javax.jms.TextMessage'
-      java_import 'org.apache.activemq.command.ActiveMQDestination'
-      begin
-        factory = ActiveMQConnectionFactory.new
-        factory.setBrokerURL("tcp://#{manager.host}:#{manager.port}")
-        connection = factory.createQueueConnection(manager.user, manager.password)
-        session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-        connection.start
-        connection.destroyDestination(session.createQueue(queue)) # Удаляем очередь.
-        response_ajax("Очистили очередь") and return
-        session.close
-        connection.close
-      rescue => msg
-        response_ajax("Случилось непредвиденное:<br/> #{msg.message}", 5000)
-      ensure
-        session.close if session
-        connection.close if connection
-      end
-    end
-      else if manager.manager_type == 'WebSphere MQ'
-             java_import 'javax.jms.JMSException'
-             java_import 'javax.jms.QueueConnection'
-             java_import 'javax.jms.QueueSender'
-             java_import 'javax.jms.QueueReceiver'
-             java_import 'javax.jms.QueueSession'
-             java_import 'javax.jms.Session'
-             java_import 'javax.jms.TextMessage'
-             java_import 'com.ibm.mq.MQMessage'
-             java_import 'com.ibm.mq.jms.MQQueueConnectionFactory'
-             java_import 'com.ibm.mq.jms.JMSC'
-             begin
-               factory = MQQueueConnectionFactory.new
-               factory.setHostName(manager.host)
-               factory.setQueueManager(manager.channel_manager)
-               factory.setChannel(manager.channel)
-               factory.setPort(manager.port.to_i)
-               factory.setClientID('mqm')
-               factory.setTransportType(JMSC.MQJMS_TP_CLIENT_MQ_TCPIP)
-               manager.user.nil? ? user ='' : user=manager.user
-               manager.password.nil? ? password ='' : password=manager.password
-               connection = factory.createQueueConnection(user, password)
-               session = connection.createQueueSession(false, QueueSession::AUTO_ACKNOWLEDGE)
-               receiver = session.createReceiver(session.createQueue(queue))
-               connection.start
-               count = 0
-               while count < 50
-                 xml = receiver.receive(100)
-                 if xml.nil?
-                   response_ajax("Очистили очередь.<br/>Удалили #{count} сообщений") and return
-                   return false
-                 end
-                 count +=1
-               end
-               response_ajax("Невозможно удалить больше 50 сообщений:(") if count == 3
-               receiver.close
-               session.close
-               connection.close
-             rescue => msg
-               response_ajax("Случилось непредвиденное: #{msg.class} <br/> #{msg.message}")
-             ensure
-               receiver.close if receiver
-               session.close if session
-               connection.close if connection
-             end
-           end
   end
 end

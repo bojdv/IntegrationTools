@@ -76,16 +76,34 @@
     }
     //* Получение настроек входящего менеджера очередей */
     function get_manager_in_form_data() {
-        form_in_system_settings_name = document.getElementById("manager_in_manager_name_in").value;
+        form_in_system_settings_name = document.getElementById("mq_attributes_in_manager_name_in").value;
         form_in_input_queue = document.getElementById("mq_attributes_in_queue_in").value;
         $.ajax({
-            url: "xml_sender/purge_queue",
+            url: "xml_sender/crud_mq_settings",
             type: "POST",
             dataType: "script",
-            data: {system_manager_name: form_in_system_settings_name,
-                   queue: form_in_input_queue
-                },
-        });
+            data: {
+                form_elements: {
+                    system_manager_name: form_in_system_settings_name,
+                    queue: form_in_input_queue,
+                    mode: 'edit_queue'
+                }
+        }});
+    }
+    function get_in_manager() {
+        form_in_system_settings_name = document.getElementById("mq_attributes_in_manager_name_in").value;
+        $.ajax({
+            url: "xml_sender/requests_from_browser",
+            type: "POST",
+            dataType: "script",
+            data: {
+                get_in_manager: {
+                    system_manager_name: form_in_system_settings_name,
+                }
+            }});
+    }
+    function put_in_queue(queue) {
+        document.getElementById("mq_attributes_in_queue_in").value = queue;
     }
 
     function get_form_data() {

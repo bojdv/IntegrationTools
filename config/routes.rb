@@ -21,7 +21,7 @@ Rails.application.routes.draw do
   post '/xml_sender/crud_mq_settings' => 'xml_sender#crud_mq_settings'
   post '/xml_sender/validate_xml' => 'xml_sender#validate_xml'
   post '/xml_sender/add_prefix' => 'xml_sender#add_prefix'
-  post '/xml_sender/purge_queue' => 'xml_sender#purge_queue'
+  post '/xml_sender/requests_from_browser' => 'xml_sender#requests_from_browser'
   get 'signup' => 'users#new'
   get 'login' => 'sessions#new'
   post 'login' => 'sessions#create'

@@ -1,0 +1,52 @@
+<% provide(:title, "Simple Tests") %>
+<div class="col">
+<div class="row">
+  <div class="col-md-4 placeholder">
+    <div class="form-group">
+      <label for="expected_answer">Ожидаем получить:</label>
+      <textarea class="form-control" id="expected_answer" rows="11"></textarea>
+    </div>
+    <div class="form-group">
+      <label for="actual_answer">Получили ответ:</label>
+      <textarea class="form-control" id="actual_answer" rows="11"></textarea>
+    </div>
+  </div>
+  <div class="col-md placeholder">
+    <div class="form-group">
+      <label for="xml_to_send">XML для запроса</label>
+      <textarea class="form-control" id="xml_to_send" rows="24"></textarea>
+    </div>
+  </div>
+  <div class="col-md-3 placeholder" id="select_product">
+
+    <%= simple_form_for :xml, :remote => true, url: 'xml_sender/put_xml', html: { class: 'form-group' } do |f| %>
+      <%= f.input :product_name,:required => false, :label => false, :collection => @product, label_method: :product_name, prompt: 'Выберите продукт, категорию и xml'%>
+      <div class="category_select">
+        <%= f.input :select_category_name, :required => false, :label => false, :collection => @product, as: :grouped_select ,group_method: :categories, group_label_method: :product_name, :label_method => lambda { |category| "#{category.product_id != 10000 ? category.category_name : (category.category_name if (logged_in? && category.user_id == current_user.id))}"}, :value_method => lambda { |category| "#{category.product_id != 10000 ? category.id : (category.id if (logged_in? && category.user_id == current_user.id))}"}%>
+      </div>
+      <div class="xml_select">
+        <% if logged_in? %>
+          <%= f.input :select_xml_name, :required => false, :label => false, input_html: {onclick: "simple_get_choice_xml()"},:collection => @category, as: :grouped_select, group_method: :xmls, group_label_method: :category_name, :label_method => lambda { |xml| "#{xml.xml_name if xml.user_id==current_user.id || xml.private == false}"}, :value_method => lambda { |xml| "#{xml.id if xml.user_id==current_user.id || xml.private == false}"} %>
+        <% else %>
+          <%= f.input :select_xml_name, :required => false, :label => false, input_html: {onchange: "simple_get_choice_xml()", onclick: "simple_get_choice_xml()"}, :collection => @category, as: :grouped_select, group_method: :xmls, group_label_method: :category_name, :label_method => lambda { |xml| "#{xml.xml_name if xml.private == false}"}, :value_method => lambda { |xml| "#{xml.id if xml.private == false}"} %>
+        <% end %>
+      </div>
+      <!--    <%= f.button :submit, 'Загрузить XML', class: 'btn btn-primary'%><br>-->
+      <!-- Данные XML -->
+      <div id="xml_description">
+        <div class="<%= 'context-menu-one' if logged_in? %>">
+          <%= f.input :xml_name, :label => 'Название XML', :required => false, input_html: {style: "background-color: #b3ffcc"}, placeholder: 'Имя XML'%>
+        </div>
+        <div class="<%= 'context-menu-category' if logged_in? %>">
+          <%= f.input :category_name, :label => 'Название категории', :required => false, input_html: {style: "background-color: #b3ffcc"}, placeholder: 'Название категории'%>
+        </div>
+        <%= f.input :xml_description, as: :text, :label => 'Описание XML', :required => false, placeholder: 'Описание XML'%>
+        <%= f.input :autor, :label => 'Автор XML', :required => false, placeholder: logged_in? ? current_user.email : 'Авторизуйтесь для сохранения', :disabled => true%>
+        <% if logged_in? %>
+          <%= f.input :private_xml, as: :boolean, :label => 'XML доступна только автору!', checked_value: true, unchecked_value: false, input_html: {checked: true} %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>
+</div>

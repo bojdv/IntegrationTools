@@ -152,10 +152,12 @@ function get_choice_xml() { //* Получение настроек исходя
     function get_simple_test_data() {
        category_id = document.getElementById("xml_select_category_name").value;
        xml_id = document.getElementById("xml_select_xml_name").value;
+       xml_answer = document.getElementById("xml_text_in_field").value;
        manager_name = document.getElementById("manager_manager_name").value;
        return {
            category_id: category_id,
            xml_id: xml_id,
+           xml_answer: xml_answer,
            manager_name: manager_name
     };
 }
@@ -242,6 +244,7 @@ function get_choice_xml() { //* Получение настроек исходя
                         data: {
                             simpletest_data: {
                                 xml_id: simpletest_data.xml_id,
+                                xml_answer: xml_answer,
                                 category_id: simpletest_data.category_id,
                                 system_manager_name: simpletest_data.manager_name
                             }

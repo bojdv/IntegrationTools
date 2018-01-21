@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  get 'simple_tests/index'
+
   get 'sessions/new'
   get 'users/new'
   get 'product' => 'product#index'
@@ -26,6 +28,12 @@ Rails.application.routes.draw do
   get 'login' => 'sessions#new'
   post 'login' => 'sessions#create'
   delete 'logout' => 'sessions#destroy'
+
+  # Simple Tests
+  get '/simple_tests' => 'simple_tests#index'
+  post '/simple_tests/put_simple_test' => 'simple_tests#put_simple_test'
+
+
   resources :users
 
   root 'main_page#index'

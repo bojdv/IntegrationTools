@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180119161214) do
+ActiveRecord::Schema.define(version: 20180121163814) do
 
   create_table "categories", force: :cascade do |t|
     t.integer "product_id", limit: 10, precision: 10
@@ -72,6 +72,7 @@ ActiveRecord::Schema.define(version: 20180119161214) do
     t.integer "user_id", limit: 10, precision: 10
     t.boolean "private"
     t.text "xml_description"
+    t.text "xml_answer"
     t.index ["category_id"], name: "index_xmls_on_category_id"
   end
 

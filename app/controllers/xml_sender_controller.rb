@@ -1,6 +1,5 @@
 class XmlSenderController < ApplicationController
   def index
-
     logged_in? ? @qm = QueueManager.where(user_id: current_user.id).or(QueueManager.where(visible_all: true)).order('manager_name').pluck(:manager_name) : @qm = QueueManager.where(visible_all: true).pluck(:manager_name)
     @product = Product.all.order('product_name')
     @category = Category.all.order('category_name')
@@ -209,8 +208,9 @@ class XmlSenderController < ApplicationController
     elsif !params[:simpletest_data].nil? # Получаем данные для SimpleTest
       response_ajax("Не заполнены параметры:#{@empty_filds.join}") and return if !get_empty_values(simpleTest_params).empty?
       manager_id = QueueManager.find_by_manager_name(simpleTest_params[:system_manager_name])
+      xml = Xml.find(simpleTest_params[:xml_id])
       begin
-        if SimpleTest.find_or_initialize_by(xml_id: simpleTest_params[:xml_id]).update_attributes!(queue_manager_id: manager_id.id)
+        if SimpleTest.find_or_initialize_by(xml_id: simpleTest_params[:xml_id]).update_attributes!(queue_manager_id: manager_id.id) && xml.update_attribute(:xml_answer, simpleTest_params[:xml_answer])
           response_ajax("Сохранили Simple Test для xml: #{Xml.find(simpleTest_params[:xml_id]).xml_name}") and return
         else
           response_ajax("Ошибка при сохранении:<br/> #{newSimpleTest.errors.full_messages.inspect}") and return
@@ -267,5 +267,5 @@ def receive_queue_params
   params.require(:mq_attributes_in).permit(:manager_name_in, :queue_in)
 end
 def simpleTest_params
-  params.require(:simpletest_data).permit(:xml_id, :system_manager_name)
+  params.require(:simpletest_data).permit(:xml_id, :xml_answer, :system_manager_name)
 end

@@ -35,6 +35,7 @@ module XmlSenderHelper
       @empty_filds[index] = 'Пользователь' if ['user','user_in'].include?(@empty_filds[index])
       @empty_filds[index] = 'Пароль' if ['password','password_in'].include?(@empty_filds[index])
       @empty_filds[index] = 'XML сообщение' if ['xml','xml_text'].include?(@empty_filds[index])
+      @empty_filds[index] = 'Ответное XML сообщение' if ['xml_answer'].include?(@empty_filds[index])
       @empty_filds[index] = 'Название настройки' if ['manager_name'].include?(@empty_filds[index])
       @empty_filds[index] = 'Не выбран менеджер очереди' if ['system_manager_name', 'manager_name_in'].include?(@empty_filds[index])
       @empty_filds[index] = 'Название продукта' if ['product_name'].include?(@empty_filds[index])

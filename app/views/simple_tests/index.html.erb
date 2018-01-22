@@ -6,7 +6,7 @@
       <label for="expected_answer">Ожидаем получить:</label>
       <textarea class="form-control" id="expected_answer" rows="13"></textarea>
     </div>
-    <div class="form-group">
+    <div class="form-group" id="testt">
       <label for="actual_answer">Получили ответ:</label>
       <textarea class="form-control" id="actual_answer" rows="13"></textarea>
     </div>
@@ -34,8 +34,6 @@
       <!--    <%= f.button :submit, 'Загрузить XML', class: 'btn btn-primary'%><br>-->
       <!-- Данные XML -->
       <div id="xml_description">
-          <%= f.input :xml_name, :label => 'Название XML', :required => false, input_html: {style: "background-color: #b3ffcc"}, placeholder: 'Имя XML'%>
-          <%= f.input :category_name, :label => 'Название категории', :required => false, input_html: {style: "background-color: #b3ffcc"}, placeholder: 'Название категории'%>
         <%= f.input :xml_description, as: :text, :label => 'Описание XML', :required => false, placeholder: 'Описание XML'%>
         <%= f.input :autor, :label => 'Автор XML', :required => false, placeholder: logged_in? ? current_user.email : 'Авторизуйтесь для сохранения', :disabled => true%>
         <%= f.input :all_category_test, as: :boolean, :label => 'Запустить всю категорию', checked_value: true, unchecked_value: false, input_html: {checked: false} %>

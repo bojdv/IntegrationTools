@@ -15,8 +15,8 @@ class SimpleTestsController < ApplicationController
     end
   end
   def run_simpleTest
-    response_ajax("Не заполнены параметры:#{@empty_filds.join}") and return if !get_empty_values(run_simpleTest_params).empty?
     if run_simpleTest_params[:all_category_test] == 'false'
+      response_ajax("Не заполнены параметры:#{@empty_filds.join}") and return if !get_empty_values(run_simpleTest_params).empty?
       mode = 'single'
       xml = Xml.find(run_simpleTest_params[:choice_xml])
       simpleTest =SimpleTest.find_by_xml_id(run_simpleTest_params[:choice_xml])
@@ -30,8 +30,10 @@ class SimpleTestsController < ApplicationController
       else
         send_to_wmq(manager, xml.xml_text)
       end
-    else
+    elsif run_simpleTest_params[:all_category_test] == 'true'
+      response_ajax("Не выбрана категория") and return if run_simpleTest_params[:choice_category].empty?
       @xml_pass = Array.new
+      @xml_fail = Array.new
       mode = 'all'
       xml = Xml.where(category_id: run_simpleTest_params[:choice_category]).to_a
       xml.each do |xml|
@@ -41,15 +43,16 @@ class SimpleTestsController < ApplicationController
           if manager.amq_protocol == 'OpenWire'
             send_to_amq_openwire(manager, xml, mode)
           else
-            send_to_amq_stomp(manager, xml.xml_text)
+            send_to_amq_stomp(manager, xml, mode)
           end
         else
-          send_to_wmq(manager, xml.xml_text)
+          send_to_wmq(manager, xml, mode)
         end
       end
-      respond_to do |format|
-        format.js { render :js => "updateActualXml('Эти XML прошли тесты:\\n#{@xml_pass.join('\n')}')" }
-      end
+      response_ajax("<b>Эти XML прошли тесты:</b><br/>#{@xml_pass.join('<br/>')}<br/><b>А эти нет:</b><br/>#{@xml_fail.join('<br/>')}", 10000)
+      # respond_to do |format|
+      #   format.js { render :js => "updateActualXml('<b>Эти XML прошли тесты:</b>\\n#{@xml_pass.join('\n')}\\nА эти нет:\\n#{@xml_fail.join('\n')}', 'transparent')" }
+      # end
     end
   end
 end

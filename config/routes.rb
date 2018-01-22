@@ -32,7 +32,7 @@ Rails.application.routes.draw do
   # Simple Tests
   get '/simple_tests' => 'simple_tests#index'
   post '/simple_tests/put_simple_test' => 'simple_tests#put_simple_test'
-
+  post '/simple_tests/run_simpleTest' => 'simple_tests#run_simpleTest'
 
   resources :users
 

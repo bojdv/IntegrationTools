@@ -34,8 +34,9 @@ module XmlSenderHelper
       @empty_filds[index] = 'Хост' if ['host', 'host_in'].include?(@empty_filds[index])
       @empty_filds[index] = 'Пользователь' if ['user','user_in'].include?(@empty_filds[index])
       @empty_filds[index] = 'Пароль' if ['password','password_in'].include?(@empty_filds[index])
-      @empty_filds[index] = 'XML сообщение' if ['xml','xml_text'].include?(@empty_filds[index])
+      @empty_filds[index] = 'XML сообщение' if ['xml','xml_text', 'send_xml'].include?(@empty_filds[index])
       @empty_filds[index] = 'Ответное XML сообщение' if ['xml_answer'].include?(@empty_filds[index])
+      @empty_filds[index] = 'Ожидаемый ответ' if ['expected_answer'].include?(@empty_filds[index])
       @empty_filds[index] = 'Название настройки' if ['manager_name'].include?(@empty_filds[index])
       @empty_filds[index] = 'Не выбран менеджер очереди' if ['system_manager_name', 'manager_name_in'].include?(@empty_filds[index])
       @empty_filds[index] = 'Название продукта' if ['product_name'].include?(@empty_filds[index])
@@ -299,10 +300,5 @@ module XmlSenderHelper
     rescue Exception => msg
       response_ajax("Случилось непредвиденное:<br/> #{msg.message}")
     end
-  end
-  def compare_xml
-    xml1 = Nokogiri::XML(open('C:\Users\Pekav\Downloads\CurrSell.xml'))
-    xml2 = Nokogiri::XML(open('C:\Users\Pekav\Downloads\CurrSell2.xml'))
-    puts CompareXML.equivalent?(xml1, xml2, {verbose: true})
   end
 end

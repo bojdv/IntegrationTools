@@ -5,3 +5,5 @@
 @updateSimpleTest = (xml_text, xml_answer) ->
   $('#xml_to_send').val(xml_text.slice(1, -1))
   $('#expected_answer').val(xml_answer.slice(1, -1))
+@updateActualXml = (xml_text) ->
+  $('#actual_answer').val(xml_text)

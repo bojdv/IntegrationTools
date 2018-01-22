@@ -4,17 +4,17 @@
   <div class="col-md-4 placeholder">
     <div class="form-group">
       <label for="expected_answer">Ожидаем получить:</label>
-      <textarea class="form-control" id="expected_answer" rows="11"></textarea>
+      <textarea class="form-control" id="expected_answer" rows="13"></textarea>
     </div>
     <div class="form-group">
       <label for="actual_answer">Получили ответ:</label>
-      <textarea class="form-control" id="actual_answer" rows="11"></textarea>
+      <textarea class="form-control" id="actual_answer" rows="13"></textarea>
     </div>
   </div>
   <div class="col-md placeholder">
     <div class="form-group">
       <label for="xml_to_send">XML для запроса</label>
-      <textarea class="form-control" id="xml_to_send" rows="24"></textarea>
+      <textarea class="form-control" id="xml_to_send" rows="28"></textarea>
     </div>
   </div>
   <div class="col-md-3 placeholder" id="select_product">
@@ -34,19 +34,15 @@
       <!--    <%= f.button :submit, 'Загрузить XML', class: 'btn btn-primary'%><br>-->
       <!-- Данные XML -->
       <div id="xml_description">
-        <div class="<%= 'context-menu-one' if logged_in? %>">
           <%= f.input :xml_name, :label => 'Название XML', :required => false, input_html: {style: "background-color: #b3ffcc"}, placeholder: 'Имя XML'%>
-        </div>
-        <div class="<%= 'context-menu-category' if logged_in? %>">
           <%= f.input :category_name, :label => 'Название категории', :required => false, input_html: {style: "background-color: #b3ffcc"}, placeholder: 'Название категории'%>
-        </div>
         <%= f.input :xml_description, as: :text, :label => 'Описание XML', :required => false, placeholder: 'Описание XML'%>
         <%= f.input :autor, :label => 'Автор XML', :required => false, placeholder: logged_in? ? current_user.email : 'Авторизуйтесь для сохранения', :disabled => true%>
-        <% if logged_in? %>
-          <%= f.input :private_xml, as: :boolean, :label => 'XML доступна только автору!', checked_value: true, unchecked_value: false, input_html: {checked: true} %>
-        <% end %>
+        <%= f.input :all_category_test, as: :boolean, :label => 'Запустить всю категорию', checked_value: true, unchecked_value: false, input_html: {checked: false} %>
       </div>
     <% end %>
+    <button type="button" class="btn btn-primary" id="start-button", onclick="simple_test_data()">Запустить</button>
   </div>
 </div>
 </div>
+<%= render 'layouts/modal_xml_sender' %>

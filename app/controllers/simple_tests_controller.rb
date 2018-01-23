@@ -9,8 +9,17 @@ class SimpleTestsController < ApplicationController
   def put_simple_test
     if !params[:choice_xml].empty?
       xml = Xml.find(params[:choice_xml])
-      respond_to do |format|
-        format.js { render :js => "updateSimpleTest('#{xml.xml_text.inspect}', '#{xml.xml_answer.inspect}')" }
+      autor = User.find(xml.user_id)
+      simpleTest = SimpleTest.find_by_xml_id(xml.id)
+      if simpleTest = SimpleTest.find_by_xml_id(xml.id)
+        manager = QueueManager.find(simpleTest.queue_manager_id)
+        respond_to do |format|
+          format.js { render :js => "updateSimpleTest('#{xml.xml_text.inspect}', '#{xml.xml_answer.inspect}', '#{xml.xml_description}', '#{autor.email}', '#{manager.manager_name}', '#{manager.queue_out}', '#{manager.queue_in}')"}
+        end
+      else
+        respond_to do |format|
+          format.js { render :js => "updateSimpleTest('#{xml.xml_text.inspect}', '#{xml.xml_answer.inspect}', '#{xml.xml_description}', '#{autor.email}')"}
+        end
       end
     end
   end
@@ -19,40 +28,45 @@ class SimpleTestsController < ApplicationController
       response_ajax("Не заполнены параметры:#{@empty_filds.join}") and return if !get_empty_values(run_simpleTest_params).empty?
       mode = 'single'
       xml = Xml.find(run_simpleTest_params[:choice_xml])
-      simpleTest =SimpleTest.find_by_xml_id(run_simpleTest_params[:choice_xml])
+      if !simpleTest =SimpleTest.find_by_xml_id(run_simpleTest_params[:choice_xml])
+        response_ajax("Не создан Simple Test для этой XML!") and return
+      end
       manager = QueueManager.find(simpleTest.queue_manager_id)
       if manager.manager_type == 'Active MQ'
         if manager.amq_protocol == 'OpenWire'
           send_to_amq_openwire(manager, xml, mode)
         else
-          send_to_amq_stomp(manager, xml.xml_text)
+          send_to_amq_stomp(manager, xml, mode)
         end
       else
-        send_to_wmq(manager, xml.xml_text)
+        send_to_wmq(manager, xml, mode)
       end
     elsif run_simpleTest_params[:all_category_test] == 'true'
       response_ajax("Не выбрана категория") and return if run_simpleTest_params[:choice_category].empty?
       @xml_pass = Array.new
       @xml_fail = Array.new
+      @xml_missed = Array.new
       mode = 'all'
       xml = Xml.where(category_id: run_simpleTest_params[:choice_category]).to_a
       xml.each do |xml|
-        simpleTest =SimpleTest.find_by_xml_id(xml.id)
-        manager = QueueManager.find(simpleTest.queue_manager_id)
-        if manager.manager_type == 'Active MQ'
-          if manager.amq_protocol == 'OpenWire'
-            send_to_amq_openwire(manager, xml, mode)
+        simpleTest = SimpleTest.find_by_xml_id(xml.id)
+        if !simpleTest.nil?
+          manager = QueueManager.find(simpleTest.queue_manager_id)
+          if manager.manager_type == 'Active MQ'
+            if manager.amq_protocol == 'OpenWire'
+              send_to_amq_openwire(manager, xml, mode)
+            else
+              send_to_amq_stomp(manager, xml, mode)
+            end
           else
-            send_to_amq_stomp(manager, xml, mode)
+            send_to_wmq(manager, xml, mode)
           end
         else
-          send_to_wmq(manager, xml, mode)
+          @xml_missed << xml.xml_name
         end
       end
-      response_ajax("<b>Эти XML прошли тесты:</b><br/>#{@xml_pass.join('<br/>')}<br/><b>А эти нет:</b><br/>#{@xml_fail.join('<br/>')}", 10000)
-      # respond_to do |format|
-      #   format.js { render :js => "updateActualXml('<b>Эти XML прошли тесты:</b>\\n#{@xml_pass.join('\n')}\\nА эти нет:\\n#{@xml_fail.join('\n')}', 'transparent')" }
-      # end
+      @xml_missed << 'Отсутствуют' if @xml_missed.empty?
+      response_ajax("<b>XML, прошедшие тесты:</b><br/>#{@xml_pass.join('<br/>')}<br/><br/><b>XML, не прошедшие тесты:</b><br/>#{@xml_fail.join('<br/>')}<br/><br/><b>XML, у которых нет Simple Test:</b><br/>#{@xml_missed.join('<br/>')}", 10000)
     end
   end
 end

@@ -40,6 +40,7 @@ module XmlSenderHelper
       @empty_filds[index] = 'Ожидаемый ответ' if ['expected_answer'].include?(@empty_filds[index])
       @empty_filds[index] = 'Название настройки' if ['manager_name'].include?(@empty_filds[index])
       @empty_filds[index] = 'Не выбран менеджер очереди' if ['system_manager_name', 'manager_name_in'].include?(@empty_filds[index])
+      @empty_filds[index] = 'Не выбрана категория' if ['choice_category'].include?(@empty_filds[index])
       @empty_filds[index] = 'Название продукта' if ['product_name'].include?(@empty_filds[index])
       @empty_filds[index] = 'Название XML' if ['select_xml_name', 'xml_name'].include?(@empty_filds[index])
       @empty_filds[index] = 'Описание XML' if ['xml_description'].include?(@empty_filds[index])

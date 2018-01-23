@@ -3,18 +3,18 @@
 <div class="row">
   <div class="col-md-4 placeholder">
     <div class="form-group">
-      <label for="expected_answer">Ожидаем получить:</label>
-      <textarea class="form-control" id="expected_answer" rows="13"></textarea>
+      <label for="expected_answer" id="label_for_expected_response"><b>Ожидаем получить:</b></label>
+      <textarea disabled class="form-control" id="expected_answer" style="height:350px;"></textarea>
     </div>
     <div class="form-group" id="testt">
-      <label for="actual_answer">Получили ответ:</label>
-      <textarea class="form-control" id="actual_answer" rows="13"></textarea>
+      <label for="actual_answer" id="label_for_actual_response"><b>Получили ответ:</b></label>
+      <textarea disabled class="form-control" id="actual_answer" style="height:350px;"></textarea>
     </div>
   </div>
   <div class="col-md placeholder">
     <div class="form-group">
-      <label for="xml_to_send">XML для запроса</label>
-      <textarea class="form-control" id="xml_to_send" rows="28"></textarea>
+      <label for="xml_to_send" id="label_for_xml"><b>XML для запроса:</b></label>
+      <textarea disabled class="form-control" id="xml_to_send" style="height:750px;"></textarea>
     </div>
   </div>
   <div class="col-md-3 placeholder" id="select_product">
@@ -31,10 +31,9 @@
           <%= f.input :select_xml_name, :required => false, :label => false, input_html: {onchange: "simple_get_choice_xml()", onclick: "simple_get_choice_xml()"}, :collection => @category, as: :grouped_select, group_method: :xmls, group_label_method: :category_name, :label_method => lambda { |xml| "#{xml.xml_name if xml.private == false}"}, :value_method => lambda { |xml| "#{xml.id if xml.private == false}"} %>
         <% end %>
       </div>
-      <!--    <%= f.button :submit, 'Загрузить XML', class: 'btn btn-primary'%><br>-->
       <!-- Данные XML -->
       <div id="xml_description">
-        <%= f.input :xml_description, as: :text, :label => 'Описание XML', :required => false, placeholder: 'Описание XML'%>
+        <%= f.input :xml_description, as: :text, :label => 'Описание XML', :required => false, placeholder: 'Описание XML', :disabled => true%>
         <%= f.input :autor, :label => 'Автор XML', :required => false, placeholder: logged_in? ? current_user.email : 'Авторизуйтесь для сохранения', :disabled => true%>
         <%= f.input :all_category_test, as: :boolean, :label => 'Запустить всю категорию', checked_value: true, unchecked_value: false, input_html: {checked: false} %>
       </div>

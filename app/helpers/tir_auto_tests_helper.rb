@@ -22,7 +22,7 @@ module TirAutoTestsHelper
       while xml_actual.nil?
         xml_actual = receiver.receive(1000)
         puts count -=1
-        return null if count == 0
+        return nil if count == 0
       end
       return xml_actual.getText
     rescue => msg

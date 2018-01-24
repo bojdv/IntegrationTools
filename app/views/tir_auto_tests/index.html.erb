@@ -11,10 +11,10 @@
       <%= simple_form_for :test_data, remote: 'true', url: tir_auto_tests_run_path, html: {class: 'form-group' } do |f| %>
         <%= f.input :tir_version, label: 'Выберите версию платформы:', selected: 'ТИР 2.2', collection: ['ТИР 2.2', 'ТИР 2.3'], required: false %>
         <div id="tir_22">
-          <%= f.input :functional_tir22, label: 'Выберите проверки', collection: ['Test1', 'Test2'], include_hidden: false, required: false, input_html: { multiple: true} %>
+          <%= f.input :functional_tir22, label: 'Выберите проверки', collection: ['Проверка адаптера БД', 'Проверка адаптера Active MQ'], include_hidden: false, required: false, input_html: { multiple: true} %>
         </div>
         <div id="tir_23" style="display:none">
-          <%= f.input :functional_tir23, label: 'Выберите проверки', collection: ['Test3', 'Test4'], include_hidden: false, required: false, input_html: { multiple: true} %>
+          <%= f.input :functional_tir23, label: 'Выберите проверки', collection: ['Проверка адаптера БД', 'Проверка адаптера Active MQ'], include_hidden: false, required: false, input_html: { multiple: true} %>
         </div>
       <%= f.button :submit, 'Запустить', class: 'btn-primary'%>
       <%end%>

@@ -39,7 +39,7 @@ Rails.application.routes.draw do
   # TIR Auto Tests
   get '/tir_auto_tests' => 'tir_auto_tests#index'
   post '/tir_auto_tests/run' => 'tir_auto_tests#run'
-
+  get '/tir_auto_tests/tester' => 'tir_auto_tests#tester'
   resources :users
 
   root 'main_page#index'

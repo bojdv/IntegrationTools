@@ -9,6 +9,9 @@
     <li class="nav-item">
       <a class="nav-link <%= 'active' if current_page? controller: :simple_tests %>" <%= link_to "Simple Tests", simple_tests_path %></a>
     </li>
+    <li class="nav-item">
+      <a class="nav-link <%= 'active' if current_page? controller: :simple_tests %>" <%= link_to "TIR AutoTests", tir_auto_tests_path %></a>
+    </li>
   </ul>
   <footer class="footer"></footer>
 </nav>

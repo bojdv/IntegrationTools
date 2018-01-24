@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  get 'tir_auto_tests/index'
+
   get 'simple_tests/index'
 
   get 'sessions/new'
@@ -33,6 +35,10 @@ Rails.application.routes.draw do
   get '/simple_tests' => 'simple_tests#index'
   post '/simple_tests/put_simple_test' => 'simple_tests#put_simple_test'
   post '/simple_tests/run_simpleTest' => 'simple_tests#run_simpleTest'
+
+  # TIR Auto Tests
+  get '/tir_auto_tests' => 'tir_auto_tests#index'
+  post '/tir_auto_tests/run' => 'tir_auto_tests#run'
 
   resources :users
 

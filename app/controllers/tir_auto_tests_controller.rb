@@ -1,27 +1,29 @@
 include TirAutotests
 class TirAutoTestsController < ApplicationController
   def index
-
+    $log = String.new
   end
   def run
-    @message = String.new
-    @message << "WAAAAAAAAAAAAAAAAAAA"
-    response.headers["Content-Type"] = "text/event-stream"
-    response.stream.write "data: WA \n\n"
-    response.stream.close
-    # if tests_params[:tir_version] == 'ТИР 2.2'
-    #   runTest(tests_params[:functional_tir22])
-    # elsif tests_params[:tir_version] == 'ТИР 2.3'
-    #   runTest(tests_params[:functional_tir23])
-    #   tester
-    # end
+    if tests_params[:tir_version] == 'ТИР 2.2'
+      send_to_log("Запустили тесты ТИР 2.2")
+      runTest(tests_params[:functional_tir22])
+    elsif tests_params[:tir_version] == 'ТИР 2.3'
+      send_to_log("Запустили тесты ТИР 2.3")
+      runTest(tests_params[:functional_tir23])
+    end
+    sleep 0.5
+    $log.clear
+    respond_to do |format|
+      format.js { render :js => "kill_listener()" }
+    end
   end
   def tester
-    puts @message if !@message.nil?
-    response.headers["Content-Type"] = "text/event-stream"
-    response.stream.write "data: #{@message} \n\n"
-    response.stream.close
-    sleep 5
+    response.headers['Content-Type'] = 'text/event-stream'
+    sse = SSE.new(response.stream, retry: 300, event: "update_log")
+    sse.write "#{$log}"
+    $log.clear
+  ensure
+    sse.close
   end
 end
 

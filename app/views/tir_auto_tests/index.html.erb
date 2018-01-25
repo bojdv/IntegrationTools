@@ -1,11 +1,11 @@
 <% provide(:title, "TIR AutoTests") %>
 <div class="col">
   <div class="row">
-    <div class="col-md-4 placeholder">
-
-    </div>
     <div class="col-md placeholder">
-
+      <div class="form-group">
+        <label for="xml_to_send" id="label_for_xml"><b>Лог:</b></label>
+        <textarea disabled class="form-control" id="tir_autotests_log" style="height:750px;"></textarea>
+      </div>
     </div>
     <div class="col-md-3 placeholder" id="select_product">
       <%= simple_form_for :test_data, remote: 'true', url: tir_auto_tests_run_path, html: {class: 'form-group' } do |f| %>
@@ -14,9 +14,9 @@
           <%= f.input :functional_tir22, label: 'Выберите проверки', collection: ['Проверка адаптера БД', 'Проверка адаптера Active MQ'], include_hidden: false, required: false, input_html: { multiple: true} %>
         </div>
         <div id="tir_23" style="display:none">
-          <%= f.input :functional_tir23, label: 'Выберите проверки', collection: ['Проверка адаптера БД', 'Проверка адаптера Active MQ'], include_hidden: false, required: false, input_html: { multiple: true} %>
+          <%= f.input :functional_tir23, label: 'Выберите проверки', collection: ['Проверка адаптера БД1', 'Проверка адаптера Active MQ'], include_hidden: false, required: false, input_html: { multiple: true} %>
         </div>
-      <%= f.button :submit, 'Запустить', class: 'btn-primary'%>
+      <%= f.button :submit, 'Запустить', class: 'btn-primary', onclick: "clear_log(); updateLog()"%>
       <%end%>
     </div>
   </div>

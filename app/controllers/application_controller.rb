@@ -2,8 +2,10 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
   include SessionsHelper
   include XmlSenderHelper
+  include ActionController::Live
   require 'rubygems'
   require 'java'
+  require 'redis'
   # Библиотеки AMQ
   $CLASSPATH << "lib/activemq-all-5.11.1.jar"
   $CLASSPATH << "lib/log4j-1.2.17.jar"

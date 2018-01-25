@@ -35,4 +35,7 @@ module TirAutoTestsHelper
     end
 
   end
+  def send_to_log(text)
+    $log += "#{Time.now.strftime('%H:%M:%S')}: #{text}\n"
+  end
 end

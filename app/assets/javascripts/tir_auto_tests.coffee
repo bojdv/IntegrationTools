@@ -10,10 +10,10 @@ jQuery ->
     if $(this).val() is "ТИР 2.2"
       $("#tir_22").show()
       $('#tir_23').hide()
-#      menu = $("#version_functional option")
-#      for i in [0..menu.length]
-#        if menu[i] != undefined
-#          menu[i].selected = false
+      menu = $("#version_functional option")
+      for i in [0..menu.length]
+        if menu[i] != undefined
+          menu[i].selected = false
     else if $(this).val() is "ТИР 2.3"
       $("#tir_22").hide()
       $('#tir_23').show()

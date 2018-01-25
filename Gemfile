@@ -63,4 +63,3 @@ gem 'ffi', :platforms => [:mswin, :mingw]
 gem 'nokogiri'
 gem 'jquery_context_menu-rails'
 gem 'bcrypt'
-gem 'redis'

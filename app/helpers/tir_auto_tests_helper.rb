@@ -1,4 +1,9 @@
 module TirAutoTestsHelper
+  def response_ajax_auto(text, time = 2000)
+    respond_to do |format|
+      format.js {render :js => "open_modal(#{text.inspect}, #{time.inspect}); kill_listener();"}
+    end
+  end
   def send_to_amq(manager, xml) # Отправка сообщений в Active MQ по протоколу OpenWire
     java_import 'org.apache.activemq.ActiveMQConnectionFactory'
     java_import 'javax.jms.Session'
@@ -36,6 +41,11 @@ module TirAutoTestsHelper
 
   end
   def send_to_log(text)
-    $log += "#{Time.now.strftime('%H:%M:%S')}: #{text}\n"
+    $browser[:message] += "#{Time.now.strftime('%H:%M:%S')}: #{text}\n"
+  end
+  def colorize(functional, color)
+    $browser[:event] = 'colorize'
+    $browser[:functional] = functional
+    $browser[:color] = color
   end
 end

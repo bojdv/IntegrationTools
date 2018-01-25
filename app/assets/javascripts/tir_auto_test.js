@@ -15,11 +15,15 @@ function updateLog() {
     evSource.addEventListener('update_log',function(event){
         document.getElementById('tir_autotests_log').value += event.data
     },false);
+    evSource.addEventListener('colorize',function(event){
+        console.log('Event '+event.data)
+        attr = event.data.split(',')
+        colorize_options(attr[0], attr[1])
+    },false);
 }
 function kill_listener() {
     evSource.close()
     console.log("Kill Listener");
-    colorize_options();
 }
 function clear_log() {
     document.getElementById('tir_autotests_log').value = '';
@@ -33,8 +37,10 @@ function deselect_options() {
     for(var i = 0; i < elements.length; i++){
         elements[i].selected = false;
     }
+    // document.getElementById("test_data_functional_tir22").disabled = true
 }
-function colorize_options() {
+function colorize_options(functional, color) {
     deselect_options();
-    document.querySelector('div.test_data_functional_tir22 option[value="Проверка адаптера БД"]').style.backgroundColor="green";
+    func = 'div.test_data_functional_tir22 option[value="'+functional+'"]'
+    document.querySelector(func).style.backgroundColor=color;
 }

@@ -1,5 +1,5 @@
 module XmlSenderHelper
-  def response_ajax(text, time = 2000)
+  def response_ajax(text, time = 3000)
     respond_to do |format|
       format.js {render :js => "open_modal(#{text.inspect}, #{time.inspect});"}
     end

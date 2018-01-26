@@ -6,24 +6,35 @@ class TirAutoTestsController < ApplicationController
     $browser[:message] = ''
   end
   def run
+    log_file_name = "log_tir_autotests_#{Time.now.strftime('%H-%M-%S')}.txt"
+    $log = Logger.new(File.open("log\\#{log_file_name}", 'w'))
+    startTime = Time.now
     if tests_params[:tir_version] == 'ТИР 2.2'
       response_ajax_auto("Не выбран функционал для проверки") and return if tests_params[:functional_tir22].nil?
       send_to_log("Запустили тесты ТИР 2.2")
+      $log.info("Запустили тесты ТИР 2.2")
+      send_to_log("#{puts_line}")
       runTest(tests_params[:functional_tir22])
     elsif tests_params[:tir_version] == 'ТИР 2.3'
       response_ajax_auto("Не выбран функционал для проверки") and return if tests_params[:functional_tir23].nil?
       send_to_log("Запустили тесты ТИР 2.3")
+      $log.info("Запустили тесты ТИР 2.3")
+      send_to_log("#{puts_line}")
       runTest(tests_params[:functional_tir23])
     end
-    sleep 0.5
+    endTime = Time.now
+    send_to_log("#{puts_line}")
+    puts_time(startTime, endTime)
+    sleep 1
     $browser[:message].clear
+    $log.close
     respond_to do |format|
-      format.js { render :js => "kill_listener()" }
+      format.js { render :js => "kill_listener(); download_link('#{log_file_name}')" }
     end
   end
   def tester
     response.headers['Content-Type'] = 'text/event-stream'
-    sse = SSE.new(response.stream, retry: 300)
+    sse = SSE.new(response.stream, retry: 500)
     sse.write "#{$browser[:message]}", event: "update_log"
     if $browser[:event] == 'colorize'
       sse.write "#{$browser[:functional]}, #{$browser[:color]}", event: "#{$browser[:event]}"
@@ -32,6 +43,9 @@ class TirAutoTestsController < ApplicationController
     $browser[:message] =''
   ensure
     sse.close
+  end
+  def download_log
+    send_file "log\\#{params[:filename]}"
   end
 end
 

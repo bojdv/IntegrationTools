@@ -41,6 +41,12 @@ function deselect_options() {
 }
 function colorize_options(functional, color) {
     deselect_options();
-    func = 'div.test_data_functional_tir22 option[value="'+functional+'"]'
+    func = 'div.test_data_functional_tir22 option[value="'+functional+'"]';
     document.querySelector(func).style.backgroundColor=color;
+}
+function download_link(log_file_name) {
+
+    link = document.getElementById('download-link');
+    link.setAttribute('href', '/tir_auto_tests/download_log?filename='+log_file_name);
+    link.style.display = 'inline';
 }

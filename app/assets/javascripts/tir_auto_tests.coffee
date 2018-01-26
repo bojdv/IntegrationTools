@@ -17,3 +17,11 @@ jQuery ->
     else if $(this).val() is "ТИР 2.3"
       $("#tir_22").hide()
       $('#tir_23').show()
+
+  $("#run-button").click ->
+    menuTir22 = $("#test_data_functional_tir22 option")
+    for i in [0...menuTir22.length]
+      menuTir22[i].style.backgroundColor='transparent'
+    menuTir23 = $("#test_data_functional_tir23 option")
+    for i in [0...menuTir23.length]
+      menuTir23[i].style.backgroundColor='transparent'

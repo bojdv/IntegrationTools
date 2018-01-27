@@ -11,7 +11,7 @@ module TirAutoTestsHelper
     puts 'Sending message to AMQ (OpenWire)'
     begin
       factory = ActiveMQConnectionFactory.new
-      $log.info("Отправляем XML по адресу: Хост:#{manager.host}, Порт:#{manager.port}, Логи:#{manager.user}, Пароль:#{manager.password}")
+      send_to_log("Отправляем XML по адресу: Хост:#{manager.host}, Порт:#{manager.port}, Логин:#{manager.user}, Пароль:#{manager.password}")
       factory.setBrokerURL("tcp://#{manager.host}:#{manager.port}")
       manager.user.nil? ? user ='' : user=manager.user
       manager.password.nil? ? password ='' : password=manager.user
@@ -23,8 +23,7 @@ module TirAutoTestsHelper
       connection.start
       connection.destroyDestination(session.createQueue(manager.queue_in)) # Удаляем очередь.
       sender.send(textMessage)
-      send_to_log("Отправили сообщение в ТИР")
-      $log.info("Отправили сообщение в ТИР:\n #{textMessage.getText}")
+      send_to_log("Отправили сообщение в ТИР:\n #{textMessage.getText}", "Отправили сообщение в ТИР")
       receiver = session.createReceiver(session.createQueue(manager.queue_in))
       count = 5
       xml_actual = receiver.receive(1000)
@@ -33,12 +32,11 @@ module TirAutoTestsHelper
         puts count -=1
         return nil if count == 0
       end
-      send_to_log("Получили ответ от ТИР")
-      $log.info("Получили ответ от ТИР:\n #{xml_actual.getText}")
+      send_to_log("Получили ответ от ТИР:\n #{xml_actual.getText}", "Получили ответ от ТИР")
       return xml_actual.getText
     rescue Exception => msg
-      $log.info(msg)
-      return "#{msg.class}, #{msg.message}"
+      send_to_log("Ошибка! #{msg}")
+      return nil
     ensure
       sender.close if session
       receiver.close if session
@@ -47,11 +45,20 @@ module TirAutoTestsHelper
     end
 
   end
-  def send_to_log(text)
-    if text.include?('--')
-      $browser[:message] += "#{text}\n"
-    else
-      $browser[:message] += "[#{Time.now.strftime('%H:%M:%S')}]: #{text}\n"
+  def send_to_log(to_log, to_browser = false)
+    if to_log
+      if to_log.include?('Ошибка')
+        $log.error(to_log)
+      else
+        $log.info(to_log)
+      end
+    end
+    if to_browser
+      if to_browser.include?('--')
+        $browser[:message] += "#{to_browser}\n"
+      else
+        $browser[:message] += "[#{Time.now.strftime('%H:%M:%S')}]: #{to_browser}\n"
+      end
     end
   end
   def colorize(functional, color)
@@ -60,11 +67,11 @@ module TirAutoTestsHelper
     $browser[:color] = color
   end
   def puts_line
-      return '--'*67
+      return '--'*40
   end
   def puts_time(startTime, endTime)
     dif = (endTime-startTime).to_i.abs
     min = dif/1.minutes
-    send_to_log("Завершили проверку за: #{min} мин, #{dif-(min*1.minutes)} сек")
+    send_to_log("Завершили проверку за: #{min} мин, #{dif-(min*1.minutes)} сек", "Завершили проверку за: #{min} мин, #{dif-(min*1.minutes)} сек")
   end
 end

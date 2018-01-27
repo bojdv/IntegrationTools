@@ -11,19 +11,16 @@ class TirAutoTestsController < ApplicationController
     startTime = Time.now
     if tests_params[:tir_version] == 'ТИР 2.2'
       response_ajax_auto("Не выбран функционал для проверки") and return if tests_params[:functional_tir22].nil?
-      send_to_log("Запустили тесты ТИР 2.2")
-      $log.info("Запустили тесты ТИР 2.2")
-      send_to_log("#{puts_line}")
+      send_to_log("Запустили тесты ТИР 2.2", "Запустили тесты ТИР 2.2")
       runTest(tests_params[:functional_tir22])
     elsif tests_params[:tir_version] == 'ТИР 2.3'
       response_ajax_auto("Не выбран функционал для проверки") and return if tests_params[:functional_tir23].nil?
-      send_to_log("Запустили тесты ТИР 2.3")
-      $log.info("Запустили тесты ТИР 2.3")
-      send_to_log("#{puts_line}")
+      send_to_log("Запустили тесты ТИР 2.3", "Запустили тесты ТИР 2.3")
+      send_to_log("#{puts_line}", "#{puts_line}")
       runTest(tests_params[:functional_tir23])
     end
     endTime = Time.now
-    send_to_log("#{puts_line}")
+    send_to_log("#{puts_line}", "#{puts_line}")
     puts_time(startTime, endTime)
     sleep 1
     $browser[:message].clear
@@ -34,7 +31,7 @@ class TirAutoTestsController < ApplicationController
   end
   def tester
     response.headers['Content-Type'] = 'text/event-stream'
-    sse = SSE.new(response.stream, retry: 500)
+    sse = SSE.new(response.stream, retry: 200)
     sse.write "#{$browser[:message]}", event: "update_log"
     if $browser[:event] == 'colorize'
       sse.write "#{$browser[:functional]}, #{$browser[:color]}", event: "#{$browser[:event]}"

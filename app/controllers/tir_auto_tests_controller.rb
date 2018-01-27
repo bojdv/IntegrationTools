@@ -4,6 +4,12 @@ class TirAutoTestsController < ApplicationController
     $browser = Hash.new
     $browser[:event] = ''
     $browser[:message] = ''
+    @tir22_components= ['Проверка адаптера Active MQ',
+                        'Проверка компонента БД',
+                        'Проверка компонента File']
+    @tir23_components = Array.new(@tir22_components)
+    @tir23_components.push('Test2',
+                           'Test3')
   end
   def run
     log_file_name = "log_tir_autotests_#{Time.now.strftime('%H-%M-%S')}.txt"

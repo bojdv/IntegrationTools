@@ -16,7 +16,6 @@ function updateLog() {
         document.getElementById('tir_autotests_log').value += event.data
     },false);
     evSource.addEventListener('colorize',function(event){
-        console.log('Event '+event.data)
         attr = event.data.split(',')
         colorize_options(attr[0], attr[1])
     },false);

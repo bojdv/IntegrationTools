@@ -103,7 +103,6 @@ module TirAutoTestsHelper
       send_to_log("Ошибка! #{msg}")
       return nil
     ensure
-      sender.close if session
       receiver.close if session
       session.close if session
       connection.close if connection

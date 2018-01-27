@@ -85,9 +85,9 @@ module TirAutotests
         send_to_log("Получили xml для ответа от АБС: #{xml_from_abs.xml_name}")
         answer = send_to_amq(manager, xml_to_abs)
         raise send_to_tir_error if answer.nil?
-        File.open('\\\\vm-corint\\Gates\\Omega\\in_status_autotest1\\STATUS_CURRBUY_160420091010.xml', 'w'){ |file| file.write xml_from_abs.xml_text }
+        File.open('\\\\vm-corint\\Gates\\Omega\\in_status_autotest\\STATUS_CURRBUY_160420091010.xml', 'w'){ |file| file.write xml_from_abs.xml_text }
         send_to_log("Подложили ответ от АБС в каталог ТИР:\n#{xml_from_abs.xml_text}", "Подложили ответ от АБС в каталог ТИР")
-        receive_from_amq(manager)
+        answer = receive_from_amq(manager)
         raise not_receive_answer if answer.nil?
         answer = Document.new(answer)
         if answer.elements['//p:Ticket'].attributes['statusStateCode'] == 'PROCESSED'

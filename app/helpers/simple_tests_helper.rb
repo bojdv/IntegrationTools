@@ -221,8 +221,8 @@ module SimpleTestsHelper
       rescue => msg
         response_ajax("Случилось непредвиденное: #{msg.class} <br/> #{msg.message}", 10000)
       ensure
-        sender.close if session
-        receiver.close if session
+        sender.close if sender
+        receiver.close if receiver
         session.close if session
         connection.close if connection
       end
@@ -260,8 +260,8 @@ module SimpleTestsHelper
       rescue => msg
         @xml_fail << "<u>#{xml.xml_name}</u>: <i>#{msg.message}</i>"
       ensure
-        sender.close if session
-        receiver.close if session
+        sender.close if sender
+        receiver.close if receiver
         session.close if session
         connection.close if connection
       end

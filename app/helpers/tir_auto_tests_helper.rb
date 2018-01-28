@@ -11,7 +11,7 @@ module TirAutoTestsHelper
     puts 'Sending message to AMQ (OpenWire)'
     begin
       factory = ActiveMQConnectionFactory.new
-      send_to_log("Отправляем XML по адресу: Хост:#{manager.host}, Порт:#{manager.port}, Логин:#{manager.user}, Пароль:#{manager.password}")
+      send_to_log("Отправляем XML по адресу: Хост:#{manager.host}, Порт:#{manager.port}, Логин:#{manager.user}, Пароль:#{manager.password}, Очередь:#{manager.queue_out}")
       factory.setBrokerURL("tcp://#{manager.host}:#{manager.port}")
       manager.user.nil? ? user ='' : user=manager.user
       manager.password.nil? ? password ='' : password=manager.user
@@ -38,29 +38,33 @@ module TirAutoTestsHelper
       send_to_log("Ошибка! #{msg}")
       return nil
     ensure
-      sender.close if session
-      receiver.close if session
+      sender.close if sender
+      receiver.close if receiver
       session.close if session
       connection.close if connection
     end
   end
 
-    def send_to_amq(manager, xml) # Отправка сообщений в Active MQ по протоколу OpenWire
+    def send_to_amq(manager, xml, queue = manager.queue_out) # Отправка сообщений в Active MQ по протоколу OpenWire
       java_import 'org.apache.activemq.ActiveMQConnectionFactory'
       java_import 'javax.jms.Session'
       java_import 'javax.jms.TextMessage'
       puts 'Sending message to AMQ (OpenWire)'
       begin
         factory = ActiveMQConnectionFactory.new
-        send_to_log("Отправляем XML по адресу: Хост:#{manager.host}, Порт:#{manager.port}, Логин:#{manager.user}, Пароль:#{manager.password}")
+        send_to_log("Отправляем XML по адресу: Хост:#{manager.host}, Порт:#{manager.port}, Логин:#{manager.user}, Пароль:#{manager.password}, Очередь:#{queue}")
         factory.setBrokerURL("tcp://#{manager.host}:#{manager.port}")
         manager.user.nil? ? user ='' : user=manager.user
         manager.password.nil? ? password ='' : password=manager.user
         connection = factory.createQueueConnection(user, password)
         session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-        textMessage = session.createTextMessage(xml.xml_text)
+        if xml.is_a? String
+          textMessage = session.createTextMessage(xml)
+        else
+          textMessage = session.createTextMessage(xml.xml_text)
+        end
         textMessage.setJMSCorrelationID(SecureRandom.uuid)
-        sender = session.createSender(session.createQueue(manager.queue_out))
+        sender = session.createSender(session.createQueue(queue))
         connection.start
         connection.destroyDestination(session.createQueue(manager.queue_in)) # Удаляем очередь.
         sender.send(textMessage)
@@ -69,7 +73,7 @@ module TirAutoTestsHelper
         send_to_log("Ошибка! #{msg}")
         return nil
       ensure
-        sender.close if session
+        sender.close if sender
         session.close if session
         connection.close if connection
       end
@@ -103,7 +107,7 @@ module TirAutoTestsHelper
       send_to_log("Ошибка! #{msg}")
       return nil
     ensure
-      receiver.close if session
+      receiver.close if receiver
       session.close if session
       connection.close if connection
     end

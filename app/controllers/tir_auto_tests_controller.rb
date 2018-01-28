@@ -5,8 +5,10 @@ class TirAutoTestsController < ApplicationController
     $browser[:event] = ''
     $browser[:message] = ''
     @tir22_components= ['Проверка адаптера Active MQ',
+                        'Проверка адаптера HTTP',
                         'Проверка компонента БД',
-                        'Проверка компонента File']
+                        'Проверка компонента File',
+                        'Проверка компонента Active MQ']
     @tir23_components = Array.new(@tir22_components)
     @tir23_components.push('Test2',
                            'Test3')

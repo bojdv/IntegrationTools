@@ -32,7 +32,7 @@ module TirAutoTestsHelper
         puts count -=1
         return nil if count == 0
       end
-      send_to_log("Получили ответ от ТИР:\n #{xml_actual.getText}", "Получили ответ от ТИР")
+      send_to_log("Получили ответ от ТИР из очереди #{manager.queue_in}:\n #{xml_actual.getText}", "Получили ответ от ТИР")
       return xml_actual.getText
     rescue Exception => msg
       send_to_log("Ошибка! #{msg}")
@@ -101,7 +101,7 @@ module TirAutoTestsHelper
         puts count -=1
         return nil if count == 0
       end
-      send_to_log("Получили ответ от ТИР:\n #{xml_actual.getText}", "Получили ответ от ТИР")
+      send_to_log("Получили ответ от ТИР из очереди #{manager.queue_in}:\n #{xml_actual.getText}", "Получили ответ от ТИР")
       return xml_actual.getText
     rescue Exception => msg
       send_to_log("Ошибка! #{msg}")

@@ -1,1 +1,160 @@
 <% provide(:title, "Главная страница") %>
+<div class="row">
+  <div class="col-6">
+    <main role="main">
+      <div class="d-flex align-items-center p-3 my-3 text-white-50 bg-primary rounded box-shadow">
+        <div class="lh-100">
+          <h6 class="mb-0 text-white lh-100">Общая информация</h6>
+          <small>Информация о приложении в целом и пунктах меню</small>
+        </div>
+      </div>
+      <div class="my-3 p-3 bg-white rounded box-shadow">
+        <h6 class="border-bottom border-gray pb-2 mb-0"><b>Integration Tools</b> - это набор вспомогательных утилит для проведения интеграционного тестирования,
+          облегчающих управление тестовыми данными, взаимодействие с внешними системами и автоматизацию этого взаимодействия.<br/>Integration Tools состоит из следующих компонентов:</h6>
+        <div class="media text-muted pt-3">
+          <p class="media-body pb-3 mb-0 h7 lh-125 border-bottom border-gray">
+            <strong class="d-block text-gray-dark">XML Sender</strong>
+            Представляет собой центральную часть системы, информацию из XML Sender используют остальные утилиты. Состоит из двух основных частей:<br/>
+            1. Хранение тестовых XML в разрезе продуктов и категорий.<br/>
+            2. Отправку тестовых XML во внешние системы и получение от них ответов.
+          </p>
+        </div>
+        <div class="media text-muted pt-3">
+          <p class="media-body pb-3 mb-0 h7 lh-125 border-bottom border-gray">
+            <strong class="d-block text-gray-dark">Simple Tests</strong>
+            Функционал для создания простых автоматизированных тестов. Каждый Simple Test это сущность, состоящая из:<br/>
+            1. Ссылки на запись БД с XML сообщением. В этой записи хранится текст отправленного сообщения и текст фрагмента сообщения, которое мы получим в случае успеха.<br/>
+            2. Ссылки на менеджер очередей, в который это XML сообщение было когда-то отправлено и от куда мы получали успешный статус<br/>
+            Используя эти данные, Simple Test отправляет сообщение во внешнюю систему и анализирует ответ на соответствие ожидаемому ответу.
+          </p>
+        </div>
+        <div class="media text-muted pt-3">
+          <p class="media-body pb-3 mb-0 h7 lh-125 border-bottom border-gray">
+            <strong class="d-block text-gray-dark">TIR Auto Tests</strong>
+            Автотесты для проверки платформы системы ТИР. Используются для проверки компонентов и адаптеров системы.
+          </p>
+        </div>
+      </div>
+    </main>
+  </div>
+  <div class="col">
+    <main role="main">
+      <div class="d-flex align-items-center p-3 my-3 text-white-50 bg-primary rounded box-shadow">
+        <div class="lh-100">
+          <h6 class="mb-0 text-white lh-100">Release Note</h6>
+          <small>Информация об обновлениях</small>
+        </div>
+      </div>
+      <div class="my-3 p-3 bg-white rounded box-shadow">
+        <h6 class="border-bottom border-gray pb-2 mb-0"><b>Текущая версия:</b> - v0.03</h6>
+        <div class="media text-muted pt-3">
+<!--          <textarea disabled="true" id="expected_answer" style="height:450px; width: 800px">
+v0.0.3 [2017-01-24]:
+1. Релиз функционала Simple Tests.
+2. В XML Sender добавлена возможность создания Simple Test'ов из меню редактирования XML.
+
+v0.0.2 [2017-01-19]:
+1. Добавлена возможность редактирования имени категории
+2. Убраны некоторые кнопки, теперь все грузится интерактивно
+3. При получении сообщений: Добавлена очистка очереди, функционал получения первого сообщения или сразу всех
+4. Очередь для получения сообщений теперь сохраняется сама.
+
+v0.0.1 [2017-01-18] :
+Релиз XML Sender'а. Готов основной функционал для отправки и менеджемента XML, настроек менеджеров очередей
+          </textarea>-->
+          <div style="height:450px;width:800px;border:5px solid dodgerblue;font:16px/26px Georgia, Garamond, Serif;overflow:auto;">
+            <b>v0.0.3 [2017-01-24]:</b><br/>
+            1. Релиз функционала Simple Tests.<br/>
+            2. В XML Sender добавлена возможность создания Simple Test'ов из меню редактирования XML.<br/><br/>
+
+            v0.0.2 [2017-01-19]:<br/>
+            1. Добавлена возможность редактирования имени категории<br/>
+            2. Убраны некоторые кнопки, теперь все грузится интерактивно<br/>
+            3. При получении сообщений: Добавлена очистка очереди, функционал получения первого сообщения или сразу всех<br/>
+            4. Очередь для получения сообщений теперь сохраняется сама.<br/><br/>
+
+            v0.0.1 [2017-01-18] :<br/>
+            Релиз XML Sender'а. Готов основной функционал для отправки и менеджемента XML, настроек менеджеров очередей<br/>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<div class="row">
+  <div class="col-6">
+    <main role="main">
+      <div class="d-flex align-items-center p-3 my-3 text-white-50 bg-primary rounded box-shadow">
+        <div class="lh-100">
+          <h6 class="mb-0 text-white lh-100">Общая информация</h6>
+          <small>Информация о приложении в целом и пунктах меню</small>
+        </div>
+      </div>
+      <div class="my-3 p-3 bg-white rounded box-shadow">
+        <h6 class="border-bottom border-gray pb-2 mb-0"><b>Integration Tools</b> - это набор вспомогательных утилит для проведения интеграционного тестирования,
+          облегчающих управление тестовыми данными, взаимодействие с внешними системами и автоматизацию этого взаимодействия.<br/>Integration Tools состоит из следующих компонентов:</h6>
+        <div class="media text-muted pt-3">
+          <p class="media-body pb-3 mb-0 h7 lh-125 border-bottom border-gray">
+            <strong class="d-block text-gray-dark">XML Sender</strong>
+            Представляет собой центральную часть системы, информацию из XML Sender используют остальные утилиты. Состоит из двух основных частей:<br/>
+            1. Хранение тестовых XML в разрезе продуктов и категорий.<br/>
+            2. Отправку тестовых XML во внешние системы и получение от них ответов.
+          </p>
+        </div>
+        <div class="media text-muted pt-3">
+          <p class="media-body pb-3 mb-0 h7 lh-125 border-bottom border-gray">
+            <strong class="d-block text-gray-dark">Simple Tests</strong>
+            Функционал для создания простых автоматизированных тестов. Каждый Simple Test это сущность, состоящая из:<br/>
+            1. Ссылки на запись БД с XML сообщением. В этой записи хранится текст отправленного сообщения и текст фрагмента сообщения, которое мы получим в случае успеха.<br/>
+            2. Ссылки на менеджер очередей, в который это XML сообщение было когда-то отправлено и от куда мы получали успешный статус<br/>
+            Используя эти данные, Simple Test отправляет сообщение во внешнюю систему и анализирует ответ на соответствие ожидаемому ответу.
+          </p>
+        </div>
+        <div class="media text-muted pt-3">
+          <p class="media-body pb-3 mb-0 h7 lh-125 border-bottom border-gray">
+            <strong class="d-block text-gray-dark">TIR Auto Tests</strong>
+            Автотесты для проверки платформы системы ТИР. Используются для проверки компонентов и адаптеров системы.
+          </p>
+        </div>
+      </div>
+    </main>
+  </div>
+  <div class="col">
+    <main role="main">
+      <div class="d-flex align-items-center p-3 my-3 text-white-50 bg-primary rounded box-shadow">
+        <div class="lh-100">
+          <h6 class="mb-0 text-white lh-100">Статистика</h6>
+          <small>Полезная и не очень</small>
+        </div>
+      </div>
+      <div class="my-3 p-3 bg-white rounded box-shadow">
+        <table class="table table-dark">
+          <thead>
+          <tr>
+            <th scope="col">Статистика</th>
+            <th scope="col">Значение</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td>Всего XML в базе</td>
+            <td><%= Xml.all.count%></td>
+          </tr>
+          <tr>
+            <td>Количество Simple Tests</td>
+            <td><%= SimpleTest.all.count%></td>
+          </tr>
+          <tr>
+            <td>Всего пользователей</td>
+            <td><%= User.all.count%></td>
+          </tr>
+          <tr>
+            <td>Последний зарегистрированный</td>
+            <td><%= User.all.order(created_at: :desc).first.email %></td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+</div>

@@ -69,6 +69,34 @@ module TirAutotests
       end
     end
 
+    if components.include?('Проверка компонента трансформации')
+      menu_name = 'Проверка компонента трансформации'
+      category = Category.find_by_category_name('Компонент трансформации')
+      xml_name = 'Проверка трансформации'
+      manager = QueueManager.find_by_manager_name('TIR (vm-corint)')
+      begin
+        send_to_log("#{puts_line}", "#{puts_line}")
+        send_to_log("Начали проверку: #{menu_name}", "Начали проверку: #{xml_name}")
+        send_to_log("Пытаемся найти XML в БД")
+        xml = Xml.where(xml_name: xml_name, category_id: category.id).first
+        raise not_find_xml if xml.nil?
+        send_to_log("Получили xml: #{xml.xml_name}")
+        answer = send_to_amq_and_receive(manager, xml)
+        raise not_receive_answer if answer.nil?
+        answer = Document.new(answer)
+        if answer.elements['//p:Ticket'].attributes['statusStateCode'] == 'ACCEPTED_BY_ABS'
+          send_to_log("Проверка пройдена!", "Проверка пройдена!")
+          colorize(menu_name, pass_menu_color)
+        else
+          send_to_log("Проверка не пройдена! Ожидаемый ответ отличается от фактического", "Проверка не пройдена!")
+          colorize(menu_name, fail_menu_color)
+        end
+      rescue Exception => msg
+        send_to_log("Ошибка! #{msg}\n#{msg.backtrace.join("\n")}", "Ошибка! #{msg}")
+        colorize(menu_name, '#ff3333')
+      end
+    end
+
     if components.include?('Проверка компонента File')
       menu_name = 'Проверка компонента File'
       category = Category.find_by_category_name('Компонент File')
@@ -149,7 +177,7 @@ module TirAutotests
       manager = QueueManager.find_by_manager_name('TIR (vm-corint)')
       begin
         send_to_log("#{puts_line}", "#{puts_line}")
-        send_to_log("Начали проверку: #{menu_name}", "Начали проверку: #{xml_name}")
+        send_to_log("Начали проверку: #{menu_name}", "Начали проверку: #{menu_name}")
         send_to_log("Пытаемся найти XML в БД")
         xml_to_abs = Xml.where(xml_name: xml_name_to_ABS, category_id: category.id).first
         xml_from_abs = Xml.where(xml_name: xml_name_from_ABS, category_id: category.id).first
@@ -168,6 +196,62 @@ module TirAutotests
         raise not_receive_answer if answer.nil?
         answer = Document.new(answer)
         if answer.elements['//state'].text == 'ACCEPTED_BY_ABS'
+          send_to_log("Проверка пройдена!", "Проверка пройдена!")
+          colorize(menu_name, pass_menu_color)
+        else
+          send_to_log("Проверка не пройдена! Ожидаемый ответ отличается от фактического", "Проверка не пройдена!")
+          colorize(menu_name, fail_menu_color)
+        end
+      rescue Exception => msg
+        send_to_log("Ошибка! #{msg}\n#{msg.backtrace.join("\n")}", "Ошибка! #{msg}")
+        colorize(menu_name, '#ff3333')
+      end
+    end
+
+    if components.include?('Проверка компонента WebServiceProxy')
+      menu_name = 'Проверка компонента WebServiceProxy'
+      category = Category.find_by_category_name('Компонент WebServiceProxy')
+      xml_name = 'Проверка компонента WebServiceProxy'
+      manager = QueueManager.find_by_manager_name('TIR (vm-corint)')
+      begin
+        send_to_log("#{puts_line}", "#{puts_line}")
+        send_to_log("Начали проверку: #{menu_name}", "Начали проверку: #{xml_name}")
+        send_to_log("Пытаемся найти XML в БД")
+        xml = Xml.where(xml_name: xml_name, category_id: category.id).first
+        raise not_find_xml if xml.nil?
+        send_to_log("Получили xml: #{xml.xml_name}")
+        answer = send_to_amq_and_receive(manager, xml)
+        raise not_receive_answer if answer.nil?
+        answer = Document.new(answer)
+        if answer.elements['//cqa:data']
+          send_to_log("Проверка пройдена!", "Проверка пройдена!")
+          colorize(menu_name, pass_menu_color)
+        else
+          send_to_log("Проверка не пройдена! Ожидаемый ответ отличается от фактического", "Проверка не пройдена!")
+          colorize(menu_name, fail_menu_color)
+        end
+      rescue Exception => msg
+        send_to_log("Ошибка! #{msg}\n#{msg.backtrace.join("\n")}", "Ошибка! #{msg}")
+        colorize(menu_name, '#ff3333')
+      end
+    end
+
+    if components.include?('Проверка компонента Base64 (WebServiceProxy)')
+      menu_name = 'Проверка компонента Base64 (WebServiceProxy)'
+      category = Category.find_by_category_name('Компонент Base64 (WebServiceProxy)')
+      xml_name = 'Проверка компонента Base64'
+      manager = QueueManager.find_by_manager_name('TIR (vm-corint)')
+      begin
+        send_to_log("#{puts_line}", "#{puts_line}")
+        send_to_log("Начали проверку: #{menu_name}", "Начали проверку: #{xml_name}")
+        send_to_log("Пытаемся найти XML в БД")
+        xml = Xml.where(xml_name: xml_name, category_id: category.id).first
+        raise not_find_xml if xml.nil?
+        send_to_log("Получили xml: #{xml.xml_name}")
+        answer = send_to_amq_and_receive(manager, xml)
+        raise not_receive_answer if answer.nil?
+        answer = Document.new(answer)
+        if answer.elements['//cqa:data']
           send_to_log("Проверка пройдена!", "Проверка пройдена!")
           colorize(menu_name, pass_menu_color)
         else

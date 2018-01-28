@@ -8,10 +8,12 @@ class TirAutoTestsController < ApplicationController
                         'Проверка адаптера HTTP',
                         'Проверка компонента БД',
                         'Проверка компонента File',
-                        'Проверка компонента Active MQ']
+                        'Проверка компонента Active MQ',
+                        'Проверка компонента трансформации',
+                        'Проверка компонента WebServiceProxy',
+                        'Проверка компонента Base64 (WebServiceProxy)']
     @tir23_components = Array.new(@tir22_components)
-    @tir23_components.push('Test2',
-                           'Test3')
+    @tir23_components.push('Проверка OpenNMS')
   end
   def run
     log_file_name = "log_tir_autotests_#{Time.now.strftime('%H-%M-%S')}.txt"
@@ -24,7 +26,6 @@ class TirAutoTestsController < ApplicationController
     elsif tests_params[:tir_version] == 'ТИР 2.3'
       response_ajax_auto("Не выбран функционал для проверки") and return if tests_params[:functional_tir23].nil?
       send_to_log("Запустили тесты ТИР 2.3", "Запустили тесты ТИР 2.3")
-      send_to_log("#{puts_line}", "#{puts_line}")
       runTest(tests_params[:functional_tir23])
     end
     endTime = Time.now

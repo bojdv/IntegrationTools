@@ -46,23 +46,13 @@
         </div>
       </div>
       <div class="my-3 p-3 bg-white rounded box-shadow">
-        <h6 class="border-bottom border-gray pb-2 mb-0"><b>Текущая версия:</b> - v0.03</h6>
+        <h6 class="border-bottom border-gray pb-2 mb-0"><b>Текущая версия:</b> - v0.04</h6>
         <div class="media pt-3">
-<!--          <textarea disabled="true" id="expected_answer" style="height:450px; width: 800px">
-v0.0.3 [2017-01-24]:
-1. Релиз функционала Simple Tests.
-2. В XML Sender добавлена возможность создания Simple Test'ов из меню редактирования XML.
+          <div style="height:450px;width:800px;border:3px solid dodgerblue;font:16px/26px Georgia, Garamond, Serif;overflow:auto;">
+            <b>v0.0.4</b> [2017-01-30]:<br/>
+            1. Релиз функционала TIR AutoTests.<br/>
+            2. Заполнено содержание главной страницы.<br/><br/>
 
-v0.0.2 [2017-01-19]:
-1. Добавлена возможность редактирования имени категории
-2. Убраны некоторые кнопки, теперь все грузится интерактивно
-3. При получении сообщений: Добавлена очистка очереди, функционал получения первого сообщения или сразу всех
-4. Очередь для получения сообщений теперь сохраняется сама.
-
-v0.0.1 [2017-01-18] :
-Релиз XML Sender'а. Готов основной функционал для отправки и менеджемента XML, настроек менеджеров очередей
-          </textarea>-->
-          <div style="height:450px;width:800px;border:5px solid dodgerblue;font:16px/26px Georgia, Garamond, Serif;overflow:auto;">
             <b>v0.0.3</b> [2017-01-24]:<br/>
             1. Релиз функционала Simple Tests.<br/>
             2. В XML Sender добавлена возможность создания Simple Test'ов из меню редактирования XML.<br/><br/>
@@ -94,11 +84,12 @@ v0.0.1 [2017-01-18] :
         <h6 class="border-bottom border-gray pb-2 mb-0"><b>Integration Tools</b> - это набор вспомогательных утилит для проведения интеграционного тестирования,
           облегчающих управление тестовыми данными, взаимодействие с внешними системами и автоматизацию этого взаимодействия.<br/>Integration Tools состоит из следующих компонентов:</h6>
         <div class="list-group">
-          <a href="#" class="list-group-item list-group-item-action" onclick="$('#faq_1_modal').modal()">Где найти контекстное меню редактирования XML, категорий, менеджеров и т.д.?</a>
-          <a href="#" class="list-group-item list-group-item-action">Как сохранить/отредактировать/удалить XML?</a>
-          <a href="#" class="list-group-item list-group-item-action">Как сохранить/отредактировать/удалить категорию?</a>
-          <a href="#" class="list-group-item list-group-item-action">Как сохранить/отредактировать/удалить настройку менеджера очередей?</a>
-          <a href="#" class="list-group-item list-group-item-action">Как создать Simple Test?</a>
+          <a href="#" class="list-group-item list-group-item-action" onclick="$('#faq_main_modal').modal()">Где найти контекстное меню редактирования XML, категорий, менеджеров и т.д.?</a>
+          <a href="#" class="list-group-item list-group-item-action" onclick="$('#faq_save_category_modal').modal()">Как сохранить/отредактировать/удалить категорию?</a>
+          <a href="#" class="list-group-item list-group-item-action" onclick="$('#faq_save_xml_modal').modal()">Как сохранить/отредактировать/удалить XML?</a>
+          <a href="#" class="list-group-item list-group-item-action" onclick="$('#faq_save_manager').modal()">Как сохранить/отредактировать/удалить настройку менеджера очередей?</a>
+          <a href="#" class="list-group-item list-group-item-action" onclick="$('#faq_simple_test').modal()">Как создать Simple Test?</a>
+          <a href="#" class="list-group-item list-group-item-action" onclick="$('#faq_run_simple_test').modal()">Как запустить Simple Test?</a>
         </div>
       </div>
     </main>
@@ -142,4 +133,9 @@ v0.0.1 [2017-01-18] :
     </main>
   </div>
 </div>
-<%= render 'layouts/faq_1' %>
+<%= render 'layouts/faq_main' %>
+<%= render 'layouts/faq_save_category' %>
+<%= render 'layouts/faq_save_xml' %>
+<%= render 'layouts/faq_save_manager' %>
+<%= render 'layouts/faq_simple_test' %>
+<%= render 'layouts/faq_run_simple_test' %>

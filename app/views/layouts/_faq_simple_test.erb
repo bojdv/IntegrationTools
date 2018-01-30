@@ -1,0 +1,37 @@
+<!-- Modal -->
+<div class="modal fade" id="faq_simple_test" tabindex="-1" role="dialog" aria-labelledby="prefixModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="prefixModalLabel">Создание Simple Test</h5>
+      </div>
+      <div class="col-md-12">
+        <div class="modal-body">
+          <p>Для сохранения нового Simple Test необходимо:</p>
+          <ol>
+            <li>Войти в систему под своим email.</li>
+            <li>В списке справа выбрать Продукт, категорию и XML для отправки в менеджер очередей.</li>
+            <li>В списке слева выбрать сохраненный менеджер очередей.</li>
+            <li>Отправить сообщение (не обязательно).</li>
+            <li>Перейти на вкладку "Входящие сообщения.</li>
+            <li>Выбрать там того же менеджера очередей, куда мы отправили сообщение.</li>
+            <li>Ввести имя очереди, от куда мы получим ответ внешней системы на отправленное сообщение.</li>
+            <li>Нажать кнопку "Поехали" и получить ответ от внешней системы.</li>
+            <li>Удалить из полученной XML всю информацию за исключением той, которая нам говорит об успешности полученного ответа, например название статуса.</li>
+            <li>Вызвать контекстное меню XML, кликнув по названию XML и выбрать пункт "Сохранить Simple Test".</li>
+          </ol>
+          <ul>
+            <li>После этого в запись БД с отправленной XML сохранится информация об ожидаемом ответе. А так же создатся запись таблицы Simple Test со ссылкой на эту XML и на менеджер очередей, куда XML была отправлена.</li>
+          </ul>
+          <div class="text-center">
+          <%= link_to image_url("simple_test.png") do %>
+            <%= image_tag("simple_test.png", size: "700x311", class: "grow shadow") %>
+          <% end %>
+          </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

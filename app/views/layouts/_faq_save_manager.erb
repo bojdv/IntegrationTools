@@ -1,0 +1,39 @@
+<!-- Modal -->
+<div class="modal fade" id="faq_save_manager" tabindex="-1" role="dialog" aria-labelledby="prefixModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="prefixModalLabel">Управление Менеджерами Очередей</h5>
+      </div>
+      <div class="col-md-12">
+        <div class="modal-body">
+          <p>Для сохранения новой настройки менеджера очередей (QM) необходимо:</p>
+          <ol>
+            <li>Войти в систему под своим email.</li>
+            <li>Ввести название настройки в поле, отмеченое зеленым цветом.</li>
+            <li>Выбрать менеджера очередей: AMQ или WMQ.</li>
+            <li>Для AMQ возможен выбор протокола взаимодейтствия QM: OpenWire или STOMP. Чаще используется OpenWire.</li>
+            <li>Выбрать очередь QM, куда сообщения будут отправляться.</li>
+            <li>Выбрать хост на котором расположен QM.</li>
+            <li>Выбрать порт QM. Часто используются следующие порты: AMQ OpenWire: 61616, 61617. AMQ STOMP: 61613, WMQ: 1414. Порт QM AMQ можно посмотреть в файле activemq.xml</li>
+            <li>CorrelationID генерируется автоматически, но может быть изменен вручную.</li>
+            <li>Часто для QM не нужна авторизация. Но если она необходима, можно отметить флаг "Нужна авторизация?" и ввести логин и пароль</li>
+            <li>Если вы не хотите, что бы настройка QM была видна другим пользователям снимите флаг "Видна всем".</li>
+            <li>Кликните на поле зеленого цвета и в контекстном меню выберите пункт "Создать новую" настройку.</li>
+          </ol>
+          <ul>
+            <li>Что бы настройка появилась в списке, страницу нужно <b>обновить!</b>.</li>
+            <li>Удаление и сохранение изменений QM выполяется в этом же окне после выбора настройки из выпадающего списка.</li>
+          </ul>
+          <div class="text-center">
+          <%= link_to image_url("save_manager.png") do %>
+            <%= image_tag("save_manager.png", class: "grow shadow") %>
+          <% end %>
+          </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

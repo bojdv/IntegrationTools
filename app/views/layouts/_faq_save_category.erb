@@ -1,0 +1,33 @@
+<!-- Modal -->
+<div class="modal fade" id="faq_save_category_modal" tabindex="-1" role="dialog" aria-labelledby="prefixModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="prefixModalLabel">Управление категориями</h5>
+      </div>
+      <div class="col-md-12">
+        <div class="modal-body">
+          <p>Для сохранения новой категории необходимо:</p>
+          <ol>
+            <li>Войти в систему под своим email.</li>
+            <li>Выбрать продукт, в котором необходимо создать категорию.</li>
+            <li>Ввести название категории в поле.</li>
+            <li>Сохранить категорию из контекстного меню.</li>
+          </ol>
+          <ul>
+            <li>Категория сохраняется в продукт, выбранный в первом пункте.</li>
+            <li>Что бы категория появилась в списке, страницу нужно <b>обновить!</b>.</li>
+            <li>Удаление и редактирование категории выполяется в этом же окне после выбора продукта и категории.</li>
+          </ul>
+          <div class="text-center">
+          <%= link_to image_url("save_category.png") do %>
+            <%= image_tag("save_category.png", class: "grow shadow") %>
+          <% end %>
+          </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

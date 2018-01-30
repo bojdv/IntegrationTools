@@ -14,9 +14,10 @@ module TirAutotests
     send_to_tir_error = 'Ошибка при отправке в ТИР'
 
     if components.include?('Проверка адаптера Active MQ')
+      sleep 0.2
       menu_name = 'Проверка адаптера Active MQ'
       category = Category.find_by_category_name('Адаптер Active MQ')
-      xml_name = 'Автотест для адаптера БД'
+      xml_name = 'Автотест для адаптера Active MQ'
       manager = QueueManager.find_by_manager_name('TIR (vm-corint)')
       begin
         send_to_log("#{puts_line}", "#{puts_line}")
@@ -42,6 +43,7 @@ module TirAutotests
     end
 
     if components.include?('Проверка компонента БД')
+      sleep 0.2
       menu_name = 'Проверка компонента БД'
       category = Category.find_by_category_name('Компонент БД')
       xml_name = 'Автотест для компонента БД'
@@ -70,6 +72,7 @@ module TirAutotests
     end
 
     if components.include?('Проверка компонента трансформации')
+      sleep 0.2
       menu_name = 'Проверка компонента трансформации'
       category = Category.find_by_category_name('Компонент трансформации')
       xml_name = 'Проверка трансформации'
@@ -98,6 +101,7 @@ module TirAutotests
     end
 
     if components.include?('Проверка компонента File')
+      sleep 0.2
       menu_name = 'Проверка компонента File'
       category = Category.find_by_category_name('Компонент File')
       xml_name_to_ABS = 'Проверка получения файла из каталога. Запрос в АБС'
@@ -133,6 +137,7 @@ module TirAutotests
     end
 
     if components.include?('Проверка адаптера HTTP')
+      sleep 0.2
       menu_name = 'Проверка адаптера HTTP'
       category = Category.find_by_category_name('Адаптер HTTP')
       xml_name = 'Проверка HTTP адаптера'
@@ -169,6 +174,7 @@ module TirAutotests
     end
 
     if components.include?('Проверка компонента Active MQ')
+      sleep 0.2
       menu_name = 'Проверка компонента Active MQ'
       category = Category.find_by_category_name('Компонент Active MQ')
       xml_name_to_ABS = 'Проверка компонента Active MQ. Запрос в АБС'
@@ -209,6 +215,7 @@ module TirAutotests
     end
 
     if components.include?('Проверка компонента WebServiceProxy')
+      sleep 0.2
       menu_name = 'Проверка компонента WebServiceProxy'
       category = Category.find_by_category_name('Компонент WebServiceProxy')
       xml_name = 'Проверка компонента WebServiceProxy'
@@ -237,6 +244,7 @@ module TirAutotests
     end
 
     if components.include?('Проверка компонента Base64 (WebServiceProxy)')
+      sleep 0.2
       menu_name = 'Проверка компонента Base64 (WebServiceProxy)'
       category = Category.find_by_category_name('Компонент Base64 (WebServiceProxy)')
       xml_name = 'Проверка компонента Base64'

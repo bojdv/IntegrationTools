@@ -1,0 +1,36 @@
+<!-- Modal -->
+<div class="modal fade" id="faq_save_xml_modal" tabindex="-1" role="dialog" aria-labelledby="prefixModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="prefixModalLabel">Управление XML</h5>
+      </div>
+      <div class="col-md-12">
+        <div class="modal-body">
+          <p>Для сохранения новой XML необходимо:</p>
+          <ol>
+            <li>Войти в систему под своим email.</li>
+            <li>Вставить текст XML в поле для отправки сообщения.</li>
+            <li>Выбрать продукт, в котором необходимо создать xml.</li>
+            <li>Выбрать категорию, в которой необходимо создать xml.</li>
+            <li>Ввести название XML в поле, выделенным зеленым цветом.</li>
+            <li>Выбрать в контекстном меню пункт "Сохранить, как новую".</li>
+          </ol>
+          <ul>
+            <li>XML сохраняется в категорию, выбранную в шаге 3.</li>
+            <li>Что бы XML появилась в списке, страницу нужно <b>обновить!</b>.</li>
+            <li>Удаление и сохранение изменений в XML выполяется в этом же окне после выбора продукта и категории.</li>
+            <li>Если при сохранении установлен флаг "XML доступна только автору!", то она не будет видна остальным пользователям, пока флаг не будет снят с последующим сохранением XML.</li>
+          </ul>
+          <div class="text-center">
+          <%= link_to image_url("save_xml.png") do %>
+            <%= image_tag("save_xml.png", :size => "700x370", class: "grow shadow") %>
+          <% end %>
+          </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

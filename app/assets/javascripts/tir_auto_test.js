@@ -11,7 +11,7 @@
 // // };
 function updateLog() {
     console.log("Start Listener");
-    evSource = new EventSource("/tir_auto_tests/tester")
+    evSource = new EventSource("/tir_auto_tests/live_stream")
     evSource.addEventListener('update_log',function(event){
         document.getElementById('tir_autotests_log').value += event.data
     },false);

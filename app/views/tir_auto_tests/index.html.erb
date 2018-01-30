@@ -19,6 +19,7 @@
         <%= f.button :submit, 'Запустить', id: 'run-button', class: 'btn-primary', onclick: "clear_log(); updateLog(); document.getElementById('download-link').style.display = 'none';"%>
       <%end%>
       <a class="btn btn-primary form-group" id="download-link" href="" style="display: none;" onclick="this.style.display = 'none';">Скачать лог</a>
+      <a class="btn btn-primary form-group" id="tester" href="tir_auto_tests/tester" data-remote="true">Click</a>
     </div>
   </div>
 </div>

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:fileSettingsTemplate xmlns:tns="http://bssys.com/tir/fileComponent">
+	<tns:filerecipient name="DocIds_omega" path="C:\Gates\Omega\in_status_autotest" xpath="upper-case(concat('STATUS_',//*[local-name()='BODY']/*[local-name()='DOCREF']/text()))" charset="windows-1251"/>
+	<tns:filesender name="file" path="C:\Gates\Omega\out_autotest" charset="Windows-1251" validateRequest="false"/>
+</tns:fileSettingsTemplate>

@@ -142,4 +142,41 @@ module TirAutoTestsHelper
     min = dif/1.minutes
     send_to_log("Завершили проверку за: #{min} мин, #{dif-(min*1.minutes)} сек", "Завершили проверку за: #{min} мин, #{dif-(min*1.minutes)} сек")
   end
+  def add_test_data_in_db
+    java_import 'oracle.jdbc.OracleDriver'
+    java_import 'java.sql.DriverManager'
+
+    jmsAdapterSettingsTemplate = Document.new(File.open('lib/tir_db_data/jmsAdapterSettingsTemplate.xml'){|file| file.read})
+    jmsSettingsTemplate = Document.new(File.open('lib/tir_db_data/jmsSettingsTemplate.xml'){|file| file.read})
+    fileSettingsTemplate = Document.new(File.open('lib/tir_db_data/fileSettingsTemplate.xml'){|file| file.read})
+    dbAdapterSettingsTemplate = Document.new(File.open('lib/tir_db_data/dbAdapterSettingsTemplate.xml'){|file| file.read})
+    httpSettingsTemplate = Document.new(File.open('lib/tir_db_data/httpSettingsTemplate.xml'){|file| file.read})
+    httpAdapterSettingsTemplate = Document.new(File.open('lib/tir_db_data/httpAdapterSettingsTemplate.xml'){|file| file.read})
+
+    activeMQListner = Document.new(File.open('lib/tir_db_data/[AutoTest] ActiveMQListner.xml'){|file| file.read})
+
+
+    url = "jdbc:oracle:thin:@vm-corint:1521:corint"
+    connection = java.sql.DriverManager.getConnection(url, "tir_test", "tir_test");
+    select_stmt = connection.create_statement
+
+    select_stmt.executeUpdate("insert into sys_properties (name, value) values ('jmsAdapterSettingsTemplate.xml', q'[#{jmsAdapterSettingsTemplate}]')")
+    select_stmt.executeUpdate("insert into sys_properties (name, value) values ('jmsSettingsTemplate.xml', q'[#{jmsSettingsTemplate}]')")
+    select_stmt.executeUpdate("insert into sys_properties (name, value) values ('dbAdapterSettingsTemplate.xml', q'[#{dbAdapterSettingsTemplate}]')")
+    select_stmt.executeUpdate("insert into sys_properties (name, value) values ('fileSettingsTemplate.xml', q'[#{fileSettingsTemplate}]')")
+    select_stmt.executeUpdate("insert into sys_properties (name, value) values ('httpSettingsTemplate.xml', q'[#{httpSettingsTemplate}]')")
+    select_stmt.executeUpdate("insert into sys_properties (name, value) values ('httpAdapterSettingsTemplate.xml', q'[#{httpAdapterSettingsTemplate}]')")
+
+    select_stmt.executeUpdate("insert into deployments (id, name, src, version) values ('85376884-9d6d-4e8f-a777-243886f829a1', 'AutoTests/[AutoTest] ActiveMQListner', q'[#{activeMQListner}]', 'd9a6234b-1fc9-420c-a48e-fade75667d94')")
+    query = %Q{DECLARE
+v_long_text CLOB;
+BEGIN
+v_long_text := q'[#{tir_amq_settings}]';
+update sys_properties
+set value = v_long_text
+where name = 'jmsAdapterSettingsTemplate.xml';
+END;}
+    select_stmt.close
+    connection.close
+  end
 end

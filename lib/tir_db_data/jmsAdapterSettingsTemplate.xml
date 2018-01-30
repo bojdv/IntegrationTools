@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<tns:jmsAdapterSettingsTemplate xmlns:tns='http://bssys.com/tir/jmsAdapterSettings'>
+	<tns:jmsAdapter>
+		<tns:ActiveMQ active='true' alias='tir' brokerURL='tcp://localhost:61617' concurrentConsumers='10' maxConnections='10' name='tir_in' password='admin' persistent='true' sleep='false' sleepConfirm='true' username='admin' xmlversion='1.1'/>
+	</tns:jmsAdapter>
+</tns:jmsAdapterSettingsTemplate>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:httpSettingsTemplate xmlns:tns="http://bssys.com/tir/httpComponent">
+	<tns:httpsender name="base64" url="http://vm-corint:8383/TransformBase64WS" validateRequest="false">
+		<tns:type>
+			<tns:http/>
+		</tns:type>
+	</tns:httpsender>
+</tns:httpSettingsTemplate>

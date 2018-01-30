@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:jmsSettingsTemplate xmlns:tns="http://bssys.com/tir/jmsComponent">
+	<tns:amqrecipient>
+		<tns:ActiveMQ name="szvABSout" queue="szvABS_out" xpath="upper-case(//*[local-name()='BSMessage']/@ID)" maxConnections="1" concurrentConsumers="1" brokerURL="tcp://localhost:61617" login="admin" password="admin"/>
+	</tns:amqrecipient>
+</tns:jmsSettingsTemplate>

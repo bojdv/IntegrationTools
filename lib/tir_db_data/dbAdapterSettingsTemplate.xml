@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:dbAdapterSettingsTemplate xmlns:tns="http://bssys.com/tir/dbAdapterComponent">
+	<tns:datasource name="hmbo_ibso" username="ibso_open" password="ibso_open" validateRequest="false" active="true">
+		<tns:bdtype>
+			<tns:Oracle host="vm-corint" port="1521" sid="corint"/>
+		</tns:bdtype>
+		<tns:type>
+			<tns:BasicDataSource size="10" testWhileIdle="false" testOnBorrow="false" testOnReturn="false" removeAbandoned="false" logAbandoned="false"/>
+		</tns:type>
+	</tns:datasource>
+</tns:dbAdapterSettingsTemplate>

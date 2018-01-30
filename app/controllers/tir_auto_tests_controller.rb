@@ -54,50 +54,7 @@ class TirAutoTestsController < ApplicationController
     send_file "log\\#{params[:filename]}"
   end
   def tester
-    java_import 'oracle.jdbc.OracleDriver'
-    java_import 'java.sql.DriverManager'
-    e = Element.new 'tns:jmsAdapter'
-    e.add_element 'tns:ActiveMQ', {'alias'=>'tir',
-                                   'name'=>'tir_in5',
-                                   'concurrentConsumers' => '10',
-                                   'maxConnections' => '10',
-                                   'sleep' => 'false',
-                                   'sleepConfirm' => 'true',
-                                   'active' => 'true',
-                                   'persistent' => 'true',
-                                   'xmlversion' => '1.1',
-                                   'brokerURL' => 'tcp://localhost:61617',
-                                   'username' => 'admin',
-                                   'password' => 'admin'}
-    exist_settings = String.new
-    url = "jdbc:oracle:thin:@vm-corint:1521:corint"
-    connection = java.sql.DriverManager.getConnection(url, "tir_vmcorint", "tir_vmcorint");
-    select_stmt = connection.create_statement
-    rs=select_stmt.execute_query("select value from sys_properties where name = 'jmsAdapterSettingsTemplate.xml'")
-    while(rs.next())
-      tir_amq_settings = rs.getString("value") # get first column
-    end
-
-    tir_amq_settings = Document.new(tir_amq_settings)
-    tir_amq_settings.elements.each('//tns:ActiveMQ'){|e| exist_settings << e.attributes["name"] if e.attributes["name"] == "tir_in3"}
-    if exist_settings.empty?
-      tir_amq_settings.elements['//tns:jmsAdapterSettingsTemplate'].add_element(e)
-    end
-    # query = %{update sys_properties
-    #            set value = to_clob(q'[#{tir_amq_settings}]')
-    #            where name = 'jmsAdapterSettingsTemplate.xml'}
-    query = %Q{DECLARE
-                v_long_text CLOB;
-              BEGIN
-                v_long_text := q'[#{tir_amq_settings}]';
-                update sys_properties
-                set value = v_long_text
-                where name = 'jmsAdapterSettingsTemplate.xml';
-              END;}
-    rs=select_stmt.execute_query(query)
-    select_stmt.close
-    connection.close
-    rs.close
+    add_test_data_in_db
   end
 end
 

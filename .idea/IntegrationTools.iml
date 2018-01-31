@@ -88,6 +88,7 @@
     <orderEntry type="library" scope="PROVIDED" name="rspec-support (v3.7.0, jruby-9.1.15.0-p0) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="ruby-plsql (v0.6.0, jruby-9.1.15.0-p0) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="rubyzip (v1.2.1, jruby-9.1.15.0-p0) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="rukuli (v1.0.3, jruby-9.1.15.0-p0) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="sass (v3.5.5, jruby-9.1.15.0-p0) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="sass-listen (v4.0.0, jruby-9.1.15.0-p0) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="sass-rails (v5.0.7, jruby-9.1.15.0-p0) [gem]" level="application" />

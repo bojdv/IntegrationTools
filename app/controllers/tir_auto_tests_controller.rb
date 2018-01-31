@@ -1,4 +1,6 @@
 include TirAutotests
+require 'rukuli'
+
 class TirAutoTestsController < ApplicationController
   def index
     $browser = Hash.new
@@ -54,7 +56,19 @@ class TirAutoTestsController < ApplicationController
     send_file "log\\#{params[:filename]}"
   end
   def tester
-    add_test_data_in_db
+    sleep 2
+    Rukuli::Config.run do |config|
+      config.image_path = "#{Dir.pwd}/images/"
+      config.logging = false
+    end
+
+    # screen = Rukuli::Screen.new
+    # screen.click(10, 10) # should open your apple menu
+
+    # app = Rukuli::App.new("NotePad")
+    # app.focus
+
+    #add_test_data_in_db
   end
 end
 

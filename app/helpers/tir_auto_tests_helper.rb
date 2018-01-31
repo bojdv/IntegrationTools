@@ -153,13 +153,12 @@ module TirAutoTestsHelper
     httpSettingsTemplate = Document.new(File.open('lib/tir_db_data/httpSettingsTemplate.xml'){|file| file.read})
     httpAdapterSettingsTemplate = Document.new(File.open('lib/tir_db_data/httpAdapterSettingsTemplate.xml'){|file| file.read})
 
-    activeMQListner = Document.new(File.open('lib/tir_db_data/[AutoTest] ActiveMQListner.xml'){|file| file.read})
-
 
     url = "jdbc:oracle:thin:@vm-corint:1521:corint"
     connection = java.sql.DriverManager.getConnection(url, "tir_test", "tir_test");
     select_stmt = connection.create_statement
 
+    # Загружаем настройки
     select_stmt.executeUpdate("insert into sys_properties (name, value) values ('jmsAdapterSettingsTemplate.xml', q'[#{jmsAdapterSettingsTemplate}]')")
     select_stmt.executeUpdate("insert into sys_properties (name, value) values ('jmsSettingsTemplate.xml', q'[#{jmsSettingsTemplate}]')")
     select_stmt.executeUpdate("insert into sys_properties (name, value) values ('dbAdapterSettingsTemplate.xml', q'[#{dbAdapterSettingsTemplate}]')")
@@ -167,15 +166,96 @@ module TirAutoTestsHelper
     select_stmt.executeUpdate("insert into sys_properties (name, value) values ('httpSettingsTemplate.xml', q'[#{httpSettingsTemplate}]')")
     select_stmt.executeUpdate("insert into sys_properties (name, value) values ('httpAdapterSettingsTemplate.xml', q'[#{httpAdapterSettingsTemplate}]')")
 
-    select_stmt.executeUpdate("insert into deployments (id, name, src, version) values ('85376884-9d6d-4e8f-a777-243886f829a1', 'AutoTests/[AutoTest] ActiveMQListner', q'[#{activeMQListner}]', 'd9a6234b-1fc9-420c-a48e-fade75667d94')")
-    query = %Q{DECLARE
-v_long_text CLOB;
-BEGIN
-v_long_text := q'[#{tir_amq_settings}]';
-update sys_properties
-set value = v_long_text
-where name = 'jmsAdapterSettingsTemplate.xml';
-END;}
+    # Загружаем маршрут [AutoTest] ActiveMQListner.xml
+    first, second = '', ''
+    n=0
+    IO.read('lib/tir_db_data/[AutoTest] ActiveMQListner.xml').each_char do |char|
+      if n<20000
+        first << char
+        n+=1
+      else
+        second << char
+      end
+    end
+    select_stmt.executeUpdate(%Q{DECLARE
+                  v_long_text clob;
+                  v_long_text2 clob;
+               BEGIN
+                  v_long_text := q'[#{first}]';
+                  v_long_text2 := q'[#{second}]';
+                  dbms_lob.append(v_long_text,v_long_text2);
+                  insert into deployments (id, name, src, version)
+                  values ('85376884-9d6d-4e8f-a777-243886f829a1', 'AutoTests/[AutoTest] ActiveMQListner', v_long_text, 'd9a6234b-1fc9-420c-a48e-fade75667d94');
+                END;})
+    select_stmt.executeUpdate("update deployments set src = REPLACE(src, ']]', ']]\"') where id = '85376884-9d6d-4e8f-a777-243886f829a1'")
+
+    # Загружаем маршрут [AutoTest] CertGenRequest.xml
+    certGenRequest = File.open('lib/tir_db_data/[AutoTest] CertGenRequest.xml'){|file| file.read}
+    select_stmt.executeUpdate(%Q{DECLARE
+                  v_long_text clob;
+               BEGIN
+                  v_long_text := q'[#{certGenRequest}]';
+                  insert into deployments (id, name, src, version)
+                  values ('03a33e3e-ba0e-4409-8aba-8c7cc4d185cd', 'AutoTests/[AutoTest] CertGenRequest', v_long_text, '88e73c78-25fd-40f9-8c1d-b5853356c30c');
+                END;})
+    select_stmt.executeUpdate("update deployments set src = REPLACE(src, ']]', ']]\"') where id = '03a33e3e-ba0e-4409-8aba-8c7cc4d185cd'")
+
+    # Загружаем маршрут [AutoTest] DBAdapter.xml
+    first, second = '', ''
+    n=0
+    IO.read('lib/tir_db_data/[AutoTest] DBAdapter.xml').each_char do |char|
+      if n<20000
+        first << char
+        n+=1
+      else
+        second << char
+      end
+    end
+    select_stmt.executeUpdate(%Q{DECLARE
+                  v_long_text clob;
+                  v_long_text2 clob;
+               BEGIN
+                  v_long_text := q'[#{first}]';
+                  v_long_text2 := q'[#{second}]';
+                  dbms_lob.append(v_long_text,v_long_text2);
+                  insert into deployments (id, name, src, version)
+                  values ('0fe38fdf-3301-43d5-bdaa-a27444511d54', 'AutoTests/[AutoTest] DBAdapter', v_long_text, '476323f7-06da-4232-80d1-3f9b207bfeed');
+                END;})
+    select_stmt.executeUpdate("update deployments set src = REPLACE(src, ']]', ']]\"') where id = '0fe38fdf-3301-43d5-bdaa-a27444511d54'")
+
+    # Загружаем маршрут [AutoTest] FileAdapter.xml
+    fileAdapter = File.open('lib/tir_db_data/[AutoTest] FileAdapter.xml'){|file| file.read}
+    select_stmt.executeUpdate(%Q{DECLARE
+                  v_long_text clob;
+               BEGIN
+                  v_long_text := q'[#{fileAdapter}]';
+                  insert into deployments (id, name, src, version)
+                  values ('264aa722-1f7b-47a9-b3fd-ae921e412b63', 'AutoTests/[AutoTest] FileAdapter', v_long_text, 'cd18603f-6377-4c93-827e-8ed097214b6c');
+                END;})
+    select_stmt.executeUpdate("update deployments set src = REPLACE(src, ']]', ']]\"') where id = '264aa722-1f7b-47a9-b3fd-ae921e412b63'")
+
+    # Загружаем маршрут [AutoTest] HTTPAdaper.xml
+    first, second = '', ''
+    n=0
+    IO.read('lib/tir_db_data/[AutoTest] HTTPAdaper.xml').each_char do |char|
+      if n<20000
+        first << char
+        n+=1
+      else
+        second << char
+      end
+    end
+    select_stmt.executeUpdate(%Q{DECLARE
+                  v_long_text clob;
+                  v_long_text2 clob;
+               BEGIN
+                  v_long_text := q'[#{first}]';
+                  v_long_text2 := q'[#{second}]';
+                  dbms_lob.append(v_long_text,v_long_text2);
+                  insert into deployments (id, name, src, version)
+                  values ('8d9911c2-bd22-47a6-b8a2-eeb9f247b2e8', 'AutoTests/[AutoTest] HTTPAdaper', v_long_text, 'c5e591e0-f5b0-4a21-a76b-17ea559c0780');
+                END;})
+    select_stmt.executeUpdate("update deployments set src = REPLACE(src, ']]', ']]\"') where id = '8d9911c2-bd22-47a6-b8a2-eeb9f247b2e8'")
     select_stmt.close
     connection.close
   end

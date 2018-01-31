@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <tns:httpAdapterSettingsTemplate xmlns:tns="http://bssys.com/tir/httpAdapter">
-	<tns:httpadapter port="3333" detailedDump="false" daemon="false" sleep="false" sleepConfirm="false" persistent="true" active="false">
+	<tns:httpadapter port="3333" detailedDump="false" daemon="false" sleep="false" sleepConfirm="false" persistent="true" active="true">
 		<tns:type>
 			<tns:http/>
 		</tns:type>

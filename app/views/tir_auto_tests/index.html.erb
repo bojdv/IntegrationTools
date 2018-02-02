@@ -16,6 +16,7 @@
         <div id="tir_23" style="display:none">
           <%= f.input :functional_tir23, label: 'Выберите проверки', collection: @tir23_components, include_hidden: false, required: false, input_html: { multiple: true, style: "height:300px"} %>
         </div>
+        <%= f.input :tir_dir, label: 'Каталог ТИР:', required: false, input_html: {value: '\\\\vm-corint\\TIR_Autotest'} %>
         <%= f.button :submit, 'Запустить', id: 'run-button', class: 'btn-primary', onclick: "clear_log(); updateLog(); document.getElementById('download-link').style.display = 'none';"%>
       <%end%>
       <a class="btn btn-primary form-group" id="download-link" href="" style="display: none;" onclick="this.style.display = 'none';">Скачать лог</a>

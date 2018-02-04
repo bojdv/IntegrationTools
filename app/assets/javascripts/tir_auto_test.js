@@ -17,7 +17,7 @@ function updateLog() {
     },false);
     evSource.addEventListener('colorize',function(event){
         attr = event.data.split(',')
-        colorize_options(attr[0], attr[1])
+        colorize_options(attr[0], attr[1], attr[2])
     },false);
 }
 function kill_listener() {
@@ -38,9 +38,14 @@ function deselect_options() {
     }
     // document.getElementById("test_data_functional_tir22").disabled = true
 }
-function colorize_options(functional, color) {
+function colorize_options(tir_version, functional, color) {
     deselect_options();
-    func = 'div.test_data_functional_tir22 option[value="'+functional+'"]';
+    if (tir_version == 'ТИР 2.2'){
+        func = 'div.test_data_functional_tir22 option[value="'+functional+'"]';
+    }
+    else if (tir_version == 'ТИР 2.3'){
+        func = 'div.test_data_functional_tir23 option[value="'+functional+'"]';
+    }
     document.querySelector(func).style.backgroundColor=color;
 }
 function download_link(log_file_name) {

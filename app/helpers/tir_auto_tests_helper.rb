@@ -129,8 +129,9 @@ module TirAutoTestsHelper
       end
     end
   end
-  def colorize(functional, color)
+  def colorize(tir_version, functional, color)
     $browser[:event] = 'colorize'
+    $browser[:tir_version] = tir_version
     $browser[:functional] = functional
     $browser[:color] = color
   end
@@ -259,6 +260,7 @@ module TirAutoTestsHelper
       stmt.executeUpdate("update deployments set src = REPLACE(src, ']]', ']]\"') where id = '8d9911c2-bd22-47a6-b8a2-eeb9f247b2e8'")
     rescue Exception => msg
       send_to_log("Ошибка! #{msg}", "Ошибка! #{msg}")
+      delete_rows_from_db
       return true
     ensure
       stmt.close
@@ -270,8 +272,6 @@ module TirAutoTestsHelper
 
   def end_test(log_file_name, startTime = false)
     begin
-      sleep 0.5
-      delete_rows_from_db
       sleep 0.5
       send_to_log("#{puts_line}", "#{puts_line}")
       endTime = Time.now
@@ -360,5 +360,111 @@ module TirAutoTestsHelper
     end
     sleep 0.5
     send_to_log("Done! Удалили тестовые данные.", "Done! Удалили тестовые данные.")
+  end
+
+  def start_amq(dir)
+    send_to_log("Запускаем Active MQ...", "Запускаем Active MQ...")
+    begin
+      Dir.chdir "#{dir}\\apache-activemq-5.14.5\\bin"
+      startcrypt = "#{dir}\\apache-activemq-5.14.5\\bin\\startcrypt.bat"
+      @amq_start_thread = Thread.new do
+        Open3.popen3(startcrypt) do | input, output, error, wait_thr |
+          input.sync = true
+          output.sync = true
+          input.puts "admin"
+          input.close
+          puts output.readlines do |line|
+            puts line
+          end
+        end
+      end
+    rescue Exception => msg
+      send_to_log("Ошибка! #{msg}", "Ошибка! #{msg}")
+      stop_amq
+    end
+  end
+
+  def stop_amq(dir = false)
+    send_to_log("Останавливаем Active MQ...", "Останавливаем Active MQ...")
+    Dir.chdir "#{dir}\\apache-activemq-5.14.5\\bin"
+    @amq_stop_thread = Thread.new do
+      system('stopcrypt.bat')
+    end
+    while @amq_start_thread.alive?
+      puts "@amq_start_thread alive!"
+      sleep 1
+    end
+    while @amq_stop_thread.alive?
+      puts "@amq_stop_thread alive!"
+      sleep 1
+    end
+    send_to_log("Done! Остановили Active MQ", "Done! Остановили Active MQ")
+  end
+
+  def start_servicemix(dir)
+    send_to_log("Запускаем Servicemix...", "Запускаем Servicemix...")
+    begin
+      Dir.chdir "#{dir}\\apache-servicemix-7.0.1\\bin"
+      startcrypt = "#{dir}\\apache-servicemix-7.0.1\\bin\\startcrypt.bat"
+      @servicemix_start_thread = Thread.new do
+        Open3.popen3(startcrypt) do | input, output, error, wait_thr |
+          input.sync = true
+          output.sync = true
+          input.puts "admin"
+          input.close
+          # Thread.new do
+          #   puts wait_thr.pid
+          #   Thread.current.kill
+          # end
+          # Process.kill("KILL",wait_thr.pid)
+          puts output.readlines do |line|
+            puts line
+          end
+        end
+      end
+    rescue Exception => msg
+      send_to_log("Ошибка! #{msg}", "Ошибка! #{msg}")
+      stop_servicemix
+    end
+  end
+
+  def stop_servicemix(dir = false)
+    send_to_log("Останавливаем Servicemix...", "Останавливаем Servicemix...")
+    Dir.chdir "#{dir}\\apache-servicemix-7.0.1\\bin"
+    @servicemix_stop_thread = Thread.new do
+      system('stopcrypt.bat')
+    end
+    sleep 1
+    @kill_cmd_thread = Thread.new do
+      system('Taskkill /IM cmd.exe /F')
+    end
+    while @servicemix_start_thread.alive?
+      puts "@servicemix_start_thread alive!"
+      if @servicemix_stop_thread.alive?
+        puts "@servicemix_stop_thread alive!"
+        sleep 0.5
+      end
+      if @kill_cmd_thread.alive?
+        puts "@kill_cmd_thread alive!"
+        sleep 0.5
+      end
+      sleep 1
+    end
+    send_to_log("Done! Остановили Servicemix...", "Done! Остановили Servicemix...")
+  end
+  def ping_server(host)
+    begin
+      uri = URI.parse(host)
+      response = Net::HTTP.get_response(uri)
+      puts response.code
+      return true if response.code == '200' || '401'
+    rescue Errno::ECONNREFUSED
+      return false
+    end
+  end
+  def copy_webserviceproxy(dir)
+    send_to_log("Копируем файлы webserviceproxy в каталог ТИР: #{dir}\\apache-servicemix-7.0.1", "Копируем файлы webserviceproxy в каталог ТИР")
+    FileUtils.cp("#{Rails.root}\\vendor\\webservicesProxy-1.0.jar", "#{dir}\\apache-servicemix-7.0.1\\deploy")
+    FileUtils.cp("#{Rails.root}\\vendor\\com.bssys.tir.webservice.proxy.config.cfg", "#{dir}\\apache-servicemix-7.0.1\\etc")
   end
 end

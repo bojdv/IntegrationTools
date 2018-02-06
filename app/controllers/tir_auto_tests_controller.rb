@@ -4,10 +4,7 @@ require 'net/http'
 
 class TirAutoTestsController < ApplicationController
   def index
-    $browser = Hash.new
-    $browser[:event] = ''
-    $browser[:message] = ''
-    @tir22_components= ['Проверка адаптера Active MQ',
+    @tir23_components= ['Проверка адаптера Active MQ',
                         'Проверка адаптера HTTP',
                         'Проверка компонента БД',
                         'Проверка компонента File',
@@ -15,10 +12,13 @@ class TirAutoTestsController < ApplicationController
                         'Проверка компонента трансформации',
                         'Проверка компонента WebServiceProxy',
                         'Проверка компонента Base64 (WebServiceProxy)']
-    @tir23_components = Array.new(@tir22_components)
+    @tir24_components = Array.new(@tir23_components)
     @tir23_components.push('Проверка OpenNMS')
   end
   def run
+    $browser = Hash.new
+    $browser[:event] = ''
+    $browser[:message] = ''
     begin
       response_ajax_auto("Не выбран функционал для проверки") and return if tests_params[:tir_version] == 'ТИР 2.2' and tests_params[:functional_tir22].nil?
       response_ajax_auto("Не выбран функционал для проверки") and return if tests_params[:tir_version] == 'ТИР 2.3' and tests_params[:functional_tir23].nil?
@@ -52,20 +52,22 @@ class TirAutoTestsController < ApplicationController
         n += 1
         return if n > 90
       end
+      sleep 3
       send_to_log("Done! Запустили ServiceMix", "Done! Запустили ServiceMix")
       send_to_log("#{puts_line}", "#{puts_line}")
-      if tests_params[:tir_version] == 'ТИР 2.2'
-        send_to_log("Запустили тесты ТИР 2.2", "Запустили тесты ТИР 2.2")
-        runTest(tests_params[:functional_tir22])
-      elsif tests_params[:tir_version] == 'ТИР 2.3'
+      if tests_params[:tir_version] == 'ТИР 2.3'
         send_to_log("Запустили тесты ТИР 2.3", "Запустили тесты ТИР 2.3")
         runTest(tests_params[:functional_tir23])
+      elsif tests_params[:tir_version] == 'ТИР 2.4'
+        send_to_log("Запустили тесты ТИР 2.4", "Запустили тесты ТИР 2.4")
+        runTest(tests_params[:functional_tir24])
       end
       send_to_log("#{puts_line}", "#{puts_line}")
-      delete_rows_from_db
-      stop_amq(tests_params[:tir_dir])
+      delete_rows_from_db if tests_params[:dont_clear_db] == 'false'
+      stop_amq(tests_params[:tir_dir]) if tests_params[:dont_stop_TIR] == 'false'
       sleep 1
-      stop_servicemix(tests_params[:tir_dir])
+      stop_servicemix(tests_params[:tir_dir]) if tests_params[:dont_stop_TIR] == 'false'
+      delete_db if tests_params[:dont_drop_db] == 'false'
     ensure
       end_test(log_file_name, startTime)
     end
@@ -92,5 +94,5 @@ end
 
 private
   def tests_params
-    params.require(:test_data).permit(:tir_version, :tir_dir, :functional_tir22 => [], :functional_tir23 => [])
+    params.require(:test_data).permit(:tir_version, :tir_dir, :dont_clear_db, :dont_drop_db, :dont_stop_TIR, :functional_tir23 => [], :functional_tir24 => [])
   end

@@ -1,3 +1,4 @@
+del /F /Q "C:\IntegrationTools\tmp\pids\server.pid"
 jruby -S rails tmp:clear
 jruby -S rails log:clear
 jruby -S rails assets:clobber

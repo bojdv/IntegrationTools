@@ -28,11 +28,11 @@ function clear_log() {
     document.getElementById('tir_autotests_log').value = '';
 }
 function deselect_options() {
-    var elements = document.getElementById("test_data_functional_tir22").options;
+    var elements = document.getElementById("test_data_functional_tir23").options;
     for(var i = 0; i < elements.length; i++){
         elements[i].selected = false;
     }
-    var elements = document.getElementById("test_data_functional_tir23").options;
+    var elements = document.getElementById("test_data_functional_tir24").options;
     for(var i = 0; i < elements.length; i++){
         elements[i].selected = false;
     }
@@ -40,11 +40,11 @@ function deselect_options() {
 }
 function colorize_options(tir_version, functional, color) {
     deselect_options();
-    if (tir_version == 'ТИР 2.2'){
-        func = 'div.test_data_functional_tir22 option[value="'+functional+'"]';
-    }
-    else if (tir_version == 'ТИР 2.3'){
+    if (tir_version == 'ТИР 2.3'){
         func = 'div.test_data_functional_tir23 option[value="'+functional+'"]';
+    }
+    else if (tir_version == 'ТИР 2.4'){
+        func = 'div.test_data_functional_tir24 option[value="'+functional+'"]';
     }
     document.querySelector(func).style.backgroundColor=color;
 }

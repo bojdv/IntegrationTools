@@ -9,18 +9,21 @@
     </div>
     <div class="col-md-3 placeholder" id="select_product">
       <%= simple_form_for :test_data, remote: 'true', url: tir_auto_tests_run_path, html: {class: 'form-group' } do |f| %>
-        <%= f.input :tir_version, label: 'Выберите версию платформы:', selected: 'ТИР 2.2', collection: ['ТИР 2.2', 'ТИР 2.3'], required: false %>
+        <%= f.input :tir_version, label: 'Выберите версию платформы:', selected: 'ТИР 2.3', collection: ['ТИР 2.3', 'ТИР 2.4'], required: false %>
         <div id="tir_22">
-          <%= f.input :functional_tir22, label: 'Выберите проверки', collection: @tir22_components, include_hidden: false, required: false, input_html: { multiple: true, style: "height:300px"} %>
-        </div>
-        <div id="tir_23" style="display:none">
           <%= f.input :functional_tir23, label: 'Выберите проверки', collection: @tir23_components, include_hidden: false, required: false, input_html: { multiple: true, style: "height:300px"} %>
         </div>
-        <%= f.input :tir_dir, label: 'Каталог ТИР:', required: false, input_html: {value: '\\\\vm-corint\\TIR_Autotest'} %>
+        <div id="tir_23" style="display:none">
+          <%= f.input :functional_tir24, label: 'Выберите проверки', collection: @tir24_components, include_hidden: false, required: false, input_html: { multiple: true, style: "height:300px"} %>
+        </div>
+        <%= f.input :tir_dir, label: 'Каталог ТИР:', required: false, input_html: {value: 'C:\\TIR'} %>
+        <%= f.input :dont_clear_db, as: :boolean, :label => 'Не очищать БД после теста', checked_value: true, unchecked_value: false, input_html: {checked: false} %>
+        <%= f.input :dont_drop_db, as: :boolean, :label => 'Не удалять БД после теста', checked_value: true, unchecked_value: false, input_html: {checked: false} %>
+        <%= f.input :dont_stop_TIR, as: :boolean, :label => 'Не останавливать ТИР после теста', checked_value: true, unchecked_value: false, input_html: {checked: false} %>
         <%= f.button :submit, 'Запустить', id: 'run-button', class: 'btn-primary', onclick: "clear_log(); updateLog(); document.getElementById('download-link').style.display = 'none';"%>
       <%end%>
       <a class="btn btn-primary form-group" id="download-link" href="" style="display: none;" onclick="this.style.display = 'none';">Скачать лог</a>
-      <a class="btn btn-primary form-group" id="tester" href="tir_auto_tests/tester" data-remote="true">Click</a>
+      <!--<a class="btn btn-primary form-group" id="tester" href="tir_auto_tests/tester" data-remote="true">Click</a>-->
     </div>
   </div>
 </div>

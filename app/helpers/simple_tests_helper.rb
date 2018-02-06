@@ -14,7 +14,7 @@ module SimpleTestsHelper
   #     @xml_pass.push(xml.xml_name)
   #   end
   # end
-  def send_to_amq_openwire(manager, xml, mode) # Отправка сообщений в Active MQ по протоколу OpenWire
+  def send_to_amq_openwire(manager, xml, mode, ignore_ticket) # Отправка сообщений в Active MQ по протоколу OpenWire
     java_import 'org.apache.activemq.ActiveMQConnectionFactory'
     java_import 'javax.jms.Session'
     java_import 'javax.jms.TextMessage'
@@ -33,12 +33,21 @@ module SimpleTestsHelper
         connection.destroyDestination(session.createQueue(manager.queue_in)) # Удаляем очередь.
         sender.send(textMessage)
         receiver = session.createReceiver(session.createQueue(manager.queue_in))
-        count = 5
+        count = 20
         xml_actual = receiver.receive(1000)
         while xml_actual.nil?
           xml_actual = receiver.receive(1000)
           puts count -=1
           response_ajax("Ответ не был получен!") and return if count == 0
+        end
+        if ignore_ticket == 'true'
+          count = 20
+          xml_actual = receiver.receive(1000)
+          while xml_actual.nil?
+            xml_actual = receiver.receive(1000)
+            puts count -=1
+            response_ajax("Ответ не был получен!") and return if count == 0
+          end
         end
         if xml_actual.getText.include?(xml.xml_answer)
           respond_to do |format|
@@ -71,11 +80,19 @@ module SimpleTestsHelper
         connection.destroyDestination(session.createQueue(manager.queue_in)) # Удаляем очередь.
         sender.send(textMessage)
         receiver = session.createReceiver(session.createQueue(manager.queue_in))
-        count = 3
+        count = 20
         xml_actual = receiver.receive(1000)
         while xml_actual.nil? && count > 0
           xml_actual = receiver.receive(1000)
           puts count -=1
+        end
+        if ignore_ticket == 'true'
+          count = 20
+          xml_actual = receiver.receive(1000)
+          while xml_actual.nil? && count > 0
+            xml_actual = receiver.receive(1000)
+            puts count -=1
+          end
         end
         if xml_actual.nil?
           @xml_fail << "<u>#{xml.xml_name}</u>: <i>похоже, не получили ответ</i>"
@@ -111,7 +128,7 @@ module SimpleTestsHelper
         client.subscribe(inputqueue){|msg| xml_actual << msg.body.to_s}
         client.join(1)
         client.close
-        count = 5
+        count = 20
         while xml_actual.empty?
           client = Stomp::Client.new(manager.user, manager.password, manager.host, manager.port)
           client.subscribe(inputqueue){|msg| xml_actual << msg.body.to_s}
@@ -150,7 +167,7 @@ module SimpleTestsHelper
         client.subscribe(inputqueue){|msg| xml_actual << msg.body.to_s}
         client.join(1)
         client.close
-        count = 5
+        count = 20
         while xml_actual.empty?
           client = Stomp::Client.new(manager.user, manager.password, manager.host, manager.port)
           client.subscribe(inputqueue){|msg| xml_actual << msg.body.to_s}
@@ -170,7 +187,7 @@ module SimpleTestsHelper
       end
     end
   end
-  def send_to_wmq(manager, xml, mode)
+  def send_to_wmq(manager, xml, mode, ignore_ticket)
     puts 'Sending message to WMQ'
     java_import 'javax.jms.JMSException'
     java_import 'javax.jms.QueueConnection'
@@ -202,12 +219,21 @@ module SimpleTestsHelper
         connection.start
         sender.send(textMessage)
         receiver = session.createReceiver(session.createQueue(manager.queue_in))
-        count = 5
+        count = 20
         xml_actual = receiver.receive(1000)
         while xml_actual.nil?
           xml_actual = receiver.receive(1000)
           puts count -=1
           response_ajax("Ответ не был получен!") and return if count == 0
+        end
+        if ignore_ticket == 'true'
+          count = 20
+          xml_actual = receiver.receive(1000)
+          while xml_actual.nil?
+            xml_actual = receiver.receive(1000)
+            puts count -=1
+            response_ajax("Ответ не был получен!") and return if count == 0
+          end
         end
         if xml_actual.getText.include?(xml.xml_answer)
           respond_to do |format|
@@ -246,11 +272,20 @@ module SimpleTestsHelper
         connection.start
         sender.send(textMessage)
         receiver = session.createReceiver(session.createQueue(manager.queue_in))
-        count = 5
+        count = 20
         xml_actual = receiver.receive(1000)
         while xml_actual.nil? && count > 0
           xml_actual = receiver.receive(1000)
           puts count -=1
+        end
+        if ignore_ticket == 'true'
+          count = 20
+          xml_actual = receiver.receive(1000)
+          while xml_actual.nil?
+            xml_actual = receiver.receive(1000)
+            puts count -=1
+            response_ajax("Ответ не был получен!") and return if count == 0
+          end
         end
         if xml_actual.nil?
           @xml_fail << "<u>#{xml.xml_name}</u>: <i>похоже, не получили ответ</i>"

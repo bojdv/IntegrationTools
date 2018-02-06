@@ -18,7 +18,7 @@ module TirAutotests
       menu_name = 'Проверка адаптера Active MQ'
       category = Category.find_by_category_name('Адаптер Active MQ')
       xml_name = 'Автотест для адаптера Active MQ'
-      manager = QueueManager.find_by_manager_name('TIR (vm-corint)')
+      manager = QueueManager.find_by_manager_name('iTools[TIR]')
       begin
         send_to_log("#{puts_line}", "#{puts_line}")
         send_to_log("Начали проверку: #{menu_name}", "Начали проверку: #{xml_name}")
@@ -38,7 +38,7 @@ module TirAutotests
         end
       rescue Exception => msg
         send_to_log("Ошибка! #{msg}\n#{msg.backtrace.join("\n")}", "Ошибка! #{msg}")
-        colorize(tests_params[:tir_version] ,menu_name, '#ff3333')
+        colorize(tests_params[:tir_version] ,menu_name, fail_menu_color)
       end
     end
 
@@ -47,7 +47,7 @@ module TirAutotests
       menu_name = 'Проверка компонента БД'
       category = Category.find_by_category_name('Компонент БД')
       xml_name = 'Автотест для компонента БД'
-      manager = QueueManager.find_by_manager_name('TIR (vm-corint)')
+      manager = QueueManager.find_by_manager_name('iTools[TIR]')
       begin
         send_to_log("#{puts_line}", "#{puts_line}")
         send_to_log("Начали проверку: #{menu_name}", "Начали проверку: #{xml_name}")
@@ -67,7 +67,7 @@ module TirAutotests
         end
       rescue Exception => msg
         send_to_log("Ошибка! #{msg}\n#{msg.backtrace.join("\n")}", "Ошибка! #{msg}")
-        colorize(tests_params[:tir_version], menu_name, '#ff3333')
+        colorize(tests_params[:tir_version], menu_name, fail_menu_color)
       end
     end
 
@@ -76,7 +76,7 @@ module TirAutotests
       menu_name = 'Проверка компонента трансформации'
       category = Category.find_by_category_name('Компонент трансформации')
       xml_name = 'Проверка трансформации'
-      manager = QueueManager.find_by_manager_name('TIR (vm-corint)')
+      manager = QueueManager.find_by_manager_name('iTools[TIR]')
       begin
         send_to_log("#{puts_line}", "#{puts_line}")
         send_to_log("Начали проверку: #{menu_name}", "Начали проверку: #{xml_name}")
@@ -96,7 +96,7 @@ module TirAutotests
         end
       rescue Exception => msg
         send_to_log("Ошибка! #{msg}\n#{msg.backtrace.join("\n")}", "Ошибка! #{msg}")
-        colorize(tests_params[:tir_version], menu_name, '#ff3333')
+        colorize(tests_params[:tir_version], menu_name, fail_menu_color)
       end
     end
 
@@ -106,7 +106,7 @@ module TirAutotests
       category = Category.find_by_category_name('Компонент File')
       xml_name_to_ABS = 'Проверка получения файла из каталога. Запрос в АБС'
       xml_name_from_ABS = 'Проверка получения файла из каталога. Ответ от АБС'
-      manager = QueueManager.find_by_manager_name('TIR (vm-corint)')
+      manager = QueueManager.find_by_manager_name('iTools[TIR]')
       begin
         send_to_log("#{puts_line}", "#{puts_line}")
         send_to_log("Начали проверку: #{menu_name}", "Начали проверку: #{menu_name}")
@@ -118,7 +118,7 @@ module TirAutotests
         send_to_log("Получили xml для ответа от АБС: #{xml_from_abs.xml_name}")
         answer = send_to_amq(manager, xml_to_abs)
         raise send_to_tir_error if answer.nil?
-        File.open('\\\\vm-corint\\Gates\\Omega\\in_status_autotest\\STATUS_CURRBUY_160420091010.xml', 'w'){ |file| file.write xml_from_abs.xml_text }
+        File.open("C:\\Gates\\Omega\\in_status_autotest\\STATUS_CURRBUY_160420091010.xml", 'w'){ |file| file.write xml_from_abs.xml_text }
         send_to_log("Подложили ответ от АБС в каталог ТИР:\n#{xml_from_abs.xml_text}", "Подложили ответ от АБС в каталог ТИР")
         answer = receive_from_amq(manager)
         raise not_receive_answer if answer.nil?
@@ -132,7 +132,7 @@ module TirAutotests
         end
       rescue Exception => msg
         send_to_log("Ошибка! #{msg}\n#{msg.backtrace.join("\n")}", "Ошибка! #{msg}")
-        colorize(tests_params[:tir_version], menu_name, '#ff3333')
+        colorize(tests_params[:tir_version], menu_name, fail_menu_color)
       end
     end
 
@@ -141,8 +141,8 @@ module TirAutotests
       menu_name = 'Проверка адаптера HTTP'
       category = Category.find_by_category_name('Адаптер HTTP')
       xml_name = 'Проверка HTTP адаптера'
-      manager = QueueManager.find_by_manager_name('TIR (vm-corint)')
-      endpoint = 'http://vm-corint:3333/httpadapter'
+      manager = QueueManager.find_by_manager_name('iTools[TIR]')
+      endpoint = "http://#{manager.host}:3333/httpadapter"
       begin
         send_to_log("#{puts_line}", "#{puts_line}")
         send_to_log("Начали проверку: #{menu_name}", "Начали проверку: #{xml_name}")
@@ -169,7 +169,7 @@ module TirAutotests
         end
       rescue Exception => msg
         send_to_log("Ошибка! #{msg}\n#{msg.backtrace.join("\n")}", "Ошибка! #{msg}")
-        colorize(tests_params[:tir_version], menu_name, '#ff3333')
+        colorize(tests_params[:tir_version], menu_name, fail_menu_color)
       end
     end
 
@@ -180,7 +180,7 @@ module TirAutotests
       xml_name_to_ABS = 'Проверка компонента Active MQ. Запрос в АБС'
       xml_name_from_ABS = 'Проверка компонента Active MQ. Ответ от АБС'
       abs_queue_in = 'szvABS_out'
-      manager = QueueManager.find_by_manager_name('TIR (vm-corint)')
+      manager = QueueManager.find_by_manager_name('iTools[TIR]')
       begin
         send_to_log("#{puts_line}", "#{puts_line}")
         send_to_log("Начали проверку: #{menu_name}", "Начали проверку: #{menu_name}")
@@ -210,16 +210,16 @@ module TirAutotests
         end
       rescue Exception => msg
         send_to_log("Ошибка! #{msg}\n#{msg.backtrace.join("\n")}", "Ошибка! #{msg}")
-        colorize(tests_params[:tir_version], menu_name, '#ff3333')
+        colorize(tests_params[:tir_version], menu_name, fail_menu_color)
       end
     end
 
     if components.include?('Проверка компонента WebServiceProxy')
-      sleep 0.5
+      sleep 2
       menu_name = 'Проверка компонента WebServiceProxy'
       category = Category.find_by_category_name('Компонент WebServiceProxy')
       xml_name = 'Проверка компонента WebServiceProxy'
-      manager = QueueManager.find_by_manager_name('TIR (vm-corint)')
+      manager = QueueManager.find_by_manager_name('iTools[TIR]')
       begin
         send_to_log("#{puts_line}", "#{puts_line}")
         send_to_log("Начали проверку: #{menu_name}", "Начали проверку: #{xml_name}")
@@ -239,7 +239,7 @@ module TirAutotests
         end
       rescue Exception => msg
         send_to_log("Ошибка! #{msg}\n#{msg.backtrace.join("\n")}", "Ошибка! #{msg}")
-        colorize(tests_params[:tir_version], menu_name, '#ff3333')
+        colorize(tests_params[:tir_version], menu_name, fail_menu_color)
       end
     end
 
@@ -248,7 +248,7 @@ module TirAutotests
       menu_name = 'Проверка компонента Base64 (WebServiceProxy)'
       category = Category.find_by_category_name('Компонент Base64 (WebServiceProxy)')
       xml_name = 'Проверка компонента Base64'
-      manager = QueueManager.find_by_manager_name('TIR (vm-corint)')
+      manager = QueueManager.find_by_manager_name('iTools[TIR]')
       begin
         send_to_log("#{puts_line}", "#{puts_line}")
         send_to_log("Начали проверку: #{menu_name}", "Начали проверку: #{xml_name}")
@@ -268,7 +268,7 @@ module TirAutotests
         end
       rescue Exception => msg
         send_to_log("Ошибка! #{msg}\n#{msg.backtrace.join("\n")}", "Ошибка! #{msg}")
-        colorize(tests_params[:tir_version], menu_name, '#ff3333')
+        colorize(tests_params[:tir_version], menu_name, fail_menu_color)
       end
     end
   end

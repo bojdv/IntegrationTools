@@ -25,7 +25,7 @@ module TirAutoTestsHelper
       sender.send(textMessage)
       send_to_log("Отправили сообщение в ТИР:\n #{textMessage.getText}", "Отправили сообщение в ТИР")
       receiver = session.createReceiver(session.createQueue(manager.queue_in))
-      count = 5
+      count = 20
       xml_actual = receiver.receive(1000)
       while xml_actual.nil?
         xml_actual = receiver.receive(1000)
@@ -94,7 +94,7 @@ module TirAutoTestsHelper
       session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
       connection.start
       receiver = session.createReceiver(session.createQueue(manager.queue_in))
-      count = 5
+      count = 20
       xml_actual = receiver.receive(1000)
       while xml_actual.nil?
         xml_actual = receiver.receive(1000)
@@ -114,18 +114,18 @@ module TirAutoTestsHelper
   end
 
   def send_to_log(to_log, to_browser = false)
-    if to_log
-      if to_log.include?('Ошибка')
-        $log.error(to_log)
-      else
-        $log.info(to_log)
-      end
-    end
     if to_browser
       if to_browser.include?('--')
         $browser[:message] += "#{to_browser}\n"
       else
         $browser[:message] += "[#{Time.now.strftime('%H:%M:%S')}]: #{to_browser}\n"
+      end
+    end
+    if to_log
+      if to_log.include?('Ошибка')
+        $log.error(to_log)
+      else
+        $log.info(to_log)
       end
     end
   end
@@ -201,6 +201,7 @@ module TirAutoTestsHelper
                   values ('03a33e3e-ba0e-4409-8aba-8c7cc4d185cd', 'AutoTests/[AutoTest] CertGenRequest', v_long_text, '88e73c78-25fd-40f9-8c1d-b5853356c30c');
                 END;})
       stmt.executeUpdate("update deployments set src = REPLACE(src, ']]', ']]\"') where id = '03a33e3e-ba0e-4409-8aba-8c7cc4d185cd'")
+      stmt.executeUpdate("update deployments set src = REPLACE(src, ':1 ', '?') where id = '03a33e3e-ba0e-4409-8aba-8c7cc4d185cd'")
 
       # Загружаем маршрут [AutoTest] DBAdapter.xml
       first, second = '', ''
@@ -272,16 +273,16 @@ module TirAutoTestsHelper
 
   def end_test(log_file_name, startTime = false)
     begin
-      sleep 0.5
       send_to_log("#{puts_line}", "#{puts_line}")
       endTime = Time.now
       puts_time(startTime, endTime) if startTime
-      sleep 0.5
     rescue Exception => msg
       send_to_log("Ошибка! #{msg}", "Ошибка! #{msg}")
     ensure
-      $browser[:message].clear
       $log.close
+      until $browser[:message].empty?
+        sleep 0.5
+      end
       respond_to do |format|
         format.js { render :js => "kill_listener(); download_link('#{log_file_name}')" }
       end
@@ -290,7 +291,7 @@ module TirAutoTestsHelper
 
   def dir_empty?(tir_dir)
     begin
-      send_to_log("Проверка наличия каталога '#{tir_dir}'", "Проверка наличия каталога 'C:/TIR_Autotest'")
+      send_to_log("Проверка наличия каталога '#{tir_dir}'", "Проверка наличия каталога '#{tir_dir}'")
       sleep 0.5
       if Dir.entries("#{tir_dir}").size <= 2
         send_to_log("Ошибка! Каталог '#{tir_dir}' пустой", "Ошибка! Каталог '#{tir_dir}' пустой")
@@ -360,6 +361,26 @@ module TirAutoTestsHelper
     end
     sleep 0.5
     send_to_log("Done! Удалили тестовые данные.", "Done! Удалили тестовые данные.")
+  end
+
+  def delete_db
+    java_import 'oracle.jdbc.OracleDriver'
+    java_import 'java.sql.DriverManager'
+    begin
+      send_to_log("Удаляем БД 'tir_autotest'", "Удаляем БД 'tir_autotest'")
+      url = "jdbc:oracle:thin:@vm-corint:1521:corint"
+      connection = java.sql.DriverManager.getConnection(url, "sys as sysdba", "waaaaa");
+      stmt = connection.create_statement
+      stmt.executeUpdate("drop user tir_autotest cascade")
+    rescue Exception => msg
+      send_to_log("Ошибка! #{msg}", "Ошибка! #{msg}")
+      return true
+    ensure
+      stmt.close
+      connection.close
+    end
+    sleep 0.5
+    send_to_log("Done! Удалили тестовую БД.", "Done! Удалили тестовую БД.")
   end
 
   def start_amq(dir)

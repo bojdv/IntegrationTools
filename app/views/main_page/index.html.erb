@@ -46,9 +46,21 @@
         </div>
       </div>
       <div class="my-3 p-3 bg-white rounded box-shadow">
-        <h6 class="border-bottom border-gray pb-2 mb-0"><b>Текущая версия:</b> - v0.04</h6>
+        <h6 class="border-bottom border-gray pb-2 mb-0"><b>Текущая версия:</b> - v0.05</h6>
         <div class="media pt-3">
           <div style="height:450px;width:800px;border:3px solid dodgerblue;font:16px/26px Georgia, Garamond, Serif;overflow:auto;">
+            <b>v0.0.5</b> [2017-02-06]:<br/>
+            1. Доработан функционал TIR AutoTest:<br/>
+            <ul>
+              <li>Добавлен автоматический запуск и остановка AMQ и ServiceMix</li>
+              <li>Добавлено заполнение БД тестовыми данными</li>
+              <li>Добавлены новые параметры запуска</li>
+            </ul>
+            2. Доработан функционал Simple Tests:<br/>
+            <ul>
+              <li>Добавлен режим игнорирования первого тикета</li>
+            </ul>
+
             <b>v0.0.4</b> [2017-01-30]:<br/>
             1. Релиз функционала TIR AutoTests.<br/>
             2. Заполнено содержание главной страницы.<br/><br/>
@@ -90,6 +102,7 @@
           <a href="#" class="list-group-item list-group-item-action" onclick="$('#faq_save_manager').modal()">Как сохранить/отредактировать/удалить настройку менеджера очередей?</a>
           <a href="#" class="list-group-item list-group-item-action" onclick="$('#faq_simple_test').modal()">Как создать Simple Test?</a>
           <a href="#" class="list-group-item list-group-item-action" onclick="$('#faq_run_simple_test').modal()">Как запустить Simple Test?</a>
+          <a href="#" class="list-group-item list-group-item-action" onclick="$('#faq_run_tir_autotests').modal()">Как запустить TIR AutoTests?</a>
         </div>
       </div>
     </main>
@@ -139,3 +152,4 @@
 <%= render 'layouts/faq_save_manager' %>
 <%= render 'layouts/faq_simple_test' %>
 <%= render 'layouts/faq_run_simple_test' %>
+<%= render 'layouts/faq_run_tir_autotests' %>

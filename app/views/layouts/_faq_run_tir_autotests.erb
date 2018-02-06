@@ -1,0 +1,33 @@
+<!-- Modal -->
+<div class="modal fade" id="faq_run_tir_autotests" tabindex="-1" role="dialog" aria-labelledby="prefixModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="prefixModalLabel">Запуск TIR AutoTests</h5>
+      </div>
+      <div class="col-md-12">
+        <div class="modal-body">
+          <p>Для запуска TIR AutoTests необходимо:</p>
+          <ol>
+            <li>Зайти на машину vm-itools</li>
+            <li>Установить ТИР в пустой каталог. Все настройки по умолчанию, за исключением:</li>
+            <ul>
+              <li>Выбираем для установки компоненты: AMQ+ServiceMix</li>
+              <li>Пароль для шифрования ключей: admin/admin</li>
+              <li>В качестве БД указываем Oracle и следующие параметры:</li>
+              <div class="text-center">
+                <%= link_to image_url("db_settins.png") do %>
+                  <%= image_tag("db_settins.png", class: "grow shadow") %>
+                <% end %>
+              </div>
+            </ul>
+            <li>Зайти в Integration Tools в раздел TIR AutoTests</li>
+            <li>Выбрать нужную версию ТИР, компоненты, каталог ТИР и нажать "Запустить"</li>
+            <li>Дождаться окончания тестов!</li>
+          </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

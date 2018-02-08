@@ -273,7 +273,6 @@ module TirAutoTestsHelper
 
   def end_test(log_file_name, startTime = false)
     begin
-      send_to_log("#{puts_line}", "#{puts_line}")
       endTime = Time.now
       puts_time(startTime, endTime) if startTime
     rescue Exception => msg

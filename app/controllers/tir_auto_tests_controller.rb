@@ -13,15 +13,15 @@ class TirAutoTestsController < ApplicationController
                         'Проверка компонента WebServiceProxy',
                         'Проверка компонента Base64 (WebServiceProxy)']
     @tir24_components = Array.new(@tir23_components)
-    @tir23_components.push('Проверка OpenNMS')
+    @tir24_components.push('Проверка OpenNMS')
   end
   def run
     $browser = Hash.new
     $browser[:event] = ''
     $browser[:message] = ''
+    response_ajax_auto("Не выбран функционал для проверки") and return if tests_params[:tir_version] == 'ТИР 2.3' and tests_params[:functional_tir23].nil?
+    response_ajax_auto("Не выбран функционал для проверки") and return if tests_params[:tir_version] == 'ТИР 2.4' and tests_params[:functional_tir24].nil?
     begin
-      response_ajax_auto("Не выбран функционал для проверки") and return if tests_params[:tir_version] == 'ТИР 2.2' and tests_params[:functional_tir22].nil?
-      response_ajax_auto("Не выбран функционал для проверки") and return if tests_params[:tir_version] == 'ТИР 2.3' and tests_params[:functional_tir23].nil?
       Dir.chdir "#{Rails.root}"
       log_file_name = "log_tir_autotests_#{Time.now.strftime('%H-%M-%S')}.txt"
       $log = Logger.new(File.open("log\\#{log_file_name}", 'w'))
@@ -68,6 +68,7 @@ class TirAutoTestsController < ApplicationController
       sleep 1
       stop_servicemix(tests_params[:tir_dir]) if tests_params[:dont_stop_TIR] == 'false'
       delete_db if tests_params[:dont_drop_db] == 'false'
+      send_to_log("#{puts_line}", "#{puts_line}")
     ensure
       end_test(log_file_name, startTime)
     end

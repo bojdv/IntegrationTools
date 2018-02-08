@@ -10,10 +10,10 @@
     <div class="col-md-3 placeholder" id="select_product">
       <%= simple_form_for :test_data, remote: 'true', url: tir_auto_tests_run_path, html: {class: 'form-group' } do |f| %>
         <%= f.input :tir_version, label: 'Выберите версию платформы:', selected: 'ТИР 2.3', collection: ['ТИР 2.3', 'ТИР 2.4'], required: false %>
-        <div id="tir_22">
+        <div id="tir_23">
           <%= f.input :functional_tir23, label: 'Выберите проверки', collection: @tir23_components, include_hidden: false, required: false, input_html: { multiple: true, style: "height:300px"} %>
         </div>
-        <div id="tir_23" style="display:none">
+        <div id="tir_24" style="display:none">
           <%= f.input :functional_tir24, label: 'Выберите проверки', collection: @tir24_components, include_hidden: false, required: false, input_html: { multiple: true, style: "height:300px"} %>
         </div>
         <%= f.input :tir_dir, label: 'Каталог ТИР:', required: false, input_html: {value: 'C:\\TIR'} %>

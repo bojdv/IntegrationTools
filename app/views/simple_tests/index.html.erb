@@ -37,6 +37,7 @@
         <%= f.input :autor, :label => 'Автор XML', :required => false, placeholder: logged_in? ? current_user.email : 'Авторизуйтесь для сохранения', :disabled => true%>
         <%= f.input :all_category_test, as: :boolean, :label => 'Запустить всю категорию', checked_value: true, unchecked_value: false, input_html: {checked: false} %>
         <%= f.input :ignore_ticket, as: :boolean, :label => 'Игнорировать первый квиток', checked_value: true, unchecked_value: false, input_html: {checked: false} %>
+        <%= f.input :egg, as: :boolean, :label => 'Внешняя система - eGG', checked_value: true, unchecked_value: false, input_html: {checked: false} %>
       </div>
     <% end %>
     <button type="button" class="btn btn-primary" id="start-button", onclick="simple_test_data()">Запустить</button>

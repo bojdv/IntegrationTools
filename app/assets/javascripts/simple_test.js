@@ -33,6 +33,7 @@ function simple_test_data() { //* Получение полей Simple Test */
     choice_category = document.getElementById("xml_select_category_name").value;
     all_category_test = document.getElementById("xml_all_category_test").checked;
     ignore_ticket = document.getElementById("xml_ignore_ticket").checked;
+    egg = document.getElementById("xml_egg").checked;
     $.ajax({
         url: "simple_tests/run_simpleTest",
         type: "POST",
@@ -44,7 +45,8 @@ function simple_test_data() { //* Получение полей Simple Test */
                 expected_answer: expected_answer,
                 choice_category: choice_category,
                 all_category_test: all_category_test,
-                ignore_ticket: ignore_ticket
+                ignore_ticket: ignore_ticket,
+                egg: egg
             }
         }});
 }

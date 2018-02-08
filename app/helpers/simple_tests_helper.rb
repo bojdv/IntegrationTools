@@ -14,7 +14,7 @@ module SimpleTestsHelper
   #     @xml_pass.push(xml.xml_name)
   #   end
   # end
-  def send_to_amq_openwire(manager, xml, mode, ignore_ticket) # Отправка сообщений в Active MQ по протоколу OpenWire
+  def send_to_amq_openwire(manager, xml, mode, ignore_ticket, egg) # Отправка сообщений в Active MQ по протоколу OpenWire
     java_import 'org.apache.activemq.ActiveMQConnectionFactory'
     java_import 'javax.jms.Session'
     java_import 'javax.jms.TextMessage'
@@ -33,7 +33,7 @@ module SimpleTestsHelper
         connection.destroyDestination(session.createQueue(manager.queue_in)) # Удаляем очередь.
         sender.send(textMessage)
         receiver = session.createReceiver(session.createQueue(manager.queue_in))
-        count = 20
+        count = 15
         xml_actual = receiver.receive(1000)
         while xml_actual.nil?
           xml_actual = receiver.receive(1000)
@@ -41,7 +41,7 @@ module SimpleTestsHelper
           response_ajax("Ответ не был получен!") and return if count == 0
         end
         if ignore_ticket == 'true'
-          count = 20
+          count = 15
           xml_actual = receiver.receive(1000)
           while xml_actual.nil?
             xml_actual = receiver.receive(1000)
@@ -49,13 +49,29 @@ module SimpleTestsHelper
             response_ajax("Ответ не был получен!") and return if count == 0
           end
         end
-        if xml_actual.getText.include?(xml.xml_answer)
-          respond_to do |format|
-            format.js { render :js => "updateActualXml('#{xml_actual.getText.inspect.slice(1..-2)}', '#b3ffcc')" }
+        if egg == 'false'
+          if xml_actual.getText.include?(xml.xml_answer)
+            respond_to do |format|
+              format.js { render :js => "updateActualXml('#{xml_actual.getText.inspect.slice(1..-2)}', '#b3ffcc')" }
+            end
+          else
+            respond_to do |format|
+              format.js { render :js => "updateActualXml('#{xml_actual.getText.inspect.slice(1..-2)}', '#e9ecef')" }
+            end
           end
         else
-          respond_to do |format|
-            format.js { render :js => "updateActualXml('#{xml_actual.getText.inspect.slice(1..-2)}', '#e9ecef')" }
+          response = Document.new(xml_actual.getText)
+          answer = response.elements['//mq:Answer'].text
+          answer_decode = Base64.decode64(answer)
+          answer_decode = answer_decode.force_encoding("utf-8")
+          if answer_decode.include?(xml.xml_answer)
+            respond_to do |format|
+              format.js { render :js => "updateActualXml('#{xml_actual.getText.inspect.slice(1..-2)}', '#b3ffcc')" }
+            end
+          else
+            respond_to do |format|
+              format.js { render :js => "updateActualXml('#{xml_actual.getText.inspect.slice(1..-2)}', '#e9ecef')" }
+            end
           end
         end
       rescue => msg
@@ -80,14 +96,14 @@ module SimpleTestsHelper
         connection.destroyDestination(session.createQueue(manager.queue_in)) # Удаляем очередь.
         sender.send(textMessage)
         receiver = session.createReceiver(session.createQueue(manager.queue_in))
-        count = 20
+        count = 15
         xml_actual = receiver.receive(1000)
         while xml_actual.nil? && count > 0
           xml_actual = receiver.receive(1000)
           puts count -=1
         end
         if ignore_ticket == 'true'
-          count = 20
+          count = 15
           xml_actual = receiver.receive(1000)
           while xml_actual.nil? && count > 0
             xml_actual = receiver.receive(1000)
@@ -97,7 +113,15 @@ module SimpleTestsHelper
         if xml_actual.nil?
           @xml_fail << "<u>#{xml.xml_name}</u>: <i>похоже, не получили ответ</i>"
         else
-          xml_actual.getText.include?(xml.xml_answer) ? @xml_pass << xml.xml_name : @xml_fail << "<u>#{xml.xml_name}</u>: <i>фактический ответ не совпал с ожидаемым</i>"
+          if egg == 'false'
+            xml_actual.getText.include?(xml.xml_answer) ? @xml_pass << xml.xml_name : @xml_fail << "<u>#{xml.xml_name}</u>: <i>фактический ответ не совпал с ожидаемым</i>"
+          else
+            response = Document.new(xml_actual.getText)
+            answer = response.elements['//mq:Answer'].text
+            answer_decode = Base64.decode64(answer)
+            answer_decode = answer_decode.force_encoding("utf-8")
+            answer_decode.include?(xml.xml_answer) ? @xml_pass << xml.xml_name : @xml_fail << "<u>#{xml.xml_name}</u>: <i>фактический ответ не совпал с ожидаемым</i>"
+          end
         end
       rescue => msg
         @xml_fail << "<u>#{xml.xml_name}</u>: <i>#{msg.message}</i>"
@@ -128,7 +152,7 @@ module SimpleTestsHelper
         client.subscribe(inputqueue){|msg| xml_actual << msg.body.to_s}
         client.join(1)
         client.close
-        count = 20
+        count = 15
         while xml_actual.empty?
           client = Stomp::Client.new(manager.user, manager.password, manager.host, manager.port)
           client.subscribe(inputqueue){|msg| xml_actual << msg.body.to_s}
@@ -167,7 +191,7 @@ module SimpleTestsHelper
         client.subscribe(inputqueue){|msg| xml_actual << msg.body.to_s}
         client.join(1)
         client.close
-        count = 20
+        count = 15
         while xml_actual.empty?
           client = Stomp::Client.new(manager.user, manager.password, manager.host, manager.port)
           client.subscribe(inputqueue){|msg| xml_actual << msg.body.to_s}
@@ -187,7 +211,7 @@ module SimpleTestsHelper
       end
     end
   end
-  def send_to_wmq(manager, xml, mode, ignore_ticket)
+  def send_to_wmq(manager, xml, mode, ignore_ticket, egg)
     puts 'Sending message to WMQ'
     java_import 'javax.jms.JMSException'
     java_import 'javax.jms.QueueConnection'
@@ -219,7 +243,7 @@ module SimpleTestsHelper
         connection.start
         sender.send(textMessage)
         receiver = session.createReceiver(session.createQueue(manager.queue_in))
-        count = 20
+        count = 15
         xml_actual = receiver.receive(1000)
         while xml_actual.nil?
           xml_actual = receiver.receive(1000)
@@ -227,7 +251,7 @@ module SimpleTestsHelper
           response_ajax("Ответ не был получен!") and return if count == 0
         end
         if ignore_ticket == 'true'
-          count = 20
+          count = 15
           xml_actual = receiver.receive(1000)
           while xml_actual.nil?
             xml_actual = receiver.receive(1000)
@@ -235,13 +259,29 @@ module SimpleTestsHelper
             response_ajax("Ответ не был получен!") and return if count == 0
           end
         end
-        if xml_actual.getText.include?(xml.xml_answer)
-          respond_to do |format|
-            format.js { render :js => "updateActualXml('#{xml_actual.getText.inspect.slice(1..-2)}', '#b3ffcc')" }
+        if egg == 'false'
+          if xml_actual.getText.include?(xml.xml_answer)
+            respond_to do |format|
+              format.js { render :js => "updateActualXml('#{xml_actual.getText.inspect.slice(1..-2)}', '#b3ffcc')" }
+            end
+          else
+            respond_to do |format|
+              format.js { render :js => "updateActualXml('#{xml_actual.getText.inspect.slice(1..-2)}', '#e9ecef')" }
+            end
           end
         else
-          respond_to do |format|
-            format.js { render :js => "updateActualXml('#{xml_actual.getText.inspect.slice(1..-2)}', '#e9ecef')" }
+          response = Document.new(xml_actual.getText)
+          answer = response.elements['//mq:Answer'].text
+          answer_decode = Base64.decode64(answer)
+          answer_decode = answer_decode.force_encoding("utf-8")
+          if answer_decode.include?(xml.xml_answer)
+            respond_to do |format|
+              format.js { render :js => "updateActualXml('#{xml_actual.getText.inspect.slice(1..-2)}', '#b3ffcc')" }
+            end
+          else
+            respond_to do |format|
+              format.js { render :js => "updateActualXml('#{xml_actual.getText.inspect.slice(1..-2)}', '#e9ecef')" }
+            end
           end
         end
       rescue => msg
@@ -272,14 +312,14 @@ module SimpleTestsHelper
         connection.start
         sender.send(textMessage)
         receiver = session.createReceiver(session.createQueue(manager.queue_in))
-        count = 20
+        count = 15
         xml_actual = receiver.receive(1000)
         while xml_actual.nil? && count > 0
           xml_actual = receiver.receive(1000)
           puts count -=1
         end
         if ignore_ticket == 'true'
-          count = 20
+          count = 15
           xml_actual = receiver.receive(1000)
           while xml_actual.nil?
             xml_actual = receiver.receive(1000)
@@ -290,7 +330,15 @@ module SimpleTestsHelper
         if xml_actual.nil?
           @xml_fail << "<u>#{xml.xml_name}</u>: <i>похоже, не получили ответ</i>"
         else
-          xml_actual.getText.include?(xml.xml_answer) ? @xml_pass << xml.xml_name : @xml_fail << "<u>#{xml.xml_name}</u>: <i>фактический ответ не совпал с ожидаемым</i>"
+          if egg == 'false'
+            xml_actual.getText.include?(xml.xml_answer) ? @xml_pass << xml.xml_name : @xml_fail << "<u>#{xml.xml_name}</u>: <i>фактический ответ не совпал с ожидаемым</i>"
+          else
+            response = Document.new(xml_actual.getText)
+            answer = response.elements['//mq:Answer'].text
+            answer_decode = Base64.decode64(answer)
+            answer_decode = answer_decode.force_encoding("utf-8")
+            answer_decode.include?(xml.xml_answer) ? @xml_pass << xml.xml_name : @xml_fail << "<u>#{xml.xml_name}</u>: <i>фактический ответ не совпал с ожидаемым</i>"
+          end
         end
       rescue => msg
         @xml_fail << "<u>#{xml.xml_name}</u>: <i>#{msg.message}</i>"

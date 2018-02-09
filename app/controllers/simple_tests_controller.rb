@@ -26,7 +26,7 @@ class SimpleTestsController < ApplicationController
       end
     end
   end
-  def run_simpleTest
+  def run_simpleTest # Запускаем тест
     if run_simpleTest_params[:all_category_test] == 'false'
       response_ajax("Не заполнены параметры:#{@empty_filds.join}") and return if !get_empty_values(run_simpleTest_params).empty?
       mode = 'single'

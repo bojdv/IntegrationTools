@@ -250,6 +250,7 @@ DEPENDENCIES
   puma (~> 3.7)
   rails (~> 5.1.4)
   rspec-rails (= 3.7.2)
+  rubyzip
   sass-rails (~> 5.0)
   savon
   selenium-webdriver

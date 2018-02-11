@@ -4,6 +4,24 @@ module TirAutoTestsHelper
       format.js {render :js => "open_modal(#{text.inspect}, #{time.inspect}); kill_listener();"}
     end
   end
+
+  def end_test(log_file_name, startTime = false)
+    begin
+      endTime = Time.now
+      puts_time(startTime, endTime) if startTime
+    rescue Exception => msg
+      send_to_log("Ошибка! #{msg}", "Ошибка! #{msg}")
+    ensure
+      $log.close
+      until $browser[:message].empty?
+        sleep 0.5
+      end
+      respond_to do |format|
+        format.js { render :js => "kill_listener(); download_link('#{log_file_name}')" }
+      end
+    end
+  end
+
   def send_to_amq_and_receive(manager, xml) # Отправка сообщений в Active MQ по протоколу OpenWire
     java_import 'org.apache.activemq.ActiveMQConnectionFactory'
     java_import 'javax.jms.Session'
@@ -271,23 +289,6 @@ module TirAutoTestsHelper
     sleep 0.5
   end
 
-  def end_test(log_file_name, startTime = false)
-    begin
-      endTime = Time.now
-      puts_time(startTime, endTime) if startTime
-    rescue Exception => msg
-      send_to_log("Ошибка! #{msg}", "Ошибка! #{msg}")
-    ensure
-      $log.close
-      until $browser[:message].empty?
-        sleep 0.5
-      end
-      respond_to do |format|
-        format.js { render :js => "kill_listener(); download_link('#{log_file_name}')" }
-      end
-    end
-  end
-
   def dir_empty?(tir_dir)
     begin
       send_to_log("Проверка наличия каталога '#{tir_dir}'", "Проверка наличия каталога '#{tir_dir}'")
@@ -341,26 +342,26 @@ module TirAutoTestsHelper
     end
   end
 
-  def delete_rows_from_db
-    java_import 'oracle.jdbc.OracleDriver'
-    java_import 'java.sql.DriverManager'
-    begin
-      send_to_log("Удаляем тестовые маршруты и настройки из БД 'tir_autotest'", "Удаляем тестовые маршруты и настройки из БД 'tir_autotest'")
-      url = "jdbc:oracle:thin:@vm-corint:1521:corint"
-      connection = java.sql.DriverManager.getConnection(url, "tir_autotest", "tir_autotest");
-      stmt = connection.create_statement
-      stmt.executeUpdate("TRUNCATE TABLE sys_properties")
-      stmt.executeUpdate("TRUNCATE TABLE deployments")
-    rescue Exception => msg
-      send_to_log("Ошибка! #{msg}", "Ошибка! #{msg}")
-      return true
-    ensure
-      stmt.close
-      connection.close
-    end
-    sleep 0.5
-    send_to_log("Done! Удалили тестовые данные.", "Done! Удалили тестовые данные.")
-  end
+  # def delete_rows_from_db
+  #   java_import 'oracle.jdbc.OracleDriver'
+  #   java_import 'java.sql.DriverManager'
+  #   begin
+  #     send_to_log("Удаляем тестовые маршруты и настройки из БД 'tir_autotest'", "Удаляем тестовые маршруты и настройки из БД 'tir_autotest'")
+  #     url = "jdbc:oracle:thin:@vm-corint:1521:corint"
+  #     connection = java.sql.DriverManager.getConnection(url, "tir_autotest", "tir_autotest");
+  #     stmt = connection.create_statement
+  #     stmt.executeUpdate("TRUNCATE TABLE sys_properties")
+  #     stmt.executeUpdate("TRUNCATE TABLE deployments")
+  #   rescue Exception => msg
+  #     send_to_log("Ошибка! #{msg}", "Ошибка! #{msg}")
+  #     return true
+  #   ensure
+  #     stmt.close
+  #     connection.close
+  #   end
+  #   sleep 0.5
+  #   send_to_log("Done! Удалили тестовые данные.", "Done! Удалили тестовые данные.")
+  # end
 
   def delete_db
     java_import 'oracle.jdbc.OracleDriver'
@@ -452,9 +453,10 @@ module TirAutoTestsHelper
     send_to_log("Останавливаем Servicemix...", "Останавливаем Servicemix...")
     Dir.chdir "#{dir}\\apache-servicemix-7.0.1\\bin"
     @servicemix_stop_thread = Thread.new do
+      sleep 1
       system('stopcrypt.bat')
     end
-    sleep 1
+    sleep 2
     @kill_cmd_thread = Thread.new do
       system('Taskkill /IM cmd.exe /F')
     end
@@ -486,5 +488,35 @@ module TirAutoTestsHelper
     send_to_log("Копируем файлы webserviceproxy в каталог ТИР: #{dir}\\apache-servicemix-7.0.1", "Копируем файлы webserviceproxy в каталог ТИР")
     FileUtils.cp("#{Rails.root}\\vendor\\webservicesProxy-1.0.jar", "#{dir}\\apache-servicemix-7.0.1\\deploy")
     FileUtils.cp("#{Rails.root}\\vendor\\com.bssys.tir.webservice.proxy.config.cfg", "#{dir}\\apache-servicemix-7.0.1\\etc")
+  end
+
+  def download_installer # Качаем сборку с ftp
+    send_to_log("Скачиваем инсталлятор ТИР #{tests_params[:build_version]}...", "Скачиваем инсталлятор ТИР #{tests_params[:build_version]}...")
+    begin
+      ftp = Net::FTP.new('server-ora-bssi')
+      ftp.login
+      ftp.chdir("build-release/tir-installer/#{tests_params[:build_version]}")
+      ftp.passive = true
+      ftp.getbinaryfile("tir-installer-#{tests_params[:build_version]}.zip", localfile = File.basename(@build_file))
+    rescue Exception => msg
+      send_to_log("Ошибка! #{msg}", "Ошибка! #{msg}")
+    end
+  end
+
+  def copy_installer # Копируем сборку в каталог C:\TIR_Installer
+    send_to_log("Разархивируем инсталлятор...", "Разархивируем инсталлятор...")
+    begin
+      Zip::File.open(@build_file) do |zip_file|
+        zip_file.each do |f|
+          if f.name.include?('installer-windows.exe')
+            zip_file.extract(f, @installer_path) unless File.exist?(@installer_path)
+            File.delete(@build_file)
+          end
+        end
+      end
+    rescue Exception => msg
+      puts msg
+      send_to_log("Ошибка! #{msg}", "Ошибка! #{msg}")
+    end
   end
 end

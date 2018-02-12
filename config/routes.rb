@@ -1,4 +1,8 @@
 Rails.application.routes.draw do
+  get 'egg_auto_tests/index'
+
+  get 'egg_autotests/index'
+
   get 'tir_auto_tests/index'
 
   get 'simple_tests/index'
@@ -43,6 +47,12 @@ Rails.application.routes.draw do
   get '/tir_auto_tests/live_stream' => 'tir_auto_tests#live_stream'
   get '/tir_auto_tests/download_log' => 'tir_auto_tests#download_log'
 
+  # EGG Auto Tests
+  get '/egg_auto_tests' => 'egg_auto_tests#index'
+  post '/egg_auto_tests/run' => 'egg_auto_tests#run'
+  get '/egg_auto_tests/tester' => 'egg_auto_tests#tester'
+  get '/egg_auto_tests/live_stream' => 'egg_auto_tests#live_stream'
+  get '/egg_auto_tests/download_log' => 'egg_auto_tests#download_log'
   resources :users
 
   root 'main_page#index'

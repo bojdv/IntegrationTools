@@ -83,7 +83,7 @@ class TirAutoTestsController < ApplicationController
         runTest(tests_params[:functional_tir24])
       end
       send_to_log("#{puts_line}", "#{puts_line}")
-      #delete_rows_from_db if tests_params[:dont_clear_db] == 'false'
+      delete_rows_from_db if tests_params[:dont_clear_db] == 'false'
       stop_amq(tests_params[:tir_dir]) if tests_params[:dont_stop_TIR] == 'false'
       sleep 1
       stop_servicemix(tests_params[:tir_dir]) if tests_params[:dont_stop_TIR] == 'false'
@@ -124,5 +124,5 @@ end
 
 private
   def tests_params
-    params.require(:test_data).permit(:tir_version, :tir_dir, :dont_drop_db, :dont_stop_TIR, :build_version, :functional_tir23 => [], :functional_tir24 => [])
+    params.require(:test_data).permit(:tir_version, :tir_dir, :dont_clear_db, :dont_drop_db, :dont_stop_TIR, :build_version, :functional_tir23 => [], :functional_tir24 => [])
   end

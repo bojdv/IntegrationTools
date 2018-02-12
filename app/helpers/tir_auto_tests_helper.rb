@@ -342,26 +342,26 @@ module TirAutoTestsHelper
     end
   end
 
-  # def delete_rows_from_db
-  #   java_import 'oracle.jdbc.OracleDriver'
-  #   java_import 'java.sql.DriverManager'
-  #   begin
-  #     send_to_log("Удаляем тестовые маршруты и настройки из БД 'tir_autotest'", "Удаляем тестовые маршруты и настройки из БД 'tir_autotest'")
-  #     url = "jdbc:oracle:thin:@vm-corint:1521:corint"
-  #     connection = java.sql.DriverManager.getConnection(url, "tir_autotest", "tir_autotest");
-  #     stmt = connection.create_statement
-  #     stmt.executeUpdate("TRUNCATE TABLE sys_properties")
-  #     stmt.executeUpdate("TRUNCATE TABLE deployments")
-  #   rescue Exception => msg
-  #     send_to_log("Ошибка! #{msg}", "Ошибка! #{msg}")
-  #     return true
-  #   ensure
-  #     stmt.close
-  #     connection.close
-  #   end
-  #   sleep 0.5
-  #   send_to_log("Done! Удалили тестовые данные.", "Done! Удалили тестовые данные.")
-  # end
+  def delete_rows_from_db
+    java_import 'oracle.jdbc.OracleDriver'
+    java_import 'java.sql.DriverManager'
+    begin
+      send_to_log("Удаляем тестовые маршруты и настройки из БД 'tir_autotest'", "Удаляем тестовые маршруты и настройки из БД 'tir_autotest'")
+      url = "jdbc:oracle:thin:@vm-corint:1521:corint"
+      connection = java.sql.DriverManager.getConnection(url, "tir_autotest", "tir_autotest");
+      stmt = connection.create_statement
+      stmt.executeUpdate("TRUNCATE TABLE sys_properties")
+      stmt.executeUpdate("TRUNCATE TABLE deployments")
+    rescue Exception => msg
+      send_to_log("Ошибка! #{msg}", "Ошибка! #{msg}")
+      return true
+    ensure
+      stmt.close
+      connection.close
+    end
+    sleep 0.5
+    send_to_log("Done! Удалили тестовые данные.", "Done! Удалили тестовые данные.")
+  end
 
   def delete_db
     java_import 'oracle.jdbc.OracleDriver'

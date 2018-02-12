@@ -18,7 +18,7 @@
         </div>
         <%= f.input :build_version, label: 'Выберите сборку:', collection: @dir, required: false %>
         <%= f.input :tir_dir, label: 'Каталог ТИР:', required: false, input_html: {value: 'C:\\TIR'} %>
-        <!--%= f.input :dont_clear_db, as: :boolean, :label => 'Не очищать БД после теста', checked_value: true, unchecked_value: false, input_html: {checked: false} %-->
+        <%= f.input :dont_clear_db, as: :boolean, :label => 'Не очищать БД после теста', checked_value: true, unchecked_value: false, input_html: {checked: false} %>
         <%= f.input :dont_drop_db, as: :boolean, :label => 'Не удалять БД и ТИР после теста', checked_value: true, unchecked_value: false, input_html: {checked: false} %>
         <%= f.input :dont_stop_TIR, as: :boolean, :label => 'Не останавливать ТИР после теста', checked_value: true, unchecked_value: false, input_html: {checked: false} %>
         <%= f.button :submit, 'Запустить', id: 'run-button', class: 'btn-primary', onclick: "clear_log(); updateLog(); document.getElementById('download-link').style.display = 'none';"%>

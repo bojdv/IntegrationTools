@@ -22,7 +22,7 @@ module EggAutoTestsHelper
     end
   end
 
-  def send_to_amq_and_receive(manager, xml) # Отправка сообщений в Active MQ по протоколу OpenWire
+  def send_to_amq_and_receive(manager, xml, ignore_ticket = false) # Отправка сообщений в Active MQ по протоколу OpenWire
     java_import 'org.apache.activemq.ActiveMQConnectionFactory'
     java_import 'javax.jms.Session'
     java_import 'javax.jms.TextMessage'
@@ -43,17 +43,27 @@ module EggAutoTestsHelper
       sender.send(textMessage)
       send_to_log("Отправили сообщение в eGG:\n #{textMessage.getText}", "Отправили сообщение в eGG")
       receiver = session.createReceiver(session.createQueue(manager.queue_in))
-      count = 20
+      count = 30
       xml_actual = receiver.receive(1000)
       while xml_actual.nil?
         xml_actual = receiver.receive(1000)
         puts count -=1
         return nil if count == 0
       end
+      if ignore_ticket
+        send_to_log("Получили промежуточный квиток из очереди #{manager.queue_in}:\n #{xml_actual.getText}", "Получили промежуточный квиток от eGG")
+        count = 20
+        xml_actual = receiver.receive(1000)
+        while xml_actual.nil?
+          xml_actual = receiver.receive(1000)
+          puts count -=1
+          return nil if count == 0
+        end
+      end
       send_to_log("Получили ответ от eGG из очереди #{manager.queue_in}:\n #{xml_actual.getText}", "Получили ответ от eGG")
       return xml_actual.getText
     rescue Exception => msg
-      send_to_log("Ошибка! #{msg}")
+      send_to_log("Ошибка! #{msg.backtrace.join("\n")}")
       return nil
     ensure
       sender.close if sender
@@ -97,7 +107,7 @@ module EggAutoTestsHelper
     end
   end
 
-  def receive_from_amq(manager) # Отправка сообщений в Active MQ по протоколу OpenWire
+  def receive_from_amq(manager, ignore_ticket = false) # Отправка сообщений в Active MQ по протоколу OpenWire
     java_import 'org.apache.activemq.ActiveMQConnectionFactory'
     java_import 'javax.jms.Session'
     java_import 'javax.jms.TextMessage'
@@ -118,6 +128,16 @@ module EggAutoTestsHelper
         xml_actual = receiver.receive(1000)
         puts count -=1
         return nil if count == 0
+      end
+      if ignore_ticket
+        send_to_log("Получили промежуточный квиток из очереди #{manager.queue_in}:\n #{xml_actual.getText}", "Получили промежуточный квиток от eGG")
+        count = 15
+        xml_actual = receiver.receive(1000)
+        while xml_actual.nil?
+          xml_actual = receiver.receive(1000)
+          puts count -=1
+          response_ajax("Ответ не был получен!") and return if count == 0
+        end
       end
       send_to_log("Получили ответ от eGG из очереди #{manager.queue_in}:\n #{xml_actual.getText}", "Получили ответ от eGG")
       return xml_actual.getText
@@ -228,13 +248,12 @@ module EggAutoTestsHelper
 
   def stop_servicemix(dir = false)
     send_to_log("Останавливаем Servicemix...", "Останавливаем Servicemix...")
-    puts "STOP"
     Dir.chdir "#{dir}\\apache-servicemix-6.1.2\\bin"
     @servicemix_stop_thread = Thread.new do
       sleep 1
-      system('stop.bat')
+      system('servicemix.bat stop')
     end
-    sleep 2
+    sleep 3
     @kill_cmd_thread = Thread.new do
       system('Taskkill /IM cmd.exe /F')
     end
@@ -261,5 +280,56 @@ module EggAutoTestsHelper
     rescue Errno::ECONNREFUSED
       return false
     end
+  end
+  def get_decode_answer(xml)
+    response = Document.new(xml)
+    answer = response.elements['//mq:Answer'].text
+    answer_decode = Base64.decode64(answer)
+    answer_decode = answer_decode.force_encoding("utf-8")
+    send_to_log("Расшифрованный тег Answer:\n#{answer_decode}", "Расшифровали ответ!")
+    return answer_decode
+  end
+  def validate_egg_xml(xsd, xml)
+    begin
+      send_to_log("Валидируем XML:\n#{xml}\nПо XSD: #{xsd}")
+      xsd = Nokogiri::XML::Schema(File.read(xsd))
+      xml = Nokogiri::XML(xml)
+      result = xsd.validate(xml)
+      if result.any?
+        send_to_log("Валидация не пройдена! \n#{result.join('<br/>')}", "Валидация не пройдена!")
+        return false
+      else
+        send_to_log("Валидация прошла успешно", "Валидация прошла успешно")
+        return true
+      end
+    rescue Exception => msg
+      send_to_log("Ошибка! #{msg}\n#{msg.backtrace.join("\n")}", "Ошибка! #{msg}")
+    end
+  end
+  def ufebs_file_count
+    dir = 'C:/data/inbox/1/inbound/all'
+    code_adps000 = 'ADPS000'
+    code_adps001 = 'ADPS001'
+    adps000_count = 0
+    adps001_count = 0
+    count = 30
+    until adps001_count > 0 or count == 0
+      if File.directory?(dir)
+        Dir.entries(dir).each_entry do |entry|
+          adps001_count += 1 if entry.include?(code_adps001)
+        end
+        puts "Wait ufebs answer..."
+      end
+      sleep 1
+      count -=1
+    end
+    adps001_count = 0
+    if File.directory?(dir)
+      Dir.entries(dir).each_entry do |entry|
+        adps000_count += 1 if entry.include?(code_adps000)
+        adps001_count += 1 if entry.include?(code_adps001)
+      end
+    end
+    return adps000_count, adps001_count
   end
 end

@@ -3,6 +3,7 @@ require 'open3'
 require 'net/http'
 require 'net/ftp'
 require 'zip'
+require 'nokogiri'
 
 class EggAutoTestsController < ApplicationController
   def index
@@ -35,7 +36,7 @@ class EggAutoTestsController < ApplicationController
         return if n > 90
       end
       send_to_log("Done! Запустили eGG", "Done! Запустили eGG")
-      sleep 3
+      sleep 10
       send_to_log("#{puts_line}", "#{puts_line}")
       if tests_params[:egg_version] == 'eGG 6.7'
         send_to_log("Запустили тесты eGG 6.7", "Запустили тесты eGG 6.7")
@@ -45,7 +46,7 @@ class EggAutoTestsController < ApplicationController
         runTest(tests_params[:functional_egg68])
       end
       send_to_log("#{puts_line}", "#{puts_line}")
-      sleep 20
+      sleep 2
       stop_servicemix(tests_params[:egg_dir]) if tests_params[:dont_stop_egg] == 'false'
       delete_db if tests_params[:dont_drop_db] == 'false'
       send_to_log("#{puts_line}", "#{puts_line}")
@@ -55,6 +56,7 @@ class EggAutoTestsController < ApplicationController
   end
 
   def live_stream
+    sleep 0.1
     response.headers['Content-Type'] = 'text/event-stream'
     sse = SSE.new(response.stream, retry: 300)
     sse.write "#{$browser_egg[:message]}", event: "update_log"
@@ -62,7 +64,7 @@ class EggAutoTestsController < ApplicationController
       sse.write "#{$browser_egg[:egg_version]},#{$browser_egg[:functional]},#{$browser_egg[:color]}", event: "#{$browser_egg[:event]}"
       $browser_egg[:event] = ''
     end
-    $browser_egg[:message] =''
+    $browser_egg[:message] = ''
   ensure
     sse.close
   end
@@ -71,7 +73,7 @@ class EggAutoTestsController < ApplicationController
     send_file "log\\#{params[:filename]}"
   end
   def tester
-    puts File.directory?('C:/EGG')
+    FileUtils.rm_r 'C:/data/inbox/1/inbound'
   end
 end
 

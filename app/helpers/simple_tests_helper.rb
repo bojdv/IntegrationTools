@@ -33,7 +33,7 @@ module SimpleTestsHelper
         connection.destroyDestination(session.createQueue(manager.queue_in)) # Удаляем очередь.
         sender.send(textMessage)
         receiver = session.createReceiver(session.createQueue(manager.queue_in))
-        count = 15
+        count = 25
         xml_actual = receiver.receive(1000)
         while xml_actual.nil?
           xml_actual = receiver.receive(1000)
@@ -41,7 +41,7 @@ module SimpleTestsHelper
           response_ajax("Ответ не был получен!") and return if count == 0
         end
         if ignore_ticket == 'true'
-          count = 15
+          count = 25
           xml_actual = receiver.receive(1000)
           while xml_actual.nil?
             xml_actual = receiver.receive(1000)
@@ -96,14 +96,14 @@ module SimpleTestsHelper
         connection.destroyDestination(session.createQueue(manager.queue_in)) # Удаляем очередь.
         sender.send(textMessage)
         receiver = session.createReceiver(session.createQueue(manager.queue_in))
-        count = 15
+        count = 25
         xml_actual = receiver.receive(1000)
         while xml_actual.nil? && count > 0
           xml_actual = receiver.receive(1000)
           puts count -=1
         end
         if ignore_ticket == 'true'
-          count = 15
+          count = 25
           xml_actual = receiver.receive(1000)
           while xml_actual.nil? && count > 0
             xml_actual = receiver.receive(1000)
@@ -152,7 +152,7 @@ module SimpleTestsHelper
         client.subscribe(inputqueue){|msg| xml_actual << msg.body.to_s}
         client.join(1)
         client.close
-        count = 15
+        count = 25
         while xml_actual.empty?
           client = Stomp::Client.new(manager.user, manager.password, manager.host, manager.port)
           client.subscribe(inputqueue){|msg| xml_actual << msg.body.to_s}
@@ -191,7 +191,7 @@ module SimpleTestsHelper
         client.subscribe(inputqueue){|msg| xml_actual << msg.body.to_s}
         client.join(1)
         client.close
-        count = 15
+        count = 25
         while xml_actual.empty?
           client = Stomp::Client.new(manager.user, manager.password, manager.host, manager.port)
           client.subscribe(inputqueue){|msg| xml_actual << msg.body.to_s}
@@ -243,7 +243,7 @@ module SimpleTestsHelper
         connection.start
         sender.send(textMessage)
         receiver = session.createReceiver(session.createQueue(manager.queue_in))
-        count = 15
+        count = 25
         xml_actual = receiver.receive(1000)
         while xml_actual.nil?
           xml_actual = receiver.receive(1000)
@@ -251,7 +251,7 @@ module SimpleTestsHelper
           response_ajax("Ответ не был получен!") and return if count == 0
         end
         if ignore_ticket == 'true'
-          count = 15
+          count = 25
           xml_actual = receiver.receive(1000)
           while xml_actual.nil?
             xml_actual = receiver.receive(1000)
@@ -312,14 +312,14 @@ module SimpleTestsHelper
         connection.start
         sender.send(textMessage)
         receiver = session.createReceiver(session.createQueue(manager.queue_in))
-        count = 15
+        count = 25
         xml_actual = receiver.receive(1000)
         while xml_actual.nil? && count > 0
           xml_actual = receiver.receive(1000)
           puts count -=1
         end
         if ignore_ticket == 'true'
-          count = 15
+          count = 25
           xml_actual = receiver.receive(1000)
           while xml_actual.nil?
             xml_actual = receiver.receive(1000)

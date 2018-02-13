@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:mq="MQMessage"
+	targetNamespace="MQMessage" elementFormDefault="qualified" attributeFormDefault="unqualified"
+	version="1.0.1">
+	<!--Types-->
+	<xs:complexType name="MessageAttributesType">
+		<xs:annotation>
+			<xs:documentation>Атрибуты сообщения</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="processID" type="mq:ProccessId" use="required">
+			<xs:annotation>
+				<xs:documentation>Идентификатор цепочки сообщений, уникальный для СГД / BSS-eGG в рамках процесса оказания услуги или предоставления сведений</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="requestID">
+			<xs:annotation>
+				<xs:documentation>Идентификатор запроса в формате ИС отправителя. Должен быть заполнен только в запросе к адаптеру СГД в случае, если схема взаимодействия предусматривает формирование запросов на обновление статуса обработки документа во внешней системе адаптером СГД. Для BSS-eGG не заполняется</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:minLength value="1"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="serviceID" use="required">
+			<xs:annotation>
+				<xs:documentation>Идентификатор сервиса
+				</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:minLength value="1"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="departmentID" type="xs:string" use="optional">
+			<xs:annotation>
+				<xs:documentation>Идентификатор ведомства внутри СГД/ BSS-eGG
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="systemID">
+			<xs:annotation>
+				<xs:documentation>Идентификатор системы внутри СГД / BSS-eGG
+				</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:minLength value="1"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<!--MainTypes-->
+	<xs:simpleType name="ProccessId">
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+			<xs:maxLength value="128"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="AnswerMessageType">
+		<xs:annotation>
+			<xs:documentation>Тип сообщения-ответа</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="mq:ParametrizedMessageType">
+				<xs:sequence>
+					<xs:element name="Answer" type="xs:base64Binary">
+						<xs:annotation>
+							<xs:documentation>Содержимое сообщения-ответа
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="ErrorMessageType">
+		<xs:annotation>
+			<xs:documentation>Тип сообщения с ошибкой</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="mq:ParametrizedMessageType">
+				<xs:sequence>
+					<xs:element name="errorCode">
+						<xs:annotation>
+							<xs:documentation>Код обработки</xs:documentation>
+						</xs:annotation>
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:minLength value="1"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+					<xs:element name="errorDescription" type="xs:string" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Описание ошибки</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="errorData" type="xs:string" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Данные ошибки (для системного анализа)
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="errorMessage" type="xs:string" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Сообщение, при обработки которого
+								возникла ошибка</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="RequestMessageType">
+		<xs:annotation>
+			<xs:documentation>Тип сообщения-запроса</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="mq:ParametrizedMessageType">
+				<xs:sequence>
+					<xs:element name="Request" type="xs:base64Binary">
+						<xs:annotation>
+							<xs:documentation>Запрос к сервису</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="StatusRequest" type="xs:base64Binary" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Запрос статуса заявления
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="TicketType">
+		<xs:annotation>
+			<xs:documentation>Тип технической квитанции</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="mq:ParametrizedMessageType">
+				<xs:sequence/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="KeyValueType">
+		<xs:annotation>
+			<xs:documentation>Тип ключ значение</xs:documentation>
+		</xs:annotation>
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute name="Key" use="required">
+					<xs:annotation>
+						<xs:documentation>Имя</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:minLength value="1"/>
+							<xs:maxLength value="50"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+				<xs:attribute name="Value" use="required">
+					<xs:annotation>
+						<xs:documentation>Значение</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:minLength value="1"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="ParametrizedMessageType">
+		<xs:annotation>
+			<xs:documentation>Тип параметризованного сообщения
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="mq:MessageAttributesType">
+				<xs:sequence>
+					<xs:element ref="mq:Parameters" minOccurs="0"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="Parameters">
+		<xs:annotation>
+			<xs:documentation>Тип параметризованного сообщения
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element ref="mq:Parameter" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<!--Elements-->
+	<xs:element name="AnswerMessage" type="mq:AnswerMessageType">
+		<xs:annotation>
+			<xs:documentation>Сообщение-ответ</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="ErrorMessage" type="mq:ErrorMessageType">
+		<xs:annotation>
+			<xs:documentation>Сообщение с ошибкой</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="RequestMessage" type="mq:RequestMessageType">
+		<xs:annotation>
+			<xs:documentation>Сообщение-запрос</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="Ticket" type="mq:TicketType">
+		<xs:annotation>
+			<xs:documentation>Техническая квитанция</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="Parameters" type="mq:Parameters">
+		<xs:annotation>
+			<xs:documentation>Параметры</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="Parameter" type="mq:KeyValueType">
+		<xs:annotation>
+			<xs:documentation>Параметр</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+</xs:schema>

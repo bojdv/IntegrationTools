@@ -53,7 +53,7 @@ module TirAutoTestsHelper
       send_to_log("Получили ответ от ТИР из очереди #{manager.queue_in}:\n #{xml_actual.getText}", "Получили ответ от ТИР")
       return xml_actual.getText
     rescue Exception => msg
-      send_to_log("Ошибка! #{msg}")
+      send_to_log("Ошибка! #{msg.backtrace.join("\n")}")
       return nil
     ensure
       sender.close if sender
@@ -88,7 +88,7 @@ module TirAutoTestsHelper
       sender.send(textMessage)
       send_to_log("Отправили сообщение в ТИР:\n #{textMessage.getText}", "Отправили сообщение в ТИР")
     rescue Exception => msg
-      send_to_log("Ошибка! #{msg}")
+      send_to_log("Ошибка! #{msg.backtrace.join("\n")}")
       return nil
     ensure
       sender.close if sender
@@ -122,7 +122,7 @@ module TirAutoTestsHelper
       send_to_log("Получили ответ от ТИР из очереди #{manager.queue_in}:\n #{xml_actual.getText}", "Получили ответ от ТИР")
       return xml_actual.getText
     rescue Exception => msg
-      send_to_log("Ошибка! #{msg}")
+      send_to_log("Ошибка! #{msg.backtrace.join("\n")}")
       return nil
     ensure
       receiver.close if receiver
@@ -166,12 +166,12 @@ module TirAutoTestsHelper
     java_import 'java.sql.DriverManager'
     send_to_log("Загружаем тестовые данные в БД ТИР:", "Загружаем тестовые данные в БД ТИР:")
     begin
-      jmsAdapterSettingsTemplate = Document.new(File.open('lib/tir_db_data/jmsAdapterSettingsTemplate.xml'){|file| file.read})
-      jmsSettingsTemplate = Document.new(File.open('lib/tir_db_data/jmsSettingsTemplate.xml'){|file| file.read})
-      fileSettingsTemplate = Document.new(File.open('lib/tir_db_data/fileSettingsTemplate.xml'){|file| file.read})
-      dbAdapterSettingsTemplate = Document.new(File.open('lib/tir_db_data/dbAdapterSettingsTemplate.xml'){|file| file.read})
-      httpSettingsTemplate = Document.new(File.open('lib/tir_db_data/httpSettingsTemplate.xml'){|file| file.read})
-      httpAdapterSettingsTemplate = Document.new(File.open('lib/tir_db_data/httpAdapterSettingsTemplate.xml'){|file| file.read})
+      jmsAdapterSettingsTemplate = Document.new(File.open('lib/tir_autotests/tir_db_data/jmsAdapterSettingsTemplate.xml'){|file| file.read})
+      jmsSettingsTemplate = Document.new(File.open('lib/tir_autotests/tir_db_data/jmsSettingsTemplate.xml'){|file| file.read})
+      fileSettingsTemplate = Document.new(File.open('lib/tir_autotests/tir_db_data/fileSettingsTemplate.xml'){|file| file.read})
+      dbAdapterSettingsTemplate = Document.new(File.open('lib/tir_autotests/tir_db_data/dbAdapterSettingsTemplate.xml'){|file| file.read})
+      httpSettingsTemplate = Document.new(File.open('lib/tir_autotests/tir_db_data/httpSettingsTemplate.xml'){|file| file.read})
+      httpAdapterSettingsTemplate = Document.new(File.open('lib/tir_autotests/tir_db_data/httpAdapterSettingsTemplate.xml'){|file| file.read})
 
 
       url = "jdbc:oracle:thin:@vm-corint:1521:corint"
@@ -189,7 +189,7 @@ module TirAutoTestsHelper
       # Загружаем маршрут [AutoTest] ActiveMQListner.xml
       first, second = '', ''
       n=0
-      IO.read('lib/tir_db_data/[AutoTest] ActiveMQListner.xml').each_char do |char|
+      IO.read('lib/tir_autotests/tir_db_data/[AutoTest] ActiveMQListner.xml').each_char do |char|
         if n<20000
           first << char
           n+=1
@@ -210,7 +210,7 @@ module TirAutoTestsHelper
       stmt.executeUpdate("update deployments set src = REPLACE(src, ']]', ']]\"') where id = '85376884-9d6d-4e8f-a777-243886f829a1'")
 
       # Загружаем маршрут [AutoTest] CertGenRequest.xml
-      certGenRequest = File.open('lib/tir_db_data/[AutoTest] CertGenRequest.xml'){|file| file.read}
+      certGenRequest = File.open('lib/tir_autotests/tir_db_data/[AutoTest] CertGenRequest.xml'){|file| file.read}
       stmt.executeUpdate(%Q{DECLARE
                   v_long_text clob;
                BEGIN
@@ -224,7 +224,7 @@ module TirAutoTestsHelper
       # Загружаем маршрут [AutoTest] DBAdapter.xml
       first, second = '', ''
       n=0
-      IO.read('lib/tir_db_data/[AutoTest] DBAdapter.xml').each_char do |char|
+      IO.read('lib/tir_autotests/tir_db_data/[AutoTest] DBAdapter.xml').each_char do |char|
         if n<20000
           first << char
           n+=1
@@ -245,7 +245,7 @@ module TirAutoTestsHelper
       stmt.executeUpdate("update deployments set src = REPLACE(src, ']]', ']]\"') where id = '0fe38fdf-3301-43d5-bdaa-a27444511d54'")
 
       # Загружаем маршрут [AutoTest] FileAdapter.xml
-      fileAdapter = File.open('lib/tir_db_data/[AutoTest] FileAdapter.xml'){|file| file.read}
+      fileAdapter = File.open('lib/tir_autotests/tir_db_data/[AutoTest] FileAdapter.xml'){|file| file.read}
       stmt.executeUpdate(%Q{DECLARE
                   v_long_text clob;
                BEGIN
@@ -258,7 +258,7 @@ module TirAutoTestsHelper
       # Загружаем маршрут [AutoTest] HTTPAdaper.xml
       first, second = '', ''
       n=0
-      IO.read('lib/tir_db_data/[AutoTest] HTTPAdaper.xml').each_char do |char|
+      IO.read('lib/tir_autotests/tir_db_data/[AutoTest] HTTPAdaper.xml').each_char do |char|
         if n<20000
           first << char
           n+=1

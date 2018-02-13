@@ -170,8 +170,14 @@ class XmlSenderController < ApplicationController
         validate(params[:xml])
       else if params[:mode] == 'pretty'
              xml = Nokogiri::XML(params[:xml])
-             respond_to do |format|
-               format.js { render :js => "updateOutputXml('#{xml.to_xml.inspect}')" }
+             if params[:xml_type] == 'out'
+               respond_to do |format|
+                 format.js { render :js => "updateOutputXml('#{xml.to_xml.inspect}')" }
+               end
+             else
+               respond_to do |format|
+                 format.js { render :js => "updateInputXml('#{xml.to_xml.inspect}')" }
+               end
              end
            end
       end

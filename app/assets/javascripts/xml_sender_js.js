@@ -16,12 +16,21 @@
         alert(message);
     }
 
-    function SaveXml() {
-        text = [document.getElementById("xml_text_field").value]
-        xml_name = document.getElementById("xml_xml_name").value
-        file_name = xml_name ? xml_name + '.xml' : 'Xml.xml'
-        var file = new File(text, file_name, {type: "text/plain;charset=utf-8"});
-        saveAs(file);
+    function SaveXml(xml_type) {
+        if (xml_type == 'out') {
+            text = [document.getElementById("xml_text_field").value]
+            xml_name = document.getElementById("xml_xml_name").value
+            file_name = xml_name ? xml_name + '.xml' : 'Xml.xml'
+            var file = new File(text, file_name, {type: "text/plain;charset=utf-8"});
+            saveAs(file);
+        }
+        else {
+            text = [document.getElementById("xml_text_in_field").value]
+            xml_name = document.getElementById("xml_xml_name").value
+            file_name = xml_name ? xml_name + '_in.xml' : 'Xml.xml'
+            var file = new File(text, file_name, {type: "text/plain;charset=utf-8"});
+            saveAs(file);
+        }
     }
 
     function open_modal(text, time) {
@@ -166,26 +175,49 @@ function get_choice_xml() { //* Получение настроек исходя
         $('#list').html(text);
     }
 
-    function Base64(coding_mode) {
-        textarea = document.getElementById("xml_text_field");
-        selection = (textarea.value).substring(textarea.selectionStart, textarea.selectionEnd);
-        if (coding_mode == "encode") {
-            selectionEncode = window.btoa(unescape(encodeURIComponent(selection)));
-        }
-        else if (coding_mode == "decode") {
-            selectionEncode = decodeURIComponent(escape(window.atob(selection)));
-        }
-        else if (coding_mode == "uuid") {
-            function s4() {
-                return Math.floor((1 + Math.random()) * 0x10000)
-                    .toString(16)
-                    .substring(1);
+    function Base64(coding_mode, xml) {
+        if (xml == 'out') {
+            textarea = document.getElementById("xml_text_field");
+            selection = (textarea.value).substring(textarea.selectionStart, textarea.selectionEnd);
+            if (coding_mode == "encode") {
+                selectionEncode = window.btoa(unescape(encodeURIComponent(selection)));
             }
+            else if (coding_mode == "decode") {
+                selectionEncode = decodeURIComponent(escape(window.atob(selection)));
+            }
+            else if (coding_mode == "uuid") {
+                function s4() {
+                    return Math.floor((1 + Math.random()) * 0x10000)
+                        .toString(16)
+                        .substring(1);
+                }
 
-            selectionEncode = s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+                selectionEncode = s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+            }
+            new_text = textarea.value.replace(selection, selectionEncode);
+            textarea.value = new_text;
         }
-        new_text = textarea.value.replace(selection, selectionEncode);
-        textarea.value = new_text;
+        else {
+            textarea = document.getElementById("xml_text_in_field");
+            selection = (textarea.value).substring(textarea.selectionStart, textarea.selectionEnd);
+            if (coding_mode == "encode") {
+                selectionEncode = window.btoa(unescape(encodeURIComponent(selection)));
+            }
+            else if (coding_mode == "decode") {
+                selectionEncode = decodeURIComponent(escape(window.atob(selection)));
+            }
+            else if (coding_mode == "uuid") {
+                function s4() {
+                    return Math.floor((1 + Math.random()) * 0x10000)
+                        .toString(16)
+                        .substring(1);
+                }
+
+                selectionEncode = s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+            }
+            new_text = textarea.value.replace(selection, selectionEncode);
+            textarea.value = new_text;
+        }
     }
 
     function getSelectedId() {
@@ -365,25 +397,25 @@ function get_choice_xml() { //* Получение настроек исходя
             selector: '.context-menu-xml',
             callback: function (key, options) {
                 if (key == 'decode' || key == 'encode' || key == 'uuid') {
-                    Base64(key)
+                    Base64(key, 'out')
                 }
                 if (key == 'clear') {
                     $('#xml_text_field').val('');
                 }
                 if (key == 'save_xml') {
-                    SaveXml();
+                    SaveXml('out');
                 }
                 if (key == 'validate') {
-                    validate_xml(mode = 'validate')
+                    validate_xml(mode = 'validate', 'out')
                 }
                 if (key == 'validate_xsd') {
-                    xsd_upload()
+                    xsd_upload('out')
                 }
                 if (key == 'prefix') {
                     prefixModal()
                 }
                 if (key == 'pretty') {
-                    validate_xml(mode = 'pretty')
+                    validate_xml(mode = 'pretty', 'out')
                 }
             },
             items: {
@@ -400,9 +432,51 @@ function get_choice_xml() { //* Получение настроек исходя
         });
     });
 
+/** Контекстное меню редактирования входной XML*/
+$(function () {
+    $.contextMenu({
+        selector: '.context-menu-xml_in',
+        callback: function (key, options) {
+            if (key == 'decode' || key == 'encode' || key == 'uuid') {
+                Base64(key, 'in')
+            }
+            if (key == 'clear') {
+                $('#xml_text_in_field').val('');
+            }
+            if (key == 'save_xml') {
+                SaveXml('in');
+            }
+            if (key == 'validate') {
+                validate_xml(mode = 'validate', 'in')
+            }
+            if (key == 'validate_xsd') {
+                xsd_upload('in')
+            }
+            if (key == 'pretty') {
+                validate_xml(mode = 'pretty', 'in')
+            }
+        },
+        items: {
+            "pretty": {name: "Выровнить XML"},
+            "decode": {name: "Декодировать Base64"},
+            "encode": {name: "Кодировать в Base64"},
+            "uuid": {name: "Сгенерировать ID"},
+            "validate": {name: "Валидировать XML"},
+            "validate_xsd": {name: "Валидировать по XSD"},
+            "save_xml": {name: "Сохранить XML в файл"},
+            "clear": {name: "Очистить XML"}
+        }
+    });
+});
+
     /** Инициация загрузки xsd*/
-    function xsd_upload() {
-        visibleElement = document.getElementById("xml_text_field");
+    function xsd_upload(xml_type) {
+        if (xml_type == 'out') {
+            visibleElement = document.getElementById("xml_text_field");
+        }
+        else {
+            visibleElement = document.getElementById("xml_text_in_field");
+        }
         hiddenElement = document.getElementById("hidden_xml_text_field");
         hiddenElement.value = visibleElement.value;
         $('#xsd_choice_xsd').trigger('click');
@@ -416,13 +490,18 @@ function get_choice_xml() { //* Получение настроек исходя
         $('#prefixModal').modal();
     }
 
-    function validate_xml(mode) {
-        xml = document.getElementById("xml_text_field").value;
+    function validate_xml(mode, xml_type) {
+        if (xml_type == 'out') {
+            xml = document.getElementById("xml_text_field").value;
+        }
+        else {
+            xml = document.getElementById("xml_text_in_field").value;
+        }
         $.ajax({
             url: "xml_sender/validate_xml",
             type: "POST",
             dataType: "script",
-            data: {xml: xml, mode: mode},
+            data: {xml: xml, mode: mode, xml_type: xml_type},
         });
     }
 

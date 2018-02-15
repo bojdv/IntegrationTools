@@ -8,7 +8,7 @@
       </div>
     </div>
     <div class="col-md-3 placeholder" id="select_product">
-      <%= simple_form_for :test_data, remote: 'true', url: egg_auto_tests_run_path, html: {class: 'form-group' } do |f| %>
+      <%= simple_form_for :test_data, remote: 'true', url: egg_auto_tests_run_egg_path, html: {class: 'form-group' } do |f| %>
         <%= f.input :egg_version, label: 'Выберите версию eGG:', selected: 'eGG 6.7', collection: ['eGG 6.7', 'eGG 6.8'], required: false %>
         <div id="egg_67">
           <%= f.input :functional_egg67, label: 'Выберите проверки', collection: @egg67_components, include_hidden: false, required: false, input_html: { multiple: true, style: "height:300px"} %>
@@ -21,10 +21,10 @@
         <!--%= f.input :dont_clear_db, as: :boolean, :label => 'Не очищать БД после теста', checked_value: true, unchecked_value: false, input_html: {checked: false} %-->
         <%= f.input :dont_drop_db, as: :boolean, :label => 'Не удалять БД и eGG после теста', checked_value: true, unchecked_value: false, input_html: {checked: false} %>
         <%= f.input :dont_stop_egg, as: :boolean, :label => 'Не останавливать eGG после теста', checked_value: true, unchecked_value: false, input_html: {checked: false} %>
-        <%= f.button :submit, 'Запустить', id: 'run-button', class: 'btn-primary', onclick: "clear_log_egg(); updateLog_egg(); document.getElementById('download-link').style.display = 'none';"%>
+        <%= f.button :submit, 'Запустить', id: 'run-button', class: 'btn-primary', onclick: "clear_log_egg(); document.getElementById('download-link').style.display = 'none';"%>
       <%end%>
       <a class="btn btn-primary form-group" id="download-link" href="" style="display: none;" onclick="this.style.display = 'none';">Скачать лог</a>
-      <a class="btn btn-primary form-group" id="tester" href="egg_auto_tests/tester" data-remote="true">Click</a>
+      <!--a class="btn btn-primary form-group" id="tester" href="egg_auto_tests/tester" data-remote="true">Click</a-->
     </div>
   </div>
 </div>

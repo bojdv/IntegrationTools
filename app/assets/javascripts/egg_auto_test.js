@@ -1,11 +1,13 @@
 
+
+
 function updateLog_egg() {
     console.log("Start Listener");
-    evSource = new EventSource("/egg_auto_tests/live_stream")
+    evSource = new EventSource("/egg_auto_tests/live_stream_egg")
     evSource.addEventListener('update_log',function(event){
         document.getElementById('egg_autotests_log').value += event.data
     },false);
-    evSource.addEventListener('colorize',function(event){
+    evSource.addEventListener('colorize_egg',function(event){
         attr = event.data.split(',')
         colorize_options_egg(attr[0], attr[1], attr[2])
     },false);
@@ -16,6 +18,7 @@ function kill_listener_egg() {
 }
 function clear_log_egg() {
     document.getElementById('egg_autotests_log').value = '';
+    updateLog_egg();
 }
 function deselect_options_egg() {
     var elements = document.getElementById("test_data_functional_egg67").options;
@@ -41,6 +44,6 @@ function colorize_options_egg(egg_version, functional, color) {
 function download_link_egg(log_file_name) {
 
     link = document.getElementById('download-link');
-    link.setAttribute('href', '/egg_auto_tests/download_log?filename='+log_file_name);
+    link.setAttribute('href', '/egg_auto_tests/download_log_egg?filename='+log_file_name);
     link.style.display = 'inline';
 }

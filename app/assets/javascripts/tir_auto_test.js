@@ -26,6 +26,7 @@ function kill_listener() {
 }
 function clear_log() {
     document.getElementById('tir_autotests_log').value = '';
+    updateLog();
 }
 function deselect_options() {
     var elements = document.getElementById("test_data_functional_tir23").options;

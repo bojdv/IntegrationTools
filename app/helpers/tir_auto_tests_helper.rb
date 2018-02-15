@@ -12,8 +12,8 @@ module TirAutoTestsHelper
     rescue Exception => msg
       send_to_log("Ошибка! #{msg}", "Ошибка! #{msg}")
     ensure
-      $log.close
-      until $browser[:message].empty?
+      $log_tir.close
+      until $browser[:message].empty? && $browser[:event].empty?
         sleep 0.5
       end
       respond_to do |format|
@@ -141,9 +141,9 @@ module TirAutoTestsHelper
     end
     if to_log
       if to_log.include?('Ошибка')
-        $log.error(to_log)
+        $log_tir.error(to_log)
       else
-        $log.info(to_log)
+        $log_tir.info(to_log)
       end
     end
   end

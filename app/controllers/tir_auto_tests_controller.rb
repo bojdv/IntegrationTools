@@ -6,6 +6,9 @@ require 'zip'
 
 class TirAutoTestsController < ApplicationController
   def index
+    $browser = Hash.new
+    $browser[:event] = ''
+    $browser[:message] = ''
     @tir23_components= ['Проверка адаптера Active MQ',
                         'Проверка адаптера HTTP',
                         'Проверка компонента БД',
@@ -28,7 +31,6 @@ class TirAutoTestsController < ApplicationController
     end
     end
   def run
-    $browser = Hash.new
     $browser[:event] = ''
     $browser[:message] = ''
     response_ajax_auto("Не выбран функционал для проверки") and return if tests_params[:tir_version] == 'ТИР 2.3' and tests_params[:functional_tir23].nil?
@@ -38,13 +40,13 @@ class TirAutoTestsController < ApplicationController
       @installer_path = "C:/TIR_Installer/TIR-#{tests_params[:build_version]}-installer-windows.exe"
       Dir.chdir "#{Rails.root}"
       log_file_name = "log_tir_autotests_#{Time.now.strftime('%H-%M-%S')}.txt"
-      $log = Logger.new(File.open("log\\#{log_file_name}", 'w'))
+      $log_tir = Logger.new(File.open("log\\#{log_file_name}", 'w'))
       startTime = Time.now
       if !tests_params[:build_version].empty?
         download_installer
         copy_installer
         send_to_log("Устанавливаем ТИР #{tests_params[:build_version]}...", "Устанавливаем ТИР #{tests_params[:build_version]}...")
-        system("#{@installer_path} --optionfile #{Rails.root}/lib/tir_db_data/options24.txt")
+        system("#{@installer_path} --optionfile #{Rails.root}/lib/tir_autotests/tir_db_data/options24.txt")
       end
       return if dir_empty?(tests_params[:tir_dir])
       send_to_log("#{puts_line}", "#{puts_line}")
@@ -103,7 +105,7 @@ class TirAutoTestsController < ApplicationController
   end
   def live_stream
     response.headers['Content-Type'] = 'text/event-stream'
-    sse = SSE.new(response.stream, retry: 300)
+    sse = SSE.new(response.stream, retry: 1000)
     sse.write "#{$browser[:message]}", event: "update_log"
     if $browser[:event] == 'colorize'
       sse.write "#{$browser[:tir_version]},#{$browser[:functional]},#{$browser[:color]}", event: "#{$browser[:event]}"

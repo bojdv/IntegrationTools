@@ -49,10 +49,10 @@ Rails.application.routes.draw do
 
   # EGG Auto Tests
   get '/egg_auto_tests' => 'egg_auto_tests#index'
-  post '/egg_auto_tests/run' => 'egg_auto_tests#run'
+  post '/egg_auto_tests/run_egg' => 'egg_auto_tests#run_egg'
   get '/egg_auto_tests/tester' => 'egg_auto_tests#tester'
-  get '/egg_auto_tests/live_stream' => 'egg_auto_tests#live_stream'
-  get '/egg_auto_tests/download_log' => 'egg_auto_tests#download_log'
+  get '/egg_auto_tests/live_stream_egg' => 'egg_auto_tests#live_stream_egg'
+  get '/egg_auto_tests/download_log_egg' => 'egg_auto_tests#download_log_egg'
   resources :users
 
   root 'main_page#index'

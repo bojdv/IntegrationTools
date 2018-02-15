@@ -21,7 +21,7 @@
         <%= f.input :dont_clear_db, as: :boolean, :label => 'Не очищать БД после теста', checked_value: true, unchecked_value: false, input_html: {checked: false} %>
         <%= f.input :dont_drop_db, as: :boolean, :label => 'Не удалять БД и ТИР после теста', checked_value: true, unchecked_value: false, input_html: {checked: false} %>
         <%= f.input :dont_stop_TIR, as: :boolean, :label => 'Не останавливать ТИР после теста', checked_value: true, unchecked_value: false, input_html: {checked: false} %>
-        <%= f.button :submit, 'Запустить', id: 'run-button', class: 'btn-primary', onclick: "clear_log(); updateLog(); document.getElementById('download-link').style.display = 'none';"%>
+        <%= f.button :submit, 'Запустить', id: 'run-button', class: 'btn-primary', onclick: "clear_log(); document.getElementById('download-link').style.display = 'none';"%>
       <%end%>
       <a class="btn btn-primary form-group" id="download-link" href="" style="display: none;" onclick="this.style.display = 'none';">Скачать лог</a>
       <!--a class="btn btn-primary form-group" id="tester" href="tir_auto_tests/tester" data-remote="true">Click</a-->

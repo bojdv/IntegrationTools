@@ -1,0 +1,48 @@
+<!-- Modal -->
+<div class="modal fade" id="faq_run_egg_autotests" tabindex="-1" role="dialog" aria-labelledby="prefixModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="prefixModalLabel">Запуск EGG AutoTests</h5>
+      </div>
+      <div class="col-md-12">
+        <div class="modal-body">
+          <p>Для запуска EGG AutoTests необходимо:</p>
+          <ol>
+            <li>Зайти на машину vm-itools</li>
+            <li>Установить EGG в пустой каталог. Все настройки по умолчанию, за исключением:</li>
+            <b>СА ГИС ГМП</b>
+            <ul>
+              <li>Роль отправителя: 7</li>
+              <li>Идентификатор отправителя: 3536aa</li>
+              <li>Адрес CS: http://vm-eggcryptdev:9090/axis2/services/CryptoService</li>
+            </ul>
+            <b>ИА УФЭБС ГИС ГМП</b>
+            <ul>
+              <li>Способ заполнения даты поступления ИП: CurrentDate</li>
+              <li>Способ заполнения даты поступления ПО: CurrentDate</li>
+            </ul>
+            <b>СА ГИС ЖКХ</b>
+            <ul>
+              <li>Адрес CS: http://vm-eggcryptdev:9090/axis2/services/CryptoService</li>
+            </ul>
+            <b>Прочее</b>
+            <ul>
+              <li>Пароль для шифрования ключей: admin/admin</li>
+              <li>В качестве БД указываем Oracle и следующие параметры:</li>
+            </ul>
+            <div class="text-center">
+              <%= link_to image_url("db_settings_egg.png") do %>
+                <%= image_tag("db_settings_egg.png", class: "grow shadow") %>
+              <% end %>
+            </div>
+            <li>Зайти в Integration Tools в раздел EGG AutoTests</li>
+            <li>Выбрать нужную версию EGG, компоненты, каталог EGG и нажать "Запустить"</li>
+            <li>Дождаться окончания тестов!</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>

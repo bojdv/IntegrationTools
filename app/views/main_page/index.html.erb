@@ -46,9 +46,15 @@
         </div>
       </div>
       <div class="my-3 p-3 bg-white rounded box-shadow">
-        <h6 class="border-bottom border-gray pb-2 mb-0"><b>Текущая версия:</b> - v0.07</h6>
+        <h6 class="border-bottom border-gray pb-2 mb-0"><b>Текущая версия:</b> - v0.08</h6>
         <div class="media pt-3">
           <div style="height:450px;width:800px;border:3px solid dodgerblue;font:16px/26px Georgia, Garamond, Serif;overflow:auto;">
+            <b>v0.0.8</b> [2017-02-22]:<br/>
+            1. Доработан функционал EGG AutoTest:<br/>
+            <ul>
+              <li>Добавлены автотесты для СА ГИС ЖКХ</li>
+              <li>Добавлены автотесты для ИА УФЭБС ГИС ЖКХ</li>
+            </ul>
             <b>v0.0.7</b> [2017-02-14]:<br/>
             1. Реализован функционал EGG AutoTest:<br/>
             <ul>
@@ -117,6 +123,7 @@
           <a href="#" class="list-group-item list-group-item-action" onclick="$('#faq_simple_test').modal()">Как создать Simple Test?</a>
           <a href="#" class="list-group-item list-group-item-action" onclick="$('#faq_run_simple_test').modal()">Как запустить Simple Test?</a>
           <a href="#" class="list-group-item list-group-item-action" onclick="$('#faq_run_tir_autotests').modal()">Как запустить TIR AutoTests?</a>
+          <a href="#" class="list-group-item list-group-item-action" onclick="$('#faq_run_egg_autotests').modal()">Как запустить EGG AutoTests?</a>
         </div>
       </div>
     </main>
@@ -167,3 +174,4 @@
 <%= render 'layouts/faq_simple_test' %>
 <%= render 'layouts/faq_run_simple_test' %>
 <%= render 'layouts/faq_run_tir_autotests' %>
+<%= render 'layouts/faq_run_egg_autotests' %>

@@ -12,10 +12,12 @@ class EggAutoTestsController < ApplicationController
     $browser_egg[:event] = ''
     $browser_egg[:message] = ''
     @egg67_components= ['Проверка ИА Active MQ',
-                        'Проверка ИА УФЭБС (File)',
-                        'Проверка СА ГИС ГМП']
+                        'Проверка ИА УФЭБС (ГИС ГМП)',
+                        'Проверка ИА УФЭБС (ГИС ЖКХ)',
+                        'Проверка СА ГИС ГМП',
+                        'Проверка СА ГИС ЖКХ']
     @egg68_components = Array.new(@egg67_components)
-    @egg68_components.push('Проверка СА ГИС ЖКХ')
+    @egg68_components.push('ЕСИА')
   end
 
   def run_egg
@@ -63,8 +65,9 @@ class EggAutoTestsController < ApplicationController
   end
 
   def live_stream_egg
+    sleep 0.1
     response.headers['Content-Type'] = 'text/event-stream'
-    sse = SSE.new(response.stream, retry: 1500)
+    sse = SSE.new(response.stream, retry: 500)
     sse.write "#{$browser_egg[:message]}", event: "update_log"
     if $browser_egg[:event] == 'colorize_egg'
       sse.write "#{$browser_egg[:egg_version]},#{$browser_egg[:functional]},#{$browser_egg[:color]}", event: "#{$browser_egg[:event]}"

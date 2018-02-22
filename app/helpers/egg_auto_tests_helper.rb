@@ -35,7 +35,8 @@ module EggAutoTestsHelper
       manager.password.nil? ? password ='' : password=manager.user
       connection = factory.createQueueConnection(user, password)
       session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-      textMessage = session.createTextMessage(xml.xml_text)
+      xml.class == String  ? xml = xml : xml = xml.xml_text
+      textMessage = session.createTextMessage(xml)
       textMessage.setJMSCorrelationID(SecureRandom.uuid)
       sender = session.createSender(session.createQueue(manager.queue_out))
       connection.start
@@ -50,6 +51,10 @@ module EggAutoTestsHelper
         puts count -=1
         return nil if count == 0
       end
+      if xml_actual.getText.include?("<ErrorCode>1014</ErrorCode>")
+        send_to_log_egg("Пришла ошибка из СМЭВ: Внешний сервис недоступен.\n#{xml_actual.getText}", "Пришла ошибка из СМЭВ: Внешний сервис недоступен")
+        return nil
+      end
       if ignore_ticket
         send_to_log_egg("Получили промежуточный квиток из очереди #{manager.queue_in}:\n #{xml_actual.getText}", "Получили промежуточный квиток от eGG")
         count = 40
@@ -63,7 +68,7 @@ module EggAutoTestsHelper
       send_to_log_egg("Получили ответ от eGG из очереди #{manager.queue_in}:\n #{xml_actual.getText}", "Получили ответ от eGG")
       return xml_actual.getText
     rescue Exception => msg
-      send_to_log_egg("Ошибка! #{msg.backtrace.join("\n")}")
+      send_to_log_egg("Ошибка! #{msg.message}\n#{msg.backtrace.join("\n")}")
       return nil
     ensure
       sender.close if sender
@@ -253,7 +258,7 @@ module EggAutoTestsHelper
       sleep 1
       system('servicemix.bat stop')
     end
-    sleep 3
+    sleep 5
     @kill_cmd_thread_egg = Thread.new do
       system('Taskkill /IM cmd.exe /F')
     end
@@ -286,7 +291,23 @@ module EggAutoTestsHelper
     answer = response.elements['//mq:Answer'].text
     answer_decode = Base64.decode64(answer)
     answer_decode = answer_decode.force_encoding("utf-8")
-    send_to_log_egg("Расшифрованный тег Answer:\n#{answer_decode}", "Расшифровали ответ!")
+    send_to_log_egg("Раскодированный тег Answer:\n#{answer_decode}", "Раскодировали ответ!")
+    return answer_decode
+  end
+  def get_decode_request(xml)
+    request = Document.new(xml)
+    answer = request.elements['//mq:Request'].text
+    answer_decode = Base64.decode64(answer)
+    answer_decode = answer_decode.force_encoding("utf-8")
+    send_to_log_egg("Раскодированный тег Request:\n#{answer_decode}", "Раскодировали запрос!")
+    return answer_decode
+  end
+  def get_encode_request(xml)
+    request = Document.new(xml)
+    answer = request.elements['//mq:Answer'].text
+    answer_decode = Base64.encode64(answer)
+    answer_decode = answer_decode.force_encoding("utf-8")
+    send_to_log_egg("Раскодировали тег Request:\n#{answer_decode}", "Раскодировали запрос!")
     return answer_decode
   end
   def validate_egg_xml(xsd, xml)
@@ -306,19 +327,25 @@ module EggAutoTestsHelper
       send_to_log_egg("Ошибка! #{msg}\n#{msg.backtrace.join("\n")}", "Ошибка! #{msg}")
     end
   end
-  def ufebs_file_count(packetepd = false)
-    dir = 'C:/data/inbox/1/inbound/all'
+  def ufebs_file_count(packetepd = false, gis_type = 'gis_gmp')
+    if gis_type == 'gis_gmp'
+      dir = 'C:/data/inbox/1/inbound/all'
+    else
+      dir = 'C:/data/inbox/GIS_ZKH/inbound/all'
+    end
     code_adps000 = 'ADPS000'
     code_adps001 = 'ADPS001'
+    fail_code = 'ADP0001'
     adps000_count = 0
     adps001_count = 0
     count = 50
     packetepd ? positive_code = 3 : positive_code = 1
     send_to_log_egg("packetepd: #{positive_code}")
-    until adps001_count == positive_code or count == 0
+    until adps001_count == positive_code or count < 0
       if File.directory?(dir)
         Dir.entries(dir).each_entry do |entry|
           adps001_count += 1 if entry.include?(code_adps001)
+          count = 0 if entry.include?(fail_code)
         end
         puts "Wait ufebs answer..."
       end

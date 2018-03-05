@@ -41,7 +41,7 @@ class EggAutoTestsController < ApplicationController
         return if n > 90
       end
       send_to_log_egg("Done! Запустили eGG", "Done! Запустили eGG")
-      sleep 10
+      sleep 20
       send_to_log_egg("#{puts_line_egg}", "#{puts_line_egg}")
       if tests_params_egg[:egg_version] == 'eGG 6.7'
         send_to_log_egg("Запустили тесты eGG 6.7", "Запустили тесты eGG 6.7")

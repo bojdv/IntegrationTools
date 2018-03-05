@@ -340,11 +340,11 @@ module EggAutotests
     end
 
     if components.include?('Проверка СА ГИС ЖКХ')
-      sleep 0.5
       menu_name = 'Проверка СА ГИС ЖКХ'
       category = Category.find_by_category_name('СА ГИС ЖКХ')
       manager = QueueManager.find_by_manager_name('iTools[EGG]')
       begin
+        sleep 2
         @result = true
         xml_name = 'Payment_request'
         send_to_log_egg("#{puts_line_egg}", "#{puts_line_egg}")
@@ -362,7 +362,7 @@ module EggAutotests
         send_to_log_egg("Добавили в запрос случайные ID:\n#{xml}", "Добавили в запрос случайные ID")
         send_to_log_egg("Валидируем XML для запроса...", "Валидируем XML для запроса...")
         validate_egg_xml("#{Rails.root}/lib/egg_autotests/xsd/amq_adapter/MQMessages.xsd", xml.to_s)
-        answer = send_to_amq_and_receive_egg(manager, xml.to_s, true)
+        answer = send_to_amq_and_receive_egg(manager, xml.to_s)
         raise not_receive_answer if answer.nil?
         send_to_log_egg("Валидируем ответную XML...", "Валидируем ответную XML...")
         validate_egg_xml("#{Rails.root}/lib/egg_autotests/xsd/amq_adapter/MQMessages.xsd", answer)
@@ -382,6 +382,7 @@ module EggAutotests
       end
 
       begin
+        sleep 2
         @result = true
         xml_name = 'Payment_Cancellation_request'
         send_to_log_egg("#{puts_line_egg}", "#{puts_line_egg}")
@@ -395,7 +396,7 @@ module EggAutotests
         send_to_log_egg("Добавили в запрос случайные ID:\n#{xml}", "Добавили в запрос случайные ID")
         send_to_log_egg("Валидируем XML для запроса...", "Валидируем XML для запроса...")
         validate_egg_xml("#{Rails.root}/lib/egg_autotests/xsd/amq_adapter/MQMessages.xsd", xml.to_s)
-        answer = send_to_amq_and_receive_egg(manager, xml.to_s, true)
+        answer = send_to_amq_and_receive_egg(manager, xml.to_s)
         raise not_receive_answer if answer.nil?
         send_to_log_egg("Валидируем ответную XML...", "Валидируем ответную XML...")
         validate_egg_xml("#{Rails.root}/lib/egg_autotests/xsd/amq_adapter/MQMessages.xsd", answer)
@@ -415,6 +416,7 @@ module EggAutotests
       end
 
       begin
+        sleep 2
         @result = true
         xml_name = 'Payment_Details_request'
         send_to_log_egg("#{puts_line_egg}", "#{puts_line_egg}")
@@ -428,7 +430,7 @@ module EggAutotests
         send_to_log_egg("Добавили в запрос случайные ID:\n#{xml}", "Добавили в запрос случайные ID")
         send_to_log_egg("Валидируем XML для запроса...", "Валидируем XML для запроса...")
         validate_egg_xml("#{Rails.root}/lib/egg_autotests/xsd/amq_adapter/MQMessages.xsd", xml.to_s)
-        answer = send_to_amq_and_receive_egg(manager, xml.to_s, true)
+        answer = send_to_amq_and_receive_egg(manager, xml.to_s)
         raise not_receive_answer if answer.nil?
         send_to_log_egg("Валидируем ответную XML...", "Валидируем ответную XML...")
         validate_egg_xml("#{Rails.root}/lib/egg_autotests/xsd/amq_adapter/MQMessages.xsd", answer)

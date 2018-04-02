@@ -2,51 +2,33 @@ include EggAutoTestsHelper
 require 'rexml/document'
 include REXML
 require 'savon'
+require_dependency "#{Rails.root}/lib/egg_autotests/ia_ActiveMQ"
 
-module EggAutotests
+class EggAutotestsList
+
+  def initialize(egg_version)
+    # Переменные для всех тестов
+    @@pass_menu_color = '#b3ffcc'
+    @@fail_menu_color = '#ff3333'
+    @@not_find_xml = 'XML не найдена'
+    @@not_receive_answer = 'Не получили ответ от eGG:('
+    @@egg_version = egg_version
+  end
+
+  def testclass
+    a = IA_ActiveMQ.new
+    a.run_RequestMessage
+  end
 
   def runTest_egg(components)
-    # Переменные для всех тестов
-    pass_menu_color = '#b3ffcc'
-    fail_menu_color = '#ff3333'
-    not_find_xml = 'XML не найдена'
-    not_receive_answer = 'Не получили ответ от eGG:('
 
     if components.include?('Проверка ИА Active MQ')
-      sleep 0.5
-      menu_name = 'Проверка ИА Active MQ'
-      category = Category.find_by_category_name('ИА Active MQ')
-      xml_name = 'RequestMessage'
-      manager = QueueManager.find_by_manager_name('iTools[EGG]')
-      begin
-        send_to_log_egg("#{puts_line_egg}", "#{puts_line_egg}")
-        send_to_log_egg("Начали проверку: #{menu_name}", "Начали проверку: #{menu_name}")
-        send_to_log_egg("Пытаемся найти XML в БД")
-        xml = Xml.where(xml_name: xml_name, category_id: category.id).first
-        raise not_find_xml if xml.nil?
-        send_to_log_egg("Получили xml: #{xml.xml_name}\n#{xml.xml_text}")
-        send_to_log_egg("Валидируем XML для запроса...", "Валидируем XML для запроса...")
-        validate_egg_xml("#{Rails.root}/lib/egg_autotests/xsd/amq_adapter/MQMessages.xsd", xml.xml_text)
-        answer = send_to_amq_and_receive_egg(manager, xml, true)
-        raise not_receive_answer if answer.nil?
-        send_to_log_egg("Валидируем ответную XML...", "Валидируем ответную XML...")
-        validate_egg_xml("#{Rails.root}/lib/egg_autotests/xsd/amq_adapter/MQMessages.xsd", answer)
-        answer_decode = get_decode_answer(answer)
-        if answer_decode.include?('Импортируемые данные уже присутствуют в Системе')
-          send_to_log_egg("Проверка пройдена!", "Проверка пройдена!")
-          colorize_egg(tests_params_egg[:egg_version], menu_name, pass_menu_color)
-        else
-          send_to_log_egg("Проверка не пройдена! Ожидаемый ответ отличается от фактического", "Проверка не пройдена!")
-          colorize_egg(tests_params_egg[:egg_version], menu_name, fail_menu_color)
-        end
-      rescue Exception => msg
-        send_to_log_egg("Ошибка! #{msg}\n#{msg.backtrace.join("\n")}", "Ошибка! #{msg}")
-        colorize_egg(tests_params_egg[:egg_version] , menu_name, fail_menu_color)
-      end
+      test = IA_ActiveMQ.new
+      test.run_RequestMessage
     end
 
     if components.include?('Проверка ИА УФЭБС (ГИС ГМП)')
-      sleep 0.5
+      sleep 1.5
       menu_name = 'Проверка ИА УФЭБС (ГИС ГМП)'
       category = Category.find_by_category_name('ИА УФЭБС ГИС ГМП')
       dir_outbound = 'C:/data/inbox/1/outbound'
@@ -89,6 +71,7 @@ module EggAutotests
       end
 
       begin # ed104
+        sleep 1.5
         xml_name = 'ed104'
         xml_root_element = 'ED104'
         send_to_log_egg("#{puts_line_egg}", "#{puts_line_egg}")
@@ -124,6 +107,7 @@ module EggAutotests
       end
 
       begin # ed105
+        sleep 1.5
         xml_name = 'ed105'
         xml_root_element = 'ED105'
         send_to_log_egg("#{puts_line_egg}", "#{puts_line_egg}")
@@ -159,6 +143,7 @@ module EggAutotests
       end
 
       begin # ed108
+        sleep 1.5
         xml_name = 'ed108'
         xml_root_element = 'ED108'
         date = Date.parse("#{Random.rand(2010..2017)}-#{Random.rand(1..11)}-#{Random.rand(1..28)}")
@@ -204,6 +189,7 @@ module EggAutotests
       end
 
       begin # packetepd
+        sleep 1.5
         xml_name = 'packetepd'
         xml_root_element = 'PacketEPD'
         #date = Date.parse("#{Random.rand(2010..2017)}-#{Random.rand(1..11)}-#{Random.rand(1..28)}")
@@ -252,39 +238,42 @@ module EggAutotests
       menu_name = 'Проверка СА ГИС ГМП'
       category = Category.find_by_category_name('СА ГИС ГМП')
       manager = QueueManager.find_by_manager_name('iTools[EGG]')
-      begin
-        @result = true
-        xml_name = 'RequestMessage_1.16.5'
-        send_to_log_egg("#{puts_line_egg}", "#{puts_line_egg}")
-        send_to_log_egg("Начали проверку: #{menu_name}. Негативный кейс", "Начали проверку: #{menu_name}. Негативный кейс")
-        send_to_log_egg("Пытаемся найти XML в БД")
-        xml = Xml.where(xml_name: xml_name, category_id: category.id).first
-        raise not_find_xml if xml.nil?
-        send_to_log_egg("Получили xml: #{xml.xml_name}\n#{xml.xml_text}")
-        send_to_log_egg("Валидируем XML для запроса...", "Валидируем XML для запроса...")
-        validate_egg_xml("#{Rails.root}/lib/egg_autotests/xsd/amq_adapter/MQMessages.xsd", xml.xml_text)
-        answer = send_to_amq_and_receive_egg(manager, xml, true)
-        raise not_receive_answer if answer.nil?
-        send_to_log_egg("Валидируем ответную XML...", "Валидируем ответную XML...")
-        validate_egg_xml("#{Rails.root}/lib/egg_autotests/xsd/amq_adapter/MQMessages.xsd", answer)
-        answer_decode = get_decode_answer(answer)
-        if answer_decode.include?('Не указано основание уточнения')
-          send_to_log_egg("Проверка пройдена!", "Проверка пройдена!")
-          colorize_egg(tests_params_egg[:egg_version], menu_name, pass_menu_color) if @result
-        else
-          @result = false
-          send_to_log_egg("Проверка не пройдена! Ожидаемый ответ отличается от фактического", "Проверка не пройдена!")
-          colorize_egg(tests_params_egg[:egg_version], menu_name, fail_menu_color)
-        end
-      rescue Exception => msg
-        send_to_log_egg("Ошибка! #{msg}\n#{msg.backtrace.join("\n")}", "Ошибка! #{msg}")
-        colorize_egg(tests_params_egg[:egg_version] , menu_name, fail_menu_color)
-      end
+      # begin
+      #   sleep 1.5
+      #   @result = true
+      #   xml_name = 'RequestMessage_1.16.5'
+      #   send_to_log_egg("#{puts_line_egg}", "#{puts_line_egg}")
+      #   send_to_log_egg("Начали проверку: #{menu_name}. Негативный кейс", "Начали проверку: #{menu_name}. Негативный кейс #{xml_name}")
+      #   send_to_log_egg("Пытаемся найти XML в БД")
+      #   xml = Xml.where(xml_name: xml_name, category_id: category.id).first
+      #   raise not_find_xml if xml.nil?
+      #   send_to_log_egg("Получили xml: #{xml.xml_name}\n#{xml.xml_text}")
+      #   send_to_log_egg("Валидируем XML для запроса...", "Валидируем XML для запроса...")
+      #   validate_egg_xml("#{Rails.root}/lib/egg_autotests/xsd/amq_adapter/MQMessages.xsd", xml.xml_text)
+      #   answer = send_to_amq_and_receive_egg(manager, xml, true)
+      #   raise not_receive_answer if answer.nil?
+      #   send_to_log_egg("Валидируем ответную XML...", "Валидируем ответную XML...")
+      #   validate_egg_xml("#{Rails.root}/lib/egg_autotests/xsd/amq_adapter/MQMessages.xsd", answer)
+      #   answer_decode = get_decode_answer(answer)
+      #   if answer_decode.include?('успешно')
+      #     send_to_log_egg("Проверка пройдена!", "Проверка пройдена!")
+      #     colorize_egg(tests_params_egg[:egg_version], menu_name, pass_menu_color) if @result
+      #   else
+      #     @result = false
+      #     send_to_log_egg("Проверка не пройдена! Ожидаемый ответ отличается от фактического", "Проверка не пройдена!")
+      #     colorize_egg(tests_params_egg[:egg_version], menu_name, fail_menu_color)
+      #   end
+      # rescue Exception => msg
+      #   @result = false
+      #   send_to_log_egg("Ошибка! #{msg}\n#{msg.backtrace.join("\n")}", "Ошибка! #{msg}")
+      #   colorize_egg(tests_params_egg[:egg_version] , menu_name, fail_menu_color)
+      # end
 
       begin
+        sleep 1.5
         xml_name = 'RequestMessage'
         send_to_log_egg("#{puts_line_egg}", "#{puts_line_egg}")
-        send_to_log_egg("Начали проверку: #{menu_name}. Позитивный кейс", "Начали проверку: #{menu_name}. Позитивный кейс")
+        send_to_log_egg("Начали проверку: #{menu_name}. Позитивный кейс", "Начали проверку: #{menu_name}. Позитивный кейс #{xml_name}")
         send_to_log_egg("Пытаемся найти XML в БД")
         xml = Xml.where(xml_name: xml_name, category_id: category.id).first
         raise not_find_xml if xml.nil?
@@ -296,7 +285,7 @@ module EggAutotests
         send_to_log_egg("Валидируем ответную XML...", "Валидируем ответную XML...")
         validate_egg_xml("#{Rails.root}/lib/egg_autotests/xsd/amq_adapter/MQMessages.xsd", answer)
         answer_decode = get_decode_answer(answer)
-        if answer_decode.include?('Импортируемые данные уже присутствуют в Системе')
+        if answer_decode.include?('успешно')
           send_to_log_egg("Проверка пройдена!", "Проверка пройдена!")
           colorize_egg(tests_params_egg[:egg_version], menu_name, pass_menu_color) if @result
         else
@@ -305,11 +294,13 @@ module EggAutotests
           colorize_egg(tests_params_egg[:egg_version], menu_name, fail_menu_color)
         end
       rescue Exception => msg
+        @result = false
         send_to_log_egg("Ошибка! #{msg}\n#{msg.backtrace.join("\n")}", "Ошибка! #{msg}")
         colorize_egg(tests_params_egg[:egg_version] , menu_name, fail_menu_color)
       end
 
       begin
+        sleep 1.5
         xml_name = 'Charges'
         send_to_log_egg("#{puts_line_egg}", "#{puts_line_egg}")
         send_to_log_egg("Начали проверку: #{menu_name}. Запрос #{xml_name}", "Начали проверку: #{menu_name}. Запрос #{xml_name}")
@@ -334,6 +325,7 @@ module EggAutotests
           colorize_egg(tests_params_egg[:egg_version], menu_name, fail_menu_color)
         end
       rescue Exception => msg
+        @result = false
         send_to_log_egg("Ошибка! #{msg}\n#{msg.backtrace.join("\n")}", "Ошибка! #{msg}")
         colorize_egg(tests_params_egg[:egg_version] , menu_name, fail_menu_color)
       end
@@ -377,6 +369,7 @@ module EggAutotests
           colorize_egg(tests_params_egg[:egg_version], menu_name, fail_menu_color)
         end
       rescue Exception => msg
+        @result = false
         send_to_log_egg("Ошибка! #{msg}\n#{msg.backtrace.join("\n")}", "Ошибка! #{msg}")
         colorize_egg(tests_params_egg[:egg_version] , menu_name, fail_menu_color)
       end
@@ -411,6 +404,7 @@ module EggAutotests
           colorize_egg(tests_params_egg[:egg_version], menu_name, fail_menu_color)
         end
       rescue Exception => msg
+        @result = false
         send_to_log_egg("Ошибка! #{msg}\n#{msg.backtrace.join("\n")}", "Ошибка! #{msg}")
         colorize_egg(tests_params_egg[:egg_version] , menu_name, fail_menu_color)
       end
@@ -445,19 +439,21 @@ module EggAutotests
           colorize_egg(tests_params_egg[:egg_version], menu_name, fail_menu_color)
         end
       rescue Exception => msg
+        @result = false
         send_to_log_egg("Ошибка! #{msg}\n#{msg.backtrace.join("\n")}", "Ошибка! #{msg}")
         colorize_egg(tests_params_egg[:egg_version] , menu_name, fail_menu_color)
       end
     end
 
     if components.include?('Проверка ИА УФЭБС (ГИС ЖКХ)')
-      sleep 0.5
+      sleep 1.5
       menu_name = 'Проверка ИА УФЭБС (ГИС ЖКХ)'
       category = Category.find_by_category_name('ИА УФЭБС ГИС ЖКХ')
       dir_outbound = 'C:/data/inbox/GIS_ZKH/outbound'
       dir_inbound = 'C:/data/inbox/GIS_ZKH/inbound'
       begin # Справочник поставщиков
         @result = true
+        send_to_log_egg("#{puts_line_egg}", "#{puts_line_egg}")
         send_to_log_egg("Начали проверку: Импорт справочника поставщиков", "Начали проверку: Импорт справочника поставщиков")
         FileUtils.cp("#{Rails.root}\\lib\\egg_autotests\\provider_catalog.csv", "C:/tmp/files/in")
         url = "jdbc:oracle:thin:@vm-corint:1521:corint"
@@ -483,6 +479,7 @@ module EggAutotests
           colorize_egg(tests_params_egg[:egg_version], menu_name, fail_menu_color)
         end
       rescue Exception => msg
+        @result = false
         send_to_log_egg("Ошибка! #{msg}\n#{msg.backtrace.join("\n")}", "Ошибка! #{msg}")
         colorize_egg(tests_params_egg[:egg_version] , menu_name, fail_menu_color)
       ensure
@@ -491,6 +488,7 @@ module EggAutotests
       end
 
       begin # ed101
+        sleep 1.5
         @result = true
         xml_name = 'ed101'
         xml_root_element = 'ED101'
@@ -524,11 +522,13 @@ module EggAutotests
           colorize_egg(tests_params_egg[:egg_version], menu_name, fail_menu_color)
         end
       rescue Exception => msg
+        @result = false
         send_to_log_egg("Ошибка! #{msg}\n#{msg.backtrace.join("\n")}", "Ошибка! #{msg}")
         colorize_egg(tests_params_egg[:egg_version] , menu_name, fail_menu_color)
       end
 
       begin # ed108
+        sleep 1.5
         xml_name = 'ed108'
         xml_root_element = 'ED108'
         date = Date.parse("#{Random.rand(2010..2017)}-#{Random.rand(1..11)}-#{Random.rand(1..28)}")
@@ -569,11 +569,13 @@ module EggAutotests
           colorize_egg(tests_params_egg[:egg_version], menu_name, fail_menu_color)
         end
       rescue Exception => msg
+        @result = false
         send_to_log_egg("Ошибка! #{msg}\n#{msg.backtrace.join("\n")}", "Ошибка! #{msg}")
         colorize_egg(tests_params_egg[:egg_version] , menu_name, fail_menu_color)
       end
 
       begin # packetepd
+        sleep 1.5
         xml_name = 'packetepd'
         xml_root_element = 'PacketEPD'
         #date = Date.parse("#{Random.rand(2010..2017)}-#{Random.rand(1..11)}-#{Random.rand(1..28)}")
@@ -619,6 +621,7 @@ module EggAutotests
           colorize_egg(tests_params_egg[:egg_version], menu_name, fail_menu_color)
         end
       rescue Exception => msg
+        @result = false
         send_to_log_egg("Ошибка! #{msg}\n#{msg.backtrace.join("\n")}", "Ошибка! #{msg}")
         colorize_egg(tests_params_egg[:egg_version] , menu_name, fail_menu_color)
       end

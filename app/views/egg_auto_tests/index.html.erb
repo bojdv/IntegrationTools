@@ -16,7 +16,7 @@
         <div id="egg_68" style="display:none">
           <%= f.input :functional_egg68, label: 'Выберите проверки', collection: @egg68_components, include_hidden: false, required: false, input_html: { multiple: true, style: "height:300px"} %>
         </div>
-        <!--%= f.input :build_version, label: 'Выберите сборку:', collection: @dir, required: false %-->
+        <%= f.input :build_version, label: 'Выберите сборку:', collection: @dir, required: false %>
         <%= f.input :egg_dir, label: 'Каталог eGG:', required: false, input_html: {value: 'C:\\EGG'} %>
         <!--%= f.input :dont_clear_db, as: :boolean, :label => 'Не очищать БД после теста', checked_value: true, unchecked_value: false, input_html: {checked: false} %-->
         <%= f.input :dont_drop_db, as: :boolean, :label => 'Не удалять БД и eGG после теста', checked_value: true, unchecked_value: false, input_html: {checked: false} %>

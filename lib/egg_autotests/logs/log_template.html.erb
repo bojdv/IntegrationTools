@@ -1,0 +1,65 @@
+<meta charset="UTF-8">
+<HTML>
+<head>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <style type="text/css">
+    xmp {
+      white-space: pre-wrap;
+      word-wrap:break-word;
+
+    }
+    table {
+      table-layout: fixed;
+    }
+    td {
+      word-wrap:break-word;
+    }
+  </style>
+</head>
+<BODY>
+<div class='header' align="center"><img src="<%=Rails.root%>/app/assets/images/bss_logo.png" alt='logo'></div>
+<div class='content'>
+  <DIV class='div1' align="center">
+    <h2>Результаты выполнения автотестов для продукта Egg</h2>
+  </DIV>
+  </br></br>
+  <div class="container">
+    <% @log_egg.each do |key, value|%>
+      <% if value.is_a?(Hash) %>
+        <h2>  <%= key %> </h2>
+        </br>
+        <table class="table" border="1">
+          <thead>
+          <col width="150" align="left">
+          <col width="400" align="left">
+          <tr style="background: #B0B28E">
+            <th>Действие</th>
+            <th>Результат</th>
+          </tr>
+          </thead>
+        <% value.each do |key2, value2| %>
+            <tbody>
+            <tr>
+              <td><%= key2 %></td>
+              <td>
+                <xmp><%= value2 %></xmp>
+              </td>
+            </tr>
+        <% end %>
+      <% else %>
+        <tr>
+          <td><%= key %></td>
+          <td>
+            <xmp><%= value %></xmp>
+          </td>
+        </tr>
+      <% end %>
+      </tbody>
+      </table>
+    <% end %>
+  </div>
+</div>
+</BODY>
+</HTML>

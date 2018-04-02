@@ -19,7 +19,7 @@ class TirAutoTestsController < ApplicationController
                         'Проверка компонента Base64 (WebServiceProxy)']
     @tir24_components = Array.new(@tir23_components)
     @tir24_components.push('Проверка OpenNMS')
-    regex = /\A[2]{,1}[.][4]{,1}[.][\d]{,2}\Z/
+    regex = /\A[2]{,1}[.][4]{,1}[.][\d]{,3}\Z/
     ftp = Net::FTP.new('server-ora-bssi')
     ftp.login
     @dir = []

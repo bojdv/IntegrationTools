@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180121163814) do
+ActiveRecord::Schema.define(version: 20180306135846) do
 
   create_table "categories", force: :cascade do |t|
     t.integer "product_id", limit: 10, precision: 10
@@ -20,6 +20,17 @@ ActiveRecord::Schema.define(version: 20180121163814) do
     t.integer "user_id", limit: 10, precision: 10
     t.boolean "private"
     t.index ["product_id"], name: "index_categories_on_product_id"
+  end
+
+  create_table "cc_format_validator_logs", force: :cascade do |t|
+    t.string "uuid"
+    t.string "events"
+    t.string "status"
+    t.string "short_message"
+    t.text "full_message"
+    t.text "xml"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "products", force: :cascade do |t|

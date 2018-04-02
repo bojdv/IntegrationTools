@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns="http://bssys.com/sbns/integration" targetNamespace="http://bssys.com/sbns/integration" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:element name="StateRequest">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="branchExtId" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Идентификатор подразделения в АБС</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="255"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="docId" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Идентификатор документа</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="36"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="docType" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Тип документа</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="50"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="extId" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Идентификатор документа во внешней системе</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="64"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="orgExtId" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Идентификатор организации в АБС</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="255"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="orgLegacyId" minOccurs="0" type="xs:int">
+					<xs:annotation>
+						<xs:documentation>Идентификатор организации в ДБО3</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="sysCreateTime" minOccurs="0" type="xs:dateTime">
+					<xs:annotation>
+						<xs:documentation>Системное время создания</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

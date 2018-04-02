@@ -1,0 +1,870 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns="http://bssys.com/sbns/integration" targetNamespace="http://bssys.com/sbns/integration" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:element name="StatementRequest">
+		<xs:annotation>
+			<xs:documentation>Новый Запрос на получение информации о движении денежных средств Рублевый</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="acceptDate" minOccurs="0" type="xs:dateTime">
+					<xs:annotation>
+						<xs:documentation>Дата приема к исполнению</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="bankMessage" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Сообщение из банка</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="4000"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="bankMessageAuthor" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Ответственный исполнитель</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="1024"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="branchExtId" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Идентификатор подразделения в АБС</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="255"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="docDate" minOccurs="0" type="xs:date">
+					<xs:annotation>
+						<xs:documentation>Дата документа</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="docId" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Идентификатор документа</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="36"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="docNumber" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Номер документа</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="64"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="docTypeVersion" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Поле из 1.8 - версия документа</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="12"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="externalId" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Идентификатор документа во внешней системе</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="64"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="externalUPGId" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Идентификатор документа во внешней системе для UPG</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="64"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="fromDate" minOccurs="0" type="xs:date">
+					<xs:annotation>
+						<xs:documentation>Дата начала периода выписки</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="lastModifyDate" minOccurs="0" type="xs:dateTime">
+					<xs:annotation>
+						<xs:documentation>Дата последней модификации документа</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="messageOnlyForBank" minOccurs="0" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>Сообщнение от АБС для банка</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="orgExtId" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Идентификатор организации в АБС</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="255"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="orgId" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>ID организации</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="36"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="orgInn" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>ИНН организации клиента</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="15"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="orgLegacyId" minOccurs="0" type="xs:int">
+					<xs:annotation>
+						<xs:documentation>Идентификатор организации в ДБО3</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="orgName" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Наименование организации автора документа</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="355"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="sysCreateTime" minOccurs="0" type="xs:dateTime">
+					<xs:annotation>
+						<xs:documentation>Системное время создания</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="template" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Метка - является ли объект шаблоном</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:boolean">
+							<xs:pattern value="[0-1]{1}"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="toDate" minOccurs="0" type="xs:date">
+					<xs:annotation>
+						<xs:documentation>Дата окончания периода выписки</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="accounts" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Набор счетов по которым запрашивается выписка</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="Acc" maxOccurs="unbounded">
+								<xs:annotation>
+									<xs:documentation>Список счетов, по которым запрашивается выписки</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="account" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Счет клиента</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="20"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="bankBIC" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>БИК банка клиента</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="64"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="bankName" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Наименование и месторасположение банка клиента</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="500"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="orgName" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Наименование организации</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="355"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="signCollection" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Подписи объекта</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="SignCollection">
+								<xs:annotation>
+									<xs:documentation>Коллекция подписей. Это такая специальная сущность, чтобы отвязать подписи от подписываемых объектов.</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="bankMessage" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Сообщение из банка</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="1024"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="digestName" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Название дайджеста, используемого для формирования подписей в данной коллекции</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="255"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="signs" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Подписи, сформированные для данной коллекции</xs:documentation>
+											</xs:annotation>
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="Sign" maxOccurs="unbounded">
+														<xs:annotation>
+															<xs:documentation>Сущность, хранящая бинарную ЭП. Также сохраняется название и версия дайджеста. <p/> Для каждого типа криптографии формат свой.</xs:documentation>
+														</xs:annotation>
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element name="certificateGuid" minOccurs="0">
+																	<xs:annotation>
+																		<xs:documentation>Сертификат, которым была сделана данная подпись (из сертификатов средства подписи)</xs:documentation>
+																	</xs:annotation>
+																	<xs:simpleType>
+																		<xs:restriction base="xs:string">
+																			<xs:maxLength value="255"/>
+																		</xs:restriction>
+																	</xs:simpleType>
+																</xs:element>
+																<xs:element name="content" minOccurs="0">
+																	<xs:annotation>
+																		<xs:documentation>Содержимое подписи</xs:documentation>
+																	</xs:annotation>
+																	<xs:simpleType>
+																		<xs:restriction base="xs:string">
+																			<xs:maxLength value="2000"/>
+																		</xs:restriction>
+																	</xs:simpleType>
+																</xs:element>
+																<xs:element name="contentLarge" minOccurs="0" type="xs:string">
+																	<xs:annotation>
+																		<xs:documentation>Содержимое подписи (для длинных подписей)</xs:documentation>
+																	</xs:annotation>
+																</xs:element>
+																<xs:element name="digestScheme" minOccurs="0">
+																	<xs:annotation>
+																		<xs:documentation>Название схемы дайджеста</xs:documentation>
+																	</xs:annotation>
+																	<xs:simpleType>
+																		<xs:restriction base="xs:string">
+																			<xs:maxLength value="4000"/>
+																		</xs:restriction>
+																	</xs:simpleType>
+																</xs:element>
+																<xs:element name="digestSchemeFormat" minOccurs="0">
+																	<xs:annotation>
+																		<xs:documentation>Формат дайджеста</xs:documentation>
+																	</xs:annotation>
+																	<xs:simpleType>
+																		<xs:restriction base="xs:string">
+																			<xs:maxLength value="255"/>
+																		</xs:restriction>
+																	</xs:simpleType>
+																</xs:element>
+																<xs:element name="digestSchemeVersion" minOccurs="0" type="xs:int">
+																	<xs:annotation>
+																		<xs:documentation>Версия дайджеста</xs:documentation>
+																	</xs:annotation>
+																</xs:element>
+																<xs:element name="dtCheck" minOccurs="0" type="xs:dateTime">
+																	<xs:annotation>
+																		<xs:documentation>Время последней проверки подписи</xs:documentation>
+																	</xs:annotation>
+																</xs:element>
+																<xs:element name="dtCreate" minOccurs="0" type="xs:dateTime">
+																	<xs:annotation>
+																		<xs:documentation>Время создания подписи</xs:documentation>
+																	</xs:annotation>
+																</xs:element>
+																<xs:element name="orgId" minOccurs="0">
+																	<xs:annotation>
+																		<xs:documentation>Идентификатор организации, от лица которой была сформирована данная подпись</xs:documentation>
+																	</xs:annotation>
+																	<xs:simpleType>
+																		<xs:restriction base="xs:string">
+																			<xs:maxLength value="36"/>
+																		</xs:restriction>
+																	</xs:simpleType>
+																</xs:element>
+																<xs:element name="orgName" minOccurs="0">
+																	<xs:annotation>
+																		<xs:documentation>Имя организации, от лица которой была сформирована данная подпись</xs:documentation>
+																	</xs:annotation>
+																	<xs:simpleType>
+																		<xs:restriction base="xs:string">
+																			<xs:maxLength value="350"/>
+																		</xs:restriction>
+																	</xs:simpleType>
+																</xs:element>
+																<xs:element name="position" minOccurs="0">
+																	<xs:annotation>
+																		<xs:documentation>Должность лица, поставившего подпись</xs:documentation>
+																	</xs:annotation>
+																	<xs:simpleType>
+																		<xs:restriction base="xs:string">
+																			<xs:maxLength value="255"/>
+																		</xs:restriction>
+																	</xs:simpleType>
+																</xs:element>
+																<xs:element name="safeTouchAutoSign" minOccurs="0">
+																	<xs:annotation>
+																		<xs:documentation>Признак автоподписи для считывателя смарт-карт SafeTouch</xs:documentation>
+																	</xs:annotation>
+																	<xs:simpleType>
+																		<xs:restriction base="xs:boolean">
+																			<xs:pattern value="[0-1]{1}"/>
+																		</xs:restriction>
+																	</xs:simpleType>
+																</xs:element>
+																<xs:element name="safeTouchDigestSchemeVersion" minOccurs="0" type="xs:int">
+																	<xs:annotation>
+																		<xs:documentation>Версия дайджеста для считывателя смарт-карт SafeTouch</xs:documentation>
+																	</xs:annotation>
+																</xs:element>
+																<xs:element name="signKey" minOccurs="0">
+																	<xs:annotation>
+																		<xs:documentation>Значение введенного ключа для подтверждения права подписи</xs:documentation>
+																	</xs:annotation>
+																	<xs:simpleType>
+																		<xs:restriction base="xs:string">
+																			<xs:maxLength value="255"/>
+																		</xs:restriction>
+																	</xs:simpleType>
+																</xs:element>
+																<xs:element name="signType" minOccurs="0">
+																	<xs:annotation>
+																		<xs:documentation>Тип права подписи</xs:documentation>
+																	</xs:annotation>
+																	<xs:simpleType>
+																		<xs:restriction base="xs:string">
+																			<xs:maxLength value="255"/>
+																		</xs:restriction>
+																	</xs:simpleType>
+																</xs:element>
+																<xs:element name="signerFullName" minOccurs="0">
+																	<xs:annotation>
+																		<xs:documentation>ФИО поставившего подпись</xs:documentation>
+																	</xs:annotation>
+																	<xs:simpleType>
+																		<xs:restriction base="xs:string">
+																			<xs:maxLength value="1000"/>
+																		</xs:restriction>
+																	</xs:simpleType>
+																</xs:element>
+																<xs:element name="userIP" minOccurs="0">
+																	<xs:annotation>
+																		<xs:documentation>IP пользователя, сформировавшего данную подпись</xs:documentation>
+																	</xs:annotation>
+																	<xs:simpleType>
+																		<xs:restriction base="xs:string">
+																			<xs:maxLength value="40"/>
+																		</xs:restriction>
+																	</xs:simpleType>
+																</xs:element>
+																<xs:element name="userMAC" minOccurs="0">
+																	<xs:annotation>
+																		<xs:documentation>MAC пользователя, сформировавшего данную подпись</xs:documentation>
+																	</xs:annotation>
+																	<xs:simpleType>
+																		<xs:restriction base="xs:string">
+																			<xs:maxLength value="255"/>
+																		</xs:restriction>
+																	</xs:simpleType>
+																</xs:element>
+																<xs:element name="userName" minOccurs="0">
+																	<xs:annotation>
+																		<xs:documentation>Имя пользователя, сформировавшего данную подпись</xs:documentation>
+																	</xs:annotation>
+																	<xs:simpleType>
+																		<xs:restriction base="xs:string">
+																			<xs:maxLength value="1024"/>
+																		</xs:restriction>
+																	</xs:simpleType>
+																</xs:element>
+																<xs:element name="valid" minOccurs="0">
+																	<xs:annotation>
+																		<xs:documentation>Результат последней проверки подписи</xs:documentation>
+																	</xs:annotation>
+																	<xs:simpleType>
+																		<xs:restriction base="xs:boolean">
+																			<xs:pattern value="[0-1]{1}"/>
+																		</xs:restriction>
+																	</xs:simpleType>
+																</xs:element>
+																<xs:element name="confirmSign" minOccurs="0">
+																	<xs:annotation>
+																		<xs:documentation>Подтверждающая подпись</xs:documentation>
+																	</xs:annotation>
+																	<xs:complexType>
+																		<xs:sequence>
+																			<xs:element name="Sign">
+																				<xs:annotation>
+																					<xs:documentation>Сущность, хранящая бинарную ЭП. Также сохраняется название и версия дайджеста. <p/> Для каждого типа криптографии формат свой.</xs:documentation>
+																				</xs:annotation>
+																				<xs:complexType>
+																					<xs:sequence>
+																						<xs:element name="certificateGuid" minOccurs="0">
+																							<xs:annotation>
+																								<xs:documentation>Сертификат, которым была сделана данная подпись (из сертификатов средства подписи)</xs:documentation>
+																							</xs:annotation>
+																							<xs:simpleType>
+																								<xs:restriction base="xs:string">
+																									<xs:maxLength value="255"/>
+																								</xs:restriction>
+																							</xs:simpleType>
+																						</xs:element>
+																						<xs:element name="content" minOccurs="0">
+																							<xs:annotation>
+																								<xs:documentation>Содержимое подписи</xs:documentation>
+																							</xs:annotation>
+																							<xs:simpleType>
+																								<xs:restriction base="xs:string">
+																									<xs:maxLength value="2000"/>
+																								</xs:restriction>
+																							</xs:simpleType>
+																						</xs:element>
+																						<xs:element name="contentLarge" minOccurs="0" type="xs:string">
+																							<xs:annotation>
+																								<xs:documentation>Содержимое подписи (для длинных подписей)</xs:documentation>
+																							</xs:annotation>
+																						</xs:element>
+																						<xs:element name="digestScheme" minOccurs="0">
+																							<xs:annotation>
+																								<xs:documentation>Название схемы дайджеста</xs:documentation>
+																							</xs:annotation>
+																							<xs:simpleType>
+																								<xs:restriction base="xs:string">
+																									<xs:maxLength value="4000"/>
+																								</xs:restriction>
+																							</xs:simpleType>
+																						</xs:element>
+																						<xs:element name="digestSchemeFormat" minOccurs="0">
+																							<xs:annotation>
+																								<xs:documentation>Формат дайджеста</xs:documentation>
+																							</xs:annotation>
+																							<xs:simpleType>
+																								<xs:restriction base="xs:string">
+																									<xs:maxLength value="255"/>
+																								</xs:restriction>
+																							</xs:simpleType>
+																						</xs:element>
+																						<xs:element name="digestSchemeVersion" minOccurs="0" type="xs:int">
+																							<xs:annotation>
+																								<xs:documentation>Версия дайджеста</xs:documentation>
+																							</xs:annotation>
+																						</xs:element>
+																						<xs:element name="dtCheck" minOccurs="0" type="xs:dateTime">
+																							<xs:annotation>
+																								<xs:documentation>Время последней проверки подписи</xs:documentation>
+																							</xs:annotation>
+																						</xs:element>
+																						<xs:element name="dtCreate" minOccurs="0" type="xs:dateTime">
+																							<xs:annotation>
+																								<xs:documentation>Время создания подписи</xs:documentation>
+																							</xs:annotation>
+																						</xs:element>
+																						<xs:element name="orgId" minOccurs="0">
+																							<xs:annotation>
+																								<xs:documentation>Идентификатор организации, от лица которой была сформирована данная подпись</xs:documentation>
+																							</xs:annotation>
+																							<xs:simpleType>
+																								<xs:restriction base="xs:string">
+																									<xs:maxLength value="36"/>
+																								</xs:restriction>
+																							</xs:simpleType>
+																						</xs:element>
+																						<xs:element name="orgName" minOccurs="0">
+																							<xs:annotation>
+																								<xs:documentation>Имя организации, от лица которой была сформирована данная подпись</xs:documentation>
+																							</xs:annotation>
+																							<xs:simpleType>
+																								<xs:restriction base="xs:string">
+																									<xs:maxLength value="350"/>
+																								</xs:restriction>
+																							</xs:simpleType>
+																						</xs:element>
+																						<xs:element name="position" minOccurs="0">
+																							<xs:annotation>
+																								<xs:documentation>Должность лица, поставившего подпись</xs:documentation>
+																							</xs:annotation>
+																							<xs:simpleType>
+																								<xs:restriction base="xs:string">
+																									<xs:maxLength value="255"/>
+																								</xs:restriction>
+																							</xs:simpleType>
+																						</xs:element>
+																						<xs:element name="safeTouchAutoSign" minOccurs="0">
+																							<xs:annotation>
+																								<xs:documentation>Признак автоподписи для считывателя смарт-карт SafeTouch</xs:documentation>
+																							</xs:annotation>
+																							<xs:simpleType>
+																								<xs:restriction base="xs:boolean">
+																									<xs:pattern value="[0-1]{1}"/>
+																								</xs:restriction>
+																							</xs:simpleType>
+																						</xs:element>
+																						<xs:element name="safeTouchDigestSchemeVersion" minOccurs="0" type="xs:int">
+																							<xs:annotation>
+																								<xs:documentation>Версия дайджеста для считывателя смарт-карт SafeTouch</xs:documentation>
+																							</xs:annotation>
+																						</xs:element>
+																						<xs:element name="signKey" minOccurs="0">
+																							<xs:annotation>
+																								<xs:documentation>Значение введенного ключа для подтверждения права подписи</xs:documentation>
+																							</xs:annotation>
+																							<xs:simpleType>
+																								<xs:restriction base="xs:string">
+																									<xs:maxLength value="255"/>
+																								</xs:restriction>
+																							</xs:simpleType>
+																						</xs:element>
+																						<xs:element name="signType" minOccurs="0">
+																							<xs:annotation>
+																								<xs:documentation>Тип права подписи</xs:documentation>
+																							</xs:annotation>
+																							<xs:simpleType>
+																								<xs:restriction base="xs:string">
+																									<xs:maxLength value="255"/>
+																								</xs:restriction>
+																							</xs:simpleType>
+																						</xs:element>
+																						<xs:element name="signerFullName" minOccurs="0">
+																							<xs:annotation>
+																								<xs:documentation>ФИО поставившего подпись</xs:documentation>
+																							</xs:annotation>
+																							<xs:simpleType>
+																								<xs:restriction base="xs:string">
+																									<xs:maxLength value="1000"/>
+																								</xs:restriction>
+																							</xs:simpleType>
+																						</xs:element>
+																						<xs:element name="userIP" minOccurs="0">
+																							<xs:annotation>
+																								<xs:documentation>IP пользователя, сформировавшего данную подпись</xs:documentation>
+																							</xs:annotation>
+																							<xs:simpleType>
+																								<xs:restriction base="xs:string">
+																									<xs:maxLength value="40"/>
+																								</xs:restriction>
+																							</xs:simpleType>
+																						</xs:element>
+																						<xs:element name="userMAC" minOccurs="0">
+																							<xs:annotation>
+																								<xs:documentation>MAC пользователя, сформировавшего данную подпись</xs:documentation>
+																							</xs:annotation>
+																							<xs:simpleType>
+																								<xs:restriction base="xs:string">
+																									<xs:maxLength value="255"/>
+																								</xs:restriction>
+																							</xs:simpleType>
+																						</xs:element>
+																						<xs:element name="userName" minOccurs="0">
+																							<xs:annotation>
+																								<xs:documentation>Имя пользователя, сформировавшего данную подпись</xs:documentation>
+																							</xs:annotation>
+																							<xs:simpleType>
+																								<xs:restriction base="xs:string">
+																									<xs:maxLength value="1024"/>
+																								</xs:restriction>
+																							</xs:simpleType>
+																						</xs:element>
+																						<xs:element name="valid" minOccurs="0">
+																							<xs:annotation>
+																								<xs:documentation>Результат последней проверки подписи</xs:documentation>
+																							</xs:annotation>
+																							<xs:simpleType>
+																								<xs:restriction base="xs:boolean">
+																									<xs:pattern value="[0-1]{1}"/>
+																								</xs:restriction>
+																							</xs:simpleType>
+																						</xs:element>
+																						<xs:element name="userWorkspace" minOccurs="0">
+																							<xs:annotation>
+																								<xs:documentation>Ссылка на рабочую среду пользователя</xs:documentation>
+																							</xs:annotation>
+																							<xs:complexType>
+																								<xs:sequence>
+																									<xs:element name="UserWorkspace">
+																										<xs:annotation>
+																											<xs:documentation>Рабочая среда клиента, определяет параметры компьютера пользователя при подписи данных</xs:documentation>
+																										</xs:annotation>
+																										<xs:complexType>
+																											<xs:sequence>
+																												<xs:element name="AVPActive" minOccurs="0">
+																													<xs:annotation>
+																														<xs:documentation>Наличие и активность антивируса</xs:documentation>
+																													</xs:annotation>
+																													<xs:simpleType>
+																														<xs:restriction base="xs:boolean">
+																															<xs:pattern value="[0-1]{1}"/>
+																														</xs:restriction>
+																													</xs:simpleType>
+																												</xs:element>
+																												<xs:element name="OSUpdatable" minOccurs="0">
+																													<xs:annotation>
+																														<xs:documentation>Активность системы обновления ОС</xs:documentation>
+																													</xs:annotation>
+																													<xs:simpleType>
+																														<xs:restriction base="xs:boolean">
+																															<xs:pattern value="[0-1]{1}"/>
+																														</xs:restriction>
+																													</xs:simpleType>
+																												</xs:element>
+																												<xs:element name="addInfo" minOccurs="0">
+																													<xs:annotation>
+																														<xs:documentation>Дополнительная информация</xs:documentation>
+																													</xs:annotation>
+																													<xs:simpleType>
+																														<xs:restriction base="xs:string">
+																															<xs:maxLength value="4000"/>
+																														</xs:restriction>
+																													</xs:simpleType>
+																												</xs:element>
+																												<xs:element name="faultPassAttemptCount" minOccurs="0" type="xs:int">
+																													<xs:annotation>
+																														<xs:documentation>Общее количество неудачных попыток ввода пароля при входе в систему</xs:documentation>
+																													</xs:annotation>
+																												</xs:element>
+																												<xs:element name="hashCode" minOccurs="0">
+																													<xs:annotation>
+																														<xs:documentation>Хэш-код (дайджест) рабочего окружения пользователя для быстрого поиска</xs:documentation>
+																													</xs:annotation>
+																													<xs:simpleType>
+																														<xs:restriction base="xs:string">
+																															<xs:maxLength value="255"/>
+																														</xs:restriction>
+																													</xs:simpleType>
+																												</xs:element>
+																												<xs:element name="notRemoteAccess" minOccurs="0">
+																													<xs:annotation>
+																														<xs:documentation>Отсутствие запущенных сессий удаленного доступа</xs:documentation>
+																													</xs:annotation>
+																													<xs:simpleType>
+																														<xs:restriction base="xs:boolean">
+																															<xs:pattern value="[0-1]{1}"/>
+																														</xs:restriction>
+																													</xs:simpleType>
+																												</xs:element>
+																												<xs:element name="outerKeyStorage" minOccurs="0">
+																													<xs:annotation>
+																														<xs:documentation>Использование устройства контроля подписываемых данных (SafeTouch)</xs:documentation>
+																													</xs:annotation>
+																													<xs:simpleType>
+																														<xs:restriction base="xs:boolean">
+																															<xs:pattern value="[0-1]{1}"/>
+																														</xs:restriction>
+																													</xs:simpleType>
+																												</xs:element>
+																												<xs:element name="passChanged" minOccurs="0">
+																													<xs:annotation>
+																														<xs:documentation>Признак смены пароля пользователем за контрольный период до создания платежного поручения. Контрольный период по умолчанию 24 часа</xs:documentation>
+																													</xs:annotation>
+																													<xs:simpleType>
+																														<xs:restriction base="xs:boolean">
+																															<xs:pattern value="[0-1]{1}"/>
+																														</xs:restriction>
+																													</xs:simpleType>
+																												</xs:element>
+																												<xs:element name="userMAC" minOccurs="0">
+																													<xs:annotation>
+																														<xs:documentation>MAC пользователя, сформировавшего данную подпись</xs:documentation>
+																													</xs:annotation>
+																													<xs:simpleType>
+																														<xs:restriction base="xs:string">
+																															<xs:maxLength value="255"/>
+																														</xs:restriction>
+																													</xs:simpleType>
+																												</xs:element>
+																											</xs:sequence>
+																										</xs:complexType>
+																									</xs:element>
+																								</xs:sequence>
+																							</xs:complexType>
+																						</xs:element>
+																					</xs:sequence>
+																				</xs:complexType>
+																			</xs:element>
+																		</xs:sequence>
+																	</xs:complexType>
+																</xs:element>
+																<xs:element name="userWorkspace" minOccurs="0">
+																	<xs:annotation>
+																		<xs:documentation>Ссылка на рабочую среду пользователя</xs:documentation>
+																	</xs:annotation>
+																	<xs:complexType>
+																		<xs:sequence>
+																			<xs:element name="UserWorkspace">
+																				<xs:annotation>
+																					<xs:documentation>Рабочая среда клиента, определяет параметры компьютера пользователя при подписи данных</xs:documentation>
+																				</xs:annotation>
+																				<xs:complexType>
+																					<xs:sequence>
+																						<xs:element name="AVPActive" minOccurs="0">
+																							<xs:annotation>
+																								<xs:documentation>Наличие и активность антивируса</xs:documentation>
+																							</xs:annotation>
+																							<xs:simpleType>
+																								<xs:restriction base="xs:boolean">
+																									<xs:pattern value="[0-1]{1}"/>
+																								</xs:restriction>
+																							</xs:simpleType>
+																						</xs:element>
+																						<xs:element name="OSUpdatable" minOccurs="0">
+																							<xs:annotation>
+																								<xs:documentation>Активность системы обновления ОС</xs:documentation>
+																							</xs:annotation>
+																							<xs:simpleType>
+																								<xs:restriction base="xs:boolean">
+																									<xs:pattern value="[0-1]{1}"/>
+																								</xs:restriction>
+																							</xs:simpleType>
+																						</xs:element>
+																						<xs:element name="addInfo" minOccurs="0">
+																							<xs:annotation>
+																								<xs:documentation>Дополнительная информация</xs:documentation>
+																							</xs:annotation>
+																							<xs:simpleType>
+																								<xs:restriction base="xs:string">
+																									<xs:maxLength value="4000"/>
+																								</xs:restriction>
+																							</xs:simpleType>
+																						</xs:element>
+																						<xs:element name="faultPassAttemptCount" minOccurs="0" type="xs:int">
+																							<xs:annotation>
+																								<xs:documentation>Общее количество неудачных попыток ввода пароля при входе в систему</xs:documentation>
+																							</xs:annotation>
+																						</xs:element>
+																						<xs:element name="hashCode" minOccurs="0">
+																							<xs:annotation>
+																								<xs:documentation>Хэш-код (дайджест) рабочего окружения пользователя для быстрого поиска</xs:documentation>
+																							</xs:annotation>
+																							<xs:simpleType>
+																								<xs:restriction base="xs:string">
+																									<xs:maxLength value="255"/>
+																								</xs:restriction>
+																							</xs:simpleType>
+																						</xs:element>
+																						<xs:element name="notRemoteAccess" minOccurs="0">
+																							<xs:annotation>
+																								<xs:documentation>Отсутствие запущенных сессий удаленного доступа</xs:documentation>
+																							</xs:annotation>
+																							<xs:simpleType>
+																								<xs:restriction base="xs:boolean">
+																									<xs:pattern value="[0-1]{1}"/>
+																								</xs:restriction>
+																							</xs:simpleType>
+																						</xs:element>
+																						<xs:element name="outerKeyStorage" minOccurs="0">
+																							<xs:annotation>
+																								<xs:documentation>Использование устройства контроля подписываемых данных (SafeTouch)</xs:documentation>
+																							</xs:annotation>
+																							<xs:simpleType>
+																								<xs:restriction base="xs:boolean">
+																									<xs:pattern value="[0-1]{1}"/>
+																								</xs:restriction>
+																							</xs:simpleType>
+																						</xs:element>
+																						<xs:element name="passChanged" minOccurs="0">
+																							<xs:annotation>
+																								<xs:documentation>Признак смены пароля пользователем за контрольный период до создания платежного поручения. Контрольный период по умолчанию 24 часа</xs:documentation>
+																							</xs:annotation>
+																							<xs:simpleType>
+																								<xs:restriction base="xs:boolean">
+																									<xs:pattern value="[0-1]{1}"/>
+																								</xs:restriction>
+																							</xs:simpleType>
+																						</xs:element>
+																						<xs:element name="userMAC" minOccurs="0">
+																							<xs:annotation>
+																								<xs:documentation>MAC пользователя, сформировавшего данную подпись</xs:documentation>
+																							</xs:annotation>
+																							<xs:simpleType>
+																								<xs:restriction base="xs:string">
+																									<xs:maxLength value="255"/>
+																								</xs:restriction>
+																							</xs:simpleType>
+																						</xs:element>
+																					</xs:sequence>
+																				</xs:complexType>
+																			</xs:element>
+																		</xs:sequence>
+																	</xs:complexType>
+																</xs:element>
+															</xs:sequence>
+														</xs:complexType>
+													</xs:element>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

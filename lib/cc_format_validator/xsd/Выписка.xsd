@@ -1,0 +1,1099 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns="http://bssys.com/sbns/integration" targetNamespace="http://bssys.com/sbns/integration" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:element name="Statement">
+		<xs:annotation>
+			<xs:documentation>Информация о движении денежных средств</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="acceptDate" minOccurs="0" type="xs:dateTime">
+					<xs:annotation>
+						<xs:documentation>Дата приема к исполнению</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="account" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Счет клиента</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="20"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="actual" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Признак актуальности выписки</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:boolean">
+							<xs:pattern value="[0-1]{1}"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="author" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Ответственный исполнитель из банка</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="255"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="bankBIC" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>БИК банка клиента</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="64"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="bankName" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Наименование и месторасположение банка клиента</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="500"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="bankNameBIC" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Наименование банка клиента из справочника БИК</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="255"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="card1Sum" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Сумма по картотеке 1</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:decimal">
+							<xs:totalDigits value="18"/>
+							<xs:fractionDigits value="2"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="card2Sum" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Сумма по картотеке 2</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:decimal">
+							<xs:totalDigits value="18"/>
+							<xs:fractionDigits value="2"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="creditReturn" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Итого оборотов по кредиту</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:decimal">
+							<xs:totalDigits value="18"/>
+							<xs:fractionDigits value="2"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="creditReturnNat" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Итого оборотов по кредиту в нац. валюте</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:decimal">
+							<xs:totalDigits value="18"/>
+							<xs:fractionDigits value="2"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="currCode" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Код валюты выписки</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="255"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="currIsoCode" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>ISO-код валюты выписки</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="255"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="debetReturn" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Итого оборотов по дебету</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:decimal">
+							<xs:totalDigits value="18"/>
+							<xs:fractionDigits value="2"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="debetReturnNat" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Итого оборотов по дебету  в нац. валюте</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:decimal">
+							<xs:totalDigits value="18"/>
+							<xs:fractionDigits value="2"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="docComment" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Сообщение из банка</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="4000"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="docDate" minOccurs="0" type="xs:dateTime">
+					<xs:annotation>
+						<xs:documentation>Дата и время формирования выписки</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="docNumber" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Номер документа</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="64"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="docTypeVersion" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Поле из 1.8 - версия документа</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="12"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="externalId" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Идентификатор документа во внешней системе</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="64"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="fromDate" minOccurs="0" type="xs:dateTime">
+					<xs:annotation>
+						<xs:documentation>Дата начала периода выписки</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="inboundBalance" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Входящий остаток</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:decimal">
+							<xs:totalDigits value="18"/>
+							<xs:fractionDigits value="2"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="inboundBalanceNat" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Входящий остаток в нац. валюте</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:decimal">
+							<xs:totalDigits value="18"/>
+							<xs:fractionDigits value="2"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="isFinal" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Признак наличия в выписке итоговых данных</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:boolean">
+							<xs:pattern value="[0-1]{1}"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="lastOperationDate" minOccurs="0" type="xs:dateTime">
+					<xs:annotation>
+						<xs:documentation>Дата последней операции по счету</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="oldDocId" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Идентификатор старого документа Используется при импорте документа (в частности, в случае переноса документа из Correqts в данном поле будет хранится GLOBALDOCID из таблицы ABSTRACTDOC)</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="255"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="orgInn" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>ИНН организации клиента</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="15"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="orgName" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Наименование организации клиента</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="355"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="outboundBalance" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Исходящий остаток</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:decimal">
+							<xs:totalDigits value="18"/>
+							<xs:fractionDigits value="2"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="outboundBalanceNat" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Исходящий остаток  в нац. валюте</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:decimal">
+							<xs:totalDigits value="18"/>
+							<xs:fractionDigits value="2"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="planOutboundBalance" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Плановый исходящий остаток</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:decimal">
+							<xs:totalDigits value="18"/>
+							<xs:fractionDigits value="2"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="planOutboundBalanceNat" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Плановый исходящий остаток  в нац. валюте</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:decimal">
+							<xs:totalDigits value="18"/>
+							<xs:fractionDigits value="2"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="prevOperationDate" minOccurs="0" type="xs:dateTime">
+					<xs:annotation>
+						<xs:documentation>Дата последней операции по предыдущей выписке На форме должно быть так: "Дата предыдущей операции по счету"</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="rateIn" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Курс ЦБ за 1 ед. валюты на начало периода.</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:decimal">
+							<xs:totalDigits value="10"/>
+							<xs:fractionDigits value="4"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="rateInFull" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Курс ЦБ на начало периода с учетом масштаба</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="60"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="rateOut" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Курс за 1 ед. валюты на конец выписки</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:decimal">
+							<xs:totalDigits value="10"/>
+							<xs:fractionDigits value="4"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="rateOutFull" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Курс ЦБ на конец периода с учетом масштаба</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="60"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="seizureAmount" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Сумма ограничений по счету</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:decimal">
+							<xs:totalDigits value="18"/>
+							<xs:fractionDigits value="2"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="seizureWholeAmount" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Ограничение по счету в размере всех средств</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:boolean">
+							<xs:pattern value="[0-1]{1}"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="toDate" minOccurs="0" type="xs:dateTime">
+					<xs:annotation>
+						<xs:documentation>Дата окончания периода выписки</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="operations" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="Operation" maxOccurs="unbounded">
+								<xs:annotation>
+									<xs:documentation>Операция по выписке</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="acceptDate" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Срок акцепта, количество дней (для 02)</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="10"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="cashSymbol" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Символ по справочнику виды операций проводок выписки</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="2"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="cbc" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Код КБК (104)</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="20"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="chargeType" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Код выплат/Тип налогового платежа (110)</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="2"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="corrAccCurr" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Валюта счета корреспондента</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="3"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="corrAccCurrSum" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Сумма в валюте счета корреспондента</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:decimal">
+													<xs:totalDigits value="18"/>
+													<xs:fractionDigits value="2"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="createDocId" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Документ, которым была сформирована данная операция</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="256"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="credit" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Сумма проводки по кредиту</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:decimal">
+													<xs:totalDigits value="18"/>
+													<xs:fractionDigits value="2"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="creditNat" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Сумма проводки по кредиту в нац. валюте</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:decimal">
+													<xs:totalDigits value="20"/>
+													<xs:fractionDigits value="2"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="dboDocId" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>id документа DBO</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="255"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="debet" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Сумма проводки по дебету</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:decimal">
+													<xs:totalDigits value="18"/>
+													<xs:fractionDigits value="2"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="debetNat" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Сумма проводки по дебету в нац. валюте</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:decimal">
+													<xs:totalDigits value="20"/>
+													<xs:fractionDigits value="2"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="departmentalInfoDocDate" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Дата налогового документа, строка даты в виде dd.MM.yyyy</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="255"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="departmentalInfoDocNo" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Номер налогового документа</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="255"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="docDate" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Показатель даты документа S_ND6 (109)</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="10"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="docDate2" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Дата документа (картотека)</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="10"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="docExtId" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Внешний идентификатор документа в АБС. Может быть присвоен документу по результатам выгрузки в АБС</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="36"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="docNumber" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Показатель номера документа (108)</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="16"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="docNumber2" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Номер документа (картотека)</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="15"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="docRef" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>GUID запроса в Системе</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="36"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="docShifr" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Шифр документа (картотека)</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="255"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="documentDate" minOccurs="0" type="xs:dateTime">
+											<xs:annotation>
+												<xs:documentation>Дата документа, которым было сформирована данная операция</xs:documentation>
+											</xs:annotation>
+										</xs:element>
+										<xs:element name="documentNumber" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Номер документа</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="64"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="documentSum" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Сумма документа, которым было сформирована данная операция</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:decimal">
+													<xs:totalDigits value="18"/>
+													<xs:fractionDigits value="2"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="filial" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>filial</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="255"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="fioForStamp" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>ФИО для печати на штампе</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="255"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="ground" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Показатель основания платежа (106)</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="2"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="info" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Информация</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="4000"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="letterOfCreditAddCond" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Дополнительные условия аккредитива (для 08)</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="4000"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="letterOfCreditDemandDocs" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Требуемые документы (для 08)</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="4000"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="letterOfCreditPayAcc" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Номер счета поставщика  (для 08)</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="35"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="letterOfCreditPaymCond" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Условие оплаты аккредитива (для 08)</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="4000"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="letterOfCreditPeriodVal" minOccurs="0" type="xs:dateTime">
+											<xs:annotation>
+												<xs:documentation>Срок действия аккредитива (для 08)</xs:documentation>
+											</xs:annotation>
+										</xs:element>
+										<xs:element name="letterOfCreditType" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Вид аккредитива (для 08)</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="255"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="numPayment" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Номер платежа (картотека)</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="255"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="numberPP" minOccurs="0" type="xs:int">
+											<xs:annotation>
+												<xs:documentation>Номер по порядку</xs:documentation>
+											</xs:annotation>
+										</xs:element>
+										<xs:element name="oS" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Содержание операции</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="255"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="ocato" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Код ОКАТО (105)</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="11"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="operationDate" minOccurs="0" type="xs:dateTime">
+											<xs:annotation>
+												<xs:documentation>Дата операции</xs:documentation>
+											</xs:annotation>
+										</xs:element>
+										<xs:element name="operationType" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Тип операции</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="2"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="payerAccount" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Счет плательщика</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="50"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="payerBankBic" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>БИК банка плательщика</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="255"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="payerBankCorrAccount" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Кор. счет банка плательщика</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="50"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="payerBankName" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Банк плательщика</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="355"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="payerCurrCode" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Валюта платежа</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="3"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="payerINN" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>ИНН плательщика</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="15"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="payerKPP" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>КПП плательщика (102)</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="9"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="payerName" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Название плательщика</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="355"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="payingCondition" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Условие оплаты (для 02)</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="255"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="paymentGoalId" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>ID Цели платежа (из справочника)</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="36"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="paymentOrder" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Очередность платежа</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="2"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="paymentPurpose" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Назначение платежа</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="1000"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="paytCode" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Код вида платежа</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="3"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="paytKind" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Вид платежа</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="255"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="periodVal" minOccurs="0" type="xs:dateTime">
+											<xs:annotation>
+												<xs:documentation>Окончание срока акцепта</xs:documentation>
+											</xs:annotation>
+										</xs:element>
+										<xs:element name="receiverAccount" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Счет получателя</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="50"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="receiverBankBic" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>БИК банка получателя</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="64"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="receiverBankCorrAccount" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Кор. счет банка получателя</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="50"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="receiverBankName" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Банк получателя</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="355"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="receiverCurrCode" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Валюта платежа</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="3"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="receiverINN" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>ИНН получателя</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="15"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="receiverKPP" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>КПП получателя (103)</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="9"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="receiverName" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Название получателя</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="355"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="recieptDate" minOccurs="0" type="xs:dateTime">
+											<xs:annotation>
+												<xs:documentation>Дата поступления в банк плательщика</xs:documentation>
+											</xs:annotation>
+										</xs:element>
+										<xs:element name="sNumDoc" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Номер документа в СМФР</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="20"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="s_TI" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Переоценка, дооценка (при получении выписки по валютным счетам)</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="2"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="status" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Статус составителя документа (S_NS2)</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="2"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="sumRest" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Сумма остатка платежа (картотека)</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:decimal">
+													<xs:totalDigits value="18"/>
+													<xs:fractionDigits value="2"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="taxPeriod" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Показатель налогового периода NP10 (107)</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="10"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="uip" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Уникальный идентификатор платежа (УИП).</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="50"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="valueDate" minOccurs="0" type="xs:dateTime">
+											<xs:annotation>
+												<xs:documentation>Дата валютирования</xs:documentation>
+											</xs:annotation>
+										</xs:element>
+										<xs:element name="writeOffDate" minOccurs="0" type="xs:dateTime">
+											<xs:annotation>
+												<xs:documentation>Дата списания со счета плательщика</xs:documentation>
+											</xs:annotation>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

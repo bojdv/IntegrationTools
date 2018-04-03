@@ -9,7 +9,9 @@
     </div>
     <div class="col-md-3 placeholder" id="select_product">
       <%= simple_form_for :test_data, remote: 'true', url: egg_auto_tests_run_egg_path, html: {class: 'form-group' } do |f| %>
-        <%= f.input :egg_version, label: 'Выберите версию eGG:', selected: 'eGG 6.7', collection: ['eGG 6.7', 'eGG 6.8'], required: false %>
+        <div style="display: none;">
+          <%= f.input :egg_version, label: 'Выберите версию eGG:', selected: 'eGG 6.7', collection: ['eGG 6.7', 'eGG 6.8'], required: false %>
+        </div>
         <div id="egg_67">
           <%= f.input :functional_egg67, label: 'Выберите проверки', collection: @egg67_components, include_hidden: false, required: false, input_html: { multiple: true, style: "height:300px"} %>
         </div>

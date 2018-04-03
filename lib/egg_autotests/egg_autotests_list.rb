@@ -15,11 +15,6 @@ class EggAutotestsList
     @@egg_version = egg_version
   end
 
-  def testclass
-    a = IA_ActiveMQ.new
-    a.run_RequestMessage
-  end
-
   def runTest_egg(components)
 
     if components.include?('Проверка ИА Active MQ')

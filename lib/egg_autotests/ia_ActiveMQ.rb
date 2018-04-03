@@ -2,11 +2,7 @@ require "#{Rails.root}/lib/egg_autotests/egg_autotests_list.rb"
 
 class IA_ActiveMQ < EggAutotestsList
 
-  def asa
-    puts @@pass_menu_color
-  end
   def initialize
-
   end
 
   def run_RequestMessage

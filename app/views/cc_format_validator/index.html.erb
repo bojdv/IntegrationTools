@@ -1,0 +1,42 @@
+<% provide(:title, "Correqts Corporate XML Validator") %>
+<div class="col">
+  <div class="row">
+    <div class="col-md placeholder">
+      <div class="form-group">
+        <!--label for="xml_to_send" id="label_for_xml"><b>Лог:</b></label-->
+        <div style="height:600px;width:1500px;border:3px solid dodgerblue;font:14px/18px Calibri, Garamond, Serif;overflow:auto;">
+          <table class="table table-dark">
+            <thead>
+            <tr>
+              <th scope="col">Дата</th>
+              <th scope="col">ID процесса</th>
+              <th scope="col">Событие</th>
+              <th scope="col">Статус</th>
+              <th scope="col">Короткое сообщение</th>
+            </tr>
+            </thead>
+            <tbody>
+            <% @validator_log.each do |data| %>
+            <tr class="<%='table-danger' if data.status == 'FAIL'%>">
+              <td><%= data.created_at %></td>
+              <td><%= data.uuid %></td>
+              <td><%= data.events %></td>
+              <td><%= data.status %></td>
+              <td><%= data.short_message %></td>
+            </tr>
+            <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <a class="btn btn-primary form-group" id="tester" href="cc_format_validator/start" data-remote="true">Запустить</a>
+      <a class="btn btn-primary form-group" id="tester2" href="cc_format_validator/stop" data-remote="true">Остановить</a>
+      <a class="btn btn-primary form-group" id="tester3" href="cc_format_validator/clear_log" data-remote="true">Очистить лог</a>
+    </div>
+
+    <div class="col-md-1 placeholder" id="select_product">
+      <a class="btn btn-primary form-group" id="download-link" href="" style="display: none;" onclick="this.style.display = 'none';">Скачать лог</a>
+    </div>
+  </div>
+</div>
+<%= render 'layouts/modal_xml_sender' %>

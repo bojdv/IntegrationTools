@@ -1,9 +1,12 @@
+require 'zip'
 module EggAutoTestsHelper
 
   class Logger_egg
+
     def initialize
       @log_egg = Hash.new
       @log_dir = "#{Rails.root}/log/egg_log/#{Time.now.strftime('%Y-%m-%d(%H-%M-%S)')}"
+      Dir.mkdir @log_dir
     end
     attr_accessor :log_egg, :log_dir
 
@@ -24,14 +27,24 @@ module EggAutoTestsHelper
     end
 
     def make_log
-      Dir.mkdir @log_dir
       log_file_name = "log_egg_autotests_#{Time.now.strftime('%Y-%m-%d(%H-%M-%S)')}.html"
       template = File.read("#{Rails.root}/lib/egg_autotests/logs/log_template.html.erb")
       result = ERB.new(template).result(binding)
       File.open("#{@log_dir}/#{log_file_name}", 'w+') do |f|
         f.write result
       end
-      return log_file_name
+      folder_to_zip = "#{@log_dir}"
+      zipfile_name = "log_egg_autotests_#{Time.now.strftime('%Y-%m-%d(%H-%M-%S)')}.zip"
+      zipfile_path = "#{@log_dir}/#{zipfile_name}"
+      Zip::File.open(zipfile_path, Zip::File::CREATE) do |zipfile|
+        Dir.foreach(folder_to_zip) do |item|
+          item_path = "#{folder_to_zip}/#{item}"
+          zipfile.add( item,item_path) if File.file?item_path
+        end
+      end
+      FileUtils.rm Dir.glob("#{@log_dir}/*.log")
+      FileUtils.rm Dir.glob("#{@log_dir}/*.html")
+      return zipfile_name
     end
   end
 
@@ -62,15 +75,15 @@ module EggAutoTestsHelper
     begin
       endTime = Time.now
       puts_time_egg(startTime, endTime) if startTime
-    rescue Exception => msg
-      $log_egg.write_to_browser("Ошибка! #{msg}")
-      $log_egg.write_to_log("Завершение тестов", "Ошибка при завершении тестов:", "#{msg}")
-    ensure
-      #$log_egg.close if !$log_egg.nil?
-      log_file_name = $log_egg.make_log
       until $browser_egg[:message].empty? && $browser_egg[:event].empty?
         sleep 0.5
       end
+      log_file_name = $log_egg.make_log
+    rescue Exception => msg
+      puts msg.backtrace.join("\n")
+      $log_egg.write_to_browser("Ошибка! #{msg}")
+      $log_egg.write_to_log("Завершение тестов", "Ошибка при завершении тестов:", "#{msg.backtrace.join("\n")}")
+    ensure
       respond_to do |format|
         format.js { render :js => "kill_listener_egg(); download_link_egg('#{log_file_name}')" }
       end
@@ -130,7 +143,7 @@ module EggAutoTestsHelper
       $log_egg.write_to_log(functional, "Получили ответ", "Получили ответ от eGG из очереди #{manager.queue_in}:\n #{xml_actual.getText}")
       return xml_actual.getText
     rescue Exception => msg
-      $log_egg.write_to_browser("Ошибка! #{msg.message}\n#{msg.backtrace.join("\n")}")
+      $log_egg.write_to_browser("Ошибка! #{msg.message}")
       $log_egg.write_to_log(functional, "Случилось непредвиденное", "Ошибка! #{msg.message}\n#{msg.backtrace.join("\n")}")
       return nil
     ensure
@@ -477,7 +490,6 @@ module EggAutoTestsHelper
       end
       File.delete(@build_file_egg)
     rescue Exception => msg
-      puts msg
       $log_egg.write_to_browser("Ошибка! #{msg}")
       $log_egg.write_to_log("Установка/запуск eGG", "Ошибка при копировании инсталлятора", "Ошибка! #{msg}")
     end
@@ -493,7 +505,14 @@ module EggAutoTestsHelper
     end
   end
 
-  def copy_egg_log
-
+  def copy_egg_files
+    begin
+      FileUtils.cp_r("#{tests_params_egg[:egg_dir]}/apache-servicemix-6.1.2/data/log/.", $log_egg.log_dir) # копируем лог сервисмикса
+      FileUtils.cp_r Dir.glob("#{tests_params_egg[:egg_dir]}/*.txt"), $log_egg.log_dir # копируем лог инсталлятора
+      $log_egg.write_to_log("Завершение тестов", "Копирование логов eGG", "Done!")
+    rescue Exception => msg
+      $log_egg.write_to_browser("Ошибка! #{msg}")
+      $log_egg.write_to_log("Завершение тестов", "Ошибка при копировании логов", "Ошибка! #{msg}\n#{msg.backtrace.join("\n")}")
+    end
   end
 end

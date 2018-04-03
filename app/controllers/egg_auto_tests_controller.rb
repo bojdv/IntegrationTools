@@ -36,11 +36,10 @@ class EggAutoTestsController < ApplicationController
     response_ajax_auto_egg("Не выбран функционал для проверки") and return if tests_params_egg[:egg_version] == 'eGG 6.7' and tests_params_egg[:functional_egg67].nil?
     response_ajax_auto_egg("Не выбран функционал для проверки") and return if tests_params_egg[:egg_version] == 'eGG 6.8' and tests_params_egg[:functional_egg68].nil?
     begin
+      @egg_v = tests_params_egg[:build_version]
       @build_file_egg = "#{Rails.root}/egg-#{tests_params_egg[:build_version]}-installer-windows.exe"
       @installer_path_egg = "C:/EGG_Installer/egg-#{tests_params_egg[:build_version]}-installer-windows.exe"
       Dir.chdir "#{Rails.root}"
-      log_file_name = "log_egg_autotests_#{Time.now.strftime('%Y-%m-%d(%H-%M-%S)')}.txt"
-      #$log_egg = Logger.new(File.open("log\\#{log_file_name}", 'w'))
       $log_egg = Logger_egg.new
       startTime = Time.now
       if !tests_params_egg[:build_version].empty?
@@ -84,17 +83,23 @@ class EggAutoTestsController < ApplicationController
     rescue Exception => msg
       puts "Ошибка! #{msg}"
     ensure
-      if File.directory?('C:/EGG') && tests_params_egg[:dont_drop_db] == 'false' # Удаляем каталог eGG
-        FileUtils.rm_r "C:/EGG/."
-        $log_egg.write_to_browser("Удалили каталог с eGG")
-        $log_egg.write_to_log("Завершение тестов", "Удалили каталог с eGG", "Done!")
+      begin
+        if File.directory?(tests_params_egg[:egg_dir]) # Копируем логи из каталога ЕГГ
+          copy_egg_files
+        end
+        if File.directory?(tests_params_egg[:egg_dir]) && tests_params_egg[:dont_drop_db] == 'false' # Удаляем каталог eGG
+          FileUtils.rm_r "#{tests_params_egg[:egg_dir]}/."
+          $log_egg.write_to_browser("Удалили каталог с eGG")
+          $log_egg.write_to_log("Завершение тестов", "Удалили каталог с eGG", "Done!")
+        end
+        if File.exist?(@installer_path_egg) # Удаляем инсталлятор
+          File.delete(@installer_path_egg)
+          $log_egg.write_to_browser("Удалили инсталлятор")
+          $log_egg.write_to_log("Завершение тестов", "Удалили инсталлятор", "Done!")
+        end
+      ensure
+        end_test_egg(startTime)
       end
-      if File.exist?(@installer_path_egg) # Удаляем инсталлятор
-        File.delete(@installer_path_egg)
-        $log_egg.write_to_browser("Удалили инсталлятор")
-        $log_egg.write_to_log("Завершение тестов", "Удалили инсталлятор", "Done!")
-      end
-      end_test_egg(startTime)
     end
   end
 

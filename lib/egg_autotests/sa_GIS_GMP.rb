@@ -88,7 +88,7 @@ class SA_GIS_GMP
         answer = send_to_amq_and_receive_egg(@manager, xml, functional)
         next count +=1  if answer.nil?
         $log_egg.write_to_browser("Валидируем ответную XML...")
-        $log_egg.write_to_log(functional, "Валидируем ответную XML", "Валидируем ответную XML:\n#{answer}\nПо XSD:\n #{xsd}")
+        $log_egg.write_to_log(functional, "Валидируем ответную XML", "Валидируем ответную XML:\nПо XSD:\n #{xsd}")
         validate_egg_xml(xsd, answer, functional)
         answer_decode = get_decode_answer(answer)
         $log_egg.write_to_browser("Раскодировали ответ!")

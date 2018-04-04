@@ -97,14 +97,14 @@ module EggAutoTestsHelper
     puts 'Sending message to AMQ (OpenWire)'
     begin
       factory = ActiveMQConnectionFactory.new
+      xml.class == String  ? xml = xml : xml = xml.xml_text
       $log_egg.write_to_browser("Отправляем XML")
-      $log_egg.write_to_log(functional, "Отправка исходящей XML", "Отправляем XML #{xml.xml_name} по адресу: Хост:#{manager.host}, Порт:#{manager.port}, Логин:#{manager.user}, Пароль:#{manager.password}, Очередь:#{manager.queue_out}")
+      $log_egg.write_to_log(functional, "Отправка исходящей XML", "Отправляем XML по адресу: Хост:#{manager.host}, Порт:#{manager.port}, Логин:#{manager.user}, Пароль:#{manager.password}, Очередь:#{manager.queue_out}")
       factory.setBrokerURL("tcp://#{manager.host}:#{manager.port}")
       manager.user.nil? ? user ='' : user=manager.user
       manager.password.nil? ? password ='' : password=manager.user
       connection = factory.createQueueConnection(user, password)
       session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-      xml.class == String  ? xml = xml : xml = xml.xml_text
       textMessage = session.createTextMessage(xml)
       textMessage.setJMSCorrelationID(SecureRandom.uuid)
       sender = session.createSender(session.createQueue(manager.queue_out))
@@ -115,7 +115,8 @@ module EggAutoTestsHelper
       $log_egg.write_to_browser("Отправили сообщение в eGG")
       $log_egg.write_to_log(functional, "Отправили сообщение в eGG", "#{textMessage.getText}")
       receiver = session.createReceiver(session.createQueue(manager.queue_in))
-      count = 40
+      count = 60
+      $log_egg.write_to_browser("Ждем ответ в течении #{count} секунд")
       xml_actual = receiver.receive(1000)
       while xml_actual.nil?
         xml_actual = receiver.receive(1000)
@@ -358,6 +359,7 @@ module EggAutoTestsHelper
     $log_egg.write_to_log("Завершение тестов", "Результат остановки Servicemix", "Done! Остановили Servicemix...")
     $log_egg.write_to_browser("Done! Остановили Servicemix...")
   end
+
   def ping_server_egg(host)
     begin
       uri = URI.parse(host)
@@ -380,8 +382,6 @@ module EggAutoTestsHelper
     answer = request.elements['//mq:Request'].text
     answer_decode = Base64.decode64(answer)
     answer_decode = answer_decode.force_encoding("utf-8")
-    #$log_egg.write_to_browser("Раскодированный тег Request:\n#{answer_decode}", "Раскодировали запрос!")
-    $log_egg.write_to_browser("Раскодировали запрос!")
     return answer_decode
   end
   def get_encode_request(xml)
@@ -416,7 +416,7 @@ module EggAutoTestsHelper
     end
   end
 
-  def ufebs_file_count(packetepd = false, gis_type = 'gis_gmp')
+  def ufebs_file_count(functional, packetepd = false, gis_type = 'gis_gmp')
     if gis_type == 'gis_gmp'
       dir = 'C:/data/inbox/1/inbound/all'
     else
@@ -427,9 +427,9 @@ module EggAutoTestsHelper
     fail_code = 'ADP0001'
     adps000_count = 0
     adps001_count = 0
-    count = 50
+    count = 60
+    $log_egg.write_to_browser("Ждем ответ в течении #{count} секунд")
     packetepd ? positive_code = 3 : positive_code = 1
-    $log_egg.write_to_browser("packetepd: #{positive_code}")
     until adps001_count == positive_code or count < 0
       if File.directory?(dir)
         Dir.entries(dir).each_entry do |entry|
@@ -443,10 +443,15 @@ module EggAutoTestsHelper
     end
     adps001_count = 0
     if File.directory?(dir)
-      #$log_egg.write_to_browser("Получили ответ из каталога #{dir}", "Получили ответ из каталога #{dir}")
       $log_egg.write_to_browser("Получили ответ из каталога #{dir}")
+      $log_egg.write_to_log(functional, "Получение ответа", "Получили ответ из каталога #{dir}")
       Dir.entries(dir).each_entry do |entry|
-        $log_egg.write_to_browser("Файлы в каталоге: #{entry}")
+        file_path = "#{dir}/#{entry}"
+        if File.file?(file_path)
+          input_xml = File.open(file_path, 'r'){ |file| file.read }
+          $log_egg.write_to_browser("Файлы в каталоге: #{entry}")
+          $log_egg.write_to_log(functional, "Файлы в каталоге: #{entry}", "#{input_xml}")
+        end
         if entry.include?(code_adps000)
           adps000_count += 1
         elsif entry.include?(code_adps001)
@@ -455,8 +460,8 @@ module EggAutoTestsHelper
           filepath = "#{dir}/#{entry}"
           $log_egg.write_to_browser("Путь файла: #{filepath}")
           file = File.open(filepath, 'r'){ |file| file.read }
-          #$log_egg.write_to_browser("Получили неожиданный статус \n#{file}", "Получили неожиданный статус #{entry}")
           $log_egg.write_to_browser("Получили неожиданный статус #{entry}")
+          $log_egg.write_to_log(functional, "Получили неожиданный статус \n#{entry}", "Получили неожиданный статус #{entry}\nПуть файла: #{filepath}\n#{file}")
         end
       end
     end

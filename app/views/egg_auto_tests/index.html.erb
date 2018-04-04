@@ -18,15 +18,33 @@
         <div id="egg_68" style="display:none">
           <%= f.input :functional_egg68, label: 'Выберите проверки', collection: @egg68_components, include_hidden: false, required: false, input_html: { multiple: true, style: "height:300px"} %>
         </div>
-        <%= f.input :build_version, label: 'Выберите сборку:', collection: @dir, required: false %>
-        <%= f.input :egg_dir, label: 'Каталог eGG:', required: false, input_html: {value: 'C:\\EGG'} %>
+        <div class="col">
+          <ul class="nav nav-tabs" id="mqTab" role="tablist">
+            <li class="nav-item">
+              <a class="nav-link active" id="output-tab" data-toggle="tab" href="#output" role="tab" aria-controls="output" aria-selected="true">Запуск</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="input-tab" data-toggle="tab" href="#input" role="tab" aria-controls="input" aria-selected="false">Настройки</a>
+            </li>
+          </ul>
+          <!-- Первая вкладка -->
+          <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" id="output" role="tabpanel" aria-labelledby="output-tab">
+              <%= f.input :build_version, label: 'Выберите сборку:', collection: @dir, required: false %>
+              <%= f.button :submit, 'Запустить', id: 'run-button', class: 'btn-primary', onclick: "clear_log_egg(); document.getElementById('download-link').style.display = 'none';"%>
+              <a class="btn btn-primary form-group" id="download-link" href="" style="display: none;" onclick="this.style.display = 'none';">Скачать лог</a>
+              <!--<a class="btn btn-primary form-group" id="tester" href="egg_auto_tests/tester" data-remote="true">Click</a>-->
+            </div>
+            <!-- Вторая вкладка -->
+            <div class="tab-pane fade" id="input" role="tabpanel" aria-labelledby="input-tab">
+              <%= f.input :egg_dir, label: 'Каталог eGG:', required: false, input_html: {value: 'C:\\EGG'} %>
+              <%= f.input :try_count, label: 'Кол-во попыток отправки в СМЭВ:', required: false, input_html: {value: '3'} %>
+              <%= f.input :dont_drop_db, as: :boolean, :label => 'Не удалять БД и eGG после теста', checked_value: true, unchecked_value: false, input_html: {checked: false} %>
+              <%= f.input :dont_stop_egg, as: :boolean, :label => 'Не останавливать eGG после теста', checked_value: true, unchecked_value: false, input_html: {checked: false} %>
+            </div>
+          </div>
         <!--%= f.input :dont_clear_db, as: :boolean, :label => 'Не очищать БД после теста', checked_value: true, unchecked_value: false, input_html: {checked: false} %-->
-        <%= f.input :dont_drop_db, as: :boolean, :label => 'Не удалять БД и eGG после теста', checked_value: true, unchecked_value: false, input_html: {checked: false} %>
-        <%= f.input :dont_stop_egg, as: :boolean, :label => 'Не останавливать eGG после теста', checked_value: true, unchecked_value: false, input_html: {checked: false} %>
-        <%= f.button :submit, 'Запустить', id: 'run-button', class: 'btn-primary', onclick: "clear_log_egg(); document.getElementById('download-link').style.display = 'none';"%>
       <%end%>
-      <a class="btn btn-primary form-group" id="download-link" href="" style="display: none;" onclick="this.style.display = 'none';">Скачать лог</a>
-      <!--a class="btn btn-primary form-group" id="tester" href="egg_auto_tests/tester" data-remote="true">Click</a-->
     </div>
   </div>
 </div>

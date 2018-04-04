@@ -1,5 +1,3 @@
-#require "#{Rails.root}/lib/egg_autotests/egg_autotests_list.rb"
-
 class IA_ActiveMQ
 
   def initialize(pass_menu_color, fail_menu_color, not_find_xml, not_receive_answer, egg_version, try_count)

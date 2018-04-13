@@ -371,7 +371,14 @@ module TirAutoTestsHelper
       url = "jdbc:oracle:thin:@vm-corint:1521:corint"
       connection = java.sql.DriverManager.getConnection(url, "sys as sysdba", "waaaaa");
       stmt = connection.create_statement
-      stmt.executeUpdate("drop user tir_autotest cascade")
+      stmt.executeUpdate(%Q{BEGIN
+  EXECUTE IMMEDIATE 'DROP USER tir_autotest cascade';
+EXCEPTION
+  WHEN OTHERS THEN
+    IF SQLCODE != -1918 THEN
+      RAISE;
+    END IF;
+END;})
     rescue Exception => msg
       send_to_log("Ошибка! #{msg}", "Ошибка! #{msg}")
       return true

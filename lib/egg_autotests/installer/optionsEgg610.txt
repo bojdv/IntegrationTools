@@ -16,7 +16,7 @@ unattendedmodeui=minimalWithDialogs
 installdir=C:\EGG
 
 # устанавливаемые компоненты перечисляются через запятую
-enable-components=egg,DBcreate,ServiceMix,iaAmqComponent,saSpepComponent,saGmpComponent,iaFileGmpComponent,saZkhComponent,iaFileZkhComponent
+enable-components=egg,DBcreate,ServiceMix,iaAmqComponent,saSpepComponent,saGmpComponent,iaFileGmpComponent,saZkhComponent,iaFileZkhComponent, saZkhPayeesComponent, iaFileMqGmpComponent, iaFileMqZkhComponent
 # компоненты, установка которых не требуется, перечисляются через запятую
 disable-components=crypto,CryptoService,saEsiaComponent,saReestrFsspComponent,saUpridComponent
 
@@ -43,8 +43,8 @@ dbType=oracle
 dbHost1=vm-corint
 dbPort1=1521
 dbSID1=corint
-dbLogin1=egg_autotest
-dbPassword1=egg_autotest
+dbLogin1=egg_autotest2
+dbPassword1=egg_autotest2
 
 # настройки автоматического создания пользователя oracle
 oracledbaLogin=sys as sysdba
@@ -99,7 +99,7 @@ fk_use_proxy=false
 ufebs_file_folder=C:\data\inbox\1
 ufebs_file_systemID=Egg
 ufebs_file_systemCode=Egg
-ufebs_file_FormatVersion=2018.2.3
+ufebs_file_FormatVersion=2018.3.0
 ufebs_file_bankName=Банк
 ufebs_file_PaymentVersion=1.16.5
 ufebs_file_ignoreADP0120=false
@@ -138,7 +138,7 @@ fileErrorDir=C:\tmp\files\error
 zkh_file_folder=C:\data\inbox\GIS_ZKH
 zkh_file_systemID=Egg
 zkh_file_GisZkhVersion=8.7.2.2
-zkh_file_FormatVersion=2018.2.3
+zkh_file_FormatVersion=2018.3.0
 zkh_file_bankName=Наименование КО
 bankINN=1234567890
 bankKPP=123456789
@@ -154,6 +154,57 @@ zkh_file_proxy_host=127.0.0.1
 zkh_file_proxy_port=8080
 zkh_file_use_proxy=false
 zkh_file_ignoreTicket1004=false
-zkh_file_payees_request_schedule=0 0 0 * * ? *
+zkh_file_payees_request_schedule=0 0/3 * 1/1 * ? *
 zkh_file_zkh_loader_consumers=5
-zkh_file_is_payees_request=false
+zkh_file_is_payees_request=true
+
+# saZkhPayeesComponent - Импорт справочника поставщиков
+zkhPayees_zkhPayeesService=http://smev-mvf.test.gosuslugi.ru:7777/gateway/services/SID0004768/1.00
+zkhPayees_CryptoService=http://vm-eggcryptdev:9090/axis2/services/CryptoService
+zkhPayees_zkh_payees_sadp_consumers=5
+zkhPayees_zkh_payees_sgd_consumers=5
+zkhPayees_zkh_payees_result_sgd_consumers=5
+zkhPayees_ValidateInputDocumentSA=true
+zkhPayees_isCryptoLog=true
+zkhPayees_eGGsmevCode=RCPT00001
+zkhPayees_eGGsmevName=Получатель
+zkhPayees_OIVsmevCode=MNSV10000
+zkhPayees_OIVsmevName=Государственная информационная система жилищно-коммунального хозяйства
+zkhPayees_smevExchangeType=2
+zkhPayees_smevTypeCode=GFNC
+zkhPayees_smevServiceName=Service
+zkhPayees_smevCaseNumber=Test
+zkhPayees_isTest=true
+zkhPayees_http_client=http4
+zkhPayees_proxy_host=127.0.0.1
+zkhPayees_proxy_port=8080
+zkhPayees_use_proxy=false
+zkhPayees_timeout=60000
+zkhPayees_NumberOfAttempts=3
+zkhPayees_DeliverySchedule=1
+
+# iaFileMqGmpComponent - JPMorgan ГИС ГМП
+file_mq_gmp_testMode=true
+file_mq_gmp_inbox=C:\data\INAD_GISGMP\inbox
+file_mq_gmp_outbox=C:\data\INAD_GISGMP\outbox
+file_mq_gmp_backupbox=C:\data\INAD_GISGMP
+file_mq_gmp_errorbox=C:\data\INAD_GISGMP\error
+file_mq_gmp_systemID=Egg
+file_mq_gmp_serviceID=GIS_GMP_1.16_Payment
+file_mq_gmp_charset=Cp1251
+file_mq_gmp_queue=gisgmp-file-iadp
+file_mq_gmp_consumers=5
+
+#iaFileMqZkhComponent - JPMorgan ГИС ЖКХ
+file_mq_zkh_testMode=true
+file_mq_zkh_inbox=C:\data\INAD_GISZHKH\inbox
+file_mq_zkh_outbox=C:\data\INAD_GISZHKH\outbox
+file_mq_zkh_backupbox=C:\data\INAD_GISZHKH
+file_mq_zkh_errorbox=C:\data\INAD_GISZHKH\error
+file_mq_zkh_systemID=Egg
+file_mq_zkh_serviceID=GIS_ZKH_Payment
+file_mq_zkh_charset=Cp1251
+file_mq_zkh_consumers=5
+file_mq_zkh_ValidateInputEgg=true
+file_mq_zkh_adapterCode=egg-zkhfileMq-adapter
+file_mq_zkh_brokerURL=failover:tcp://127.0.0.1:61616

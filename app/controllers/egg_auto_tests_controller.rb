@@ -11,11 +11,14 @@ class EggAutoTestsController < ApplicationController
     $browser_egg = Hash.new
     $browser_egg[:event] = ''
     $browser_egg[:message] = ''
-    @egg67_components= ['Проверка ИА Active MQ',
-                        'Проверка ИА УФЭБС (ГИС ГМП)',
-                        'Проверка ИА УФЭБС (ГИС ЖКХ)',
-                        'Проверка СА ГИС ГМП',
-                        'Проверка СА ГИС ЖКХ']
+    @egg67_components= ['ИА Active MQ',
+                        'ИА УФЭБС (ГИС ГМП)',
+                        'ИА УФЭБС (ГИС ЖКХ)',
+                        'ИА JPMorgan (ГИС ГМП)',
+                        'ИА JPMorgan (ГИС ЖКХ)',
+                        'ИА ZKH-Loader/СА ZkhPayees',
+                        'СА ГИС ГМП',
+                        'СА ГИС ЖКХ']
     @egg68_components = Array.new(@egg67_components)
     @egg68_components.push('ЕСИА')
     regex = /\A[6]{,1}[.](9|10|11){,2}[.][\d]{,3}\Z/
@@ -34,26 +37,28 @@ class EggAutoTestsController < ApplicationController
     $browser_egg[:event] = ''
     $browser_egg[:message] = ''
     response_ajax_auto_egg("Не выбран функционал для проверки") and return if tests_params_egg[:egg_version] == 'eGG 6.7' and tests_params_egg[:functional_egg67].nil?
-    response_ajax_auto_egg("Не выбран функционал для проверки") and return if tests_params_egg[:egg_version] == 'eGG 6.8' and tests_params_egg[:functional_egg68].nil?
+    response_ajax_auto_egg("Не выбрана сборка") and return if tests_params_egg[:build_version].empty?
     begin
+      @db_username = 'egg_autotest2'
       @build_file_egg = "#{Rails.root}/egg-#{tests_params_egg[:build_version]}-installer-windows.exe"
       @installer_path_egg = "C:/EGG_Installer/egg-#{tests_params_egg[:build_version]}-installer-windows.exe"
       Dir.chdir "#{Rails.root}"
       $log_egg = Logger_egg.new
       startTime = Time.now
-      if !tests_params_egg[:build_version].empty?
+      delete_db_egg("Установка/запуск eGG") if tests_params_egg[:drop_db] == 'true'
+      if tests_params_egg[:dont_install_egg] == 'false'
         download_installer_egg
         copy_installer_egg
         $log_egg.write_to_browser("Устанавливаем EGG #{tests_params_egg[:build_version]}...")
         $log_egg.write_to_log("Установка/запуск eGG", "Устанавливаем EGG #{tests_params_egg[:build_version]}...", "Запустили задачу в #{Time.now.strftime('%H-%M-%S')}")
-        system("#{@installer_path_egg} --optionfile #{Rails.root}/lib/egg_autotests/installer/optionsEgg67.txt")
+        system("#{@installer_path_egg} --optionfile #{Rails.root}/lib/egg_autotests/installer/#{get_installer_config}")
       end
       return if dir_empty_egg?(tests_params_egg[:egg_dir])
       $log_egg.write_to_browser("#{puts_line_egg}")
       sleep 1
       start_servicemix_egg(tests_params_egg[:egg_dir])
       count = 400
-      until egg_run?
+      until egg_log_include?(tests_params_egg[:egg_dir],'Successfully')
         count -=1
         puts "Wait egg starting..#{count}"
         return if count == 0
@@ -66,12 +71,12 @@ class EggAutoTestsController < ApplicationController
       if tests_params_egg[:egg_version] == 'eGG 6.7'
         $log_egg.write_to_browser("Запустили тесты eGG #{tests_params_egg[:build_version]}")
         $log_egg.write_to_log("Установка/запуск eGG", "Запустили тесты eGG #{tests_params_egg[:build_version]}", "Done!")
-        testlist = EggAutotestsList.new(tests_params_egg[:egg_version], tests_params_egg[:try_count])
+        testlist = EggAutotestsList.new(tests_params_egg[:egg_version], tests_params_egg[:try_count], tests_params_egg[:egg_dir], @db_username, tests_params_egg[:build_version])
         testlist.runTest_egg(tests_params_egg[:functional_egg67])
       elsif tests_params_egg[:egg_version] == 'eGG 6.8'
         $log_egg.write_to_browser("Запустили тесты eGG #{tests_params_egg[:build_version]}")
         $log_egg.write_to_log("Установка/запуск eGG", "Запустили тесты eGG #{tests_params_egg[:build_version]}", "Done!")
-        testlist = EggAutotestsList.new(tests_params_egg[:egg_version], tests_params_egg[:try_count])
+        testlist = EggAutotestsList.new(tests_params_egg[:egg_version], tests_params_egg[:try_count], tests_params_egg[:egg_dir], @db_username, tests_params_egg[:build_version])
         testlist.runTest_egg(tests_params_egg[:functional_egg68])
       end
       $log_egg.write_to_browser("#{puts_line_egg}")
@@ -82,7 +87,7 @@ class EggAutoTestsController < ApplicationController
       begin
         begin
           stop_servicemix_egg(tests_params_egg[:egg_dir]) if tests_params_egg[:dont_stop_egg] == 'false'
-          delete_db_egg if tests_params_egg[:dont_drop_db] == 'false'
+          delete_db_egg("Завершение тестов") if tests_params_egg[:dont_drop_db] == 'false'
         ensure
           $log_egg.write_to_browser("#{puts_line_egg}")
           if File.directory?(tests_params_egg[:egg_dir]) # Копируем логи из каталога ЕГГ
@@ -123,16 +128,19 @@ class EggAutoTestsController < ApplicationController
     send_file "#{$log_egg.log_dir}/#{params[:filename]}"
   end
   def tester
-    count = tests_params_egg[:try_count]
-    until count > 3
-      count +=1
-      puts count
-      next count +=1 if count < 10
-    end
+    category = Category.find_by_category_name('ИА УФЭБС ГИС ГМП')
+    xml = Xml.where(xml_name: 'ed101', category_id: category.id).first
+    xsd = "C:/Users/Pekav/RubymineProjects/IntegrationTools/lib/egg_autotests/xsd/ufebs_file/2018.3.0/cbr_ed101_v2018.3.0.xsd"
+    Dir.chdir File.expand_path File.dirname(xsd)
+    xsd = Nokogiri::XML::Schema(File.read(xsd))
+    xml2 = Nokogiri::XML(xml.xml_text)
+    result = xsd.validate(xml2)
+    puts result
+
   end
 end
 
 private
 def tests_params_egg
-  params.require(:test_data).permit(:egg_version, :egg_dir, :dont_drop_db, :dont_stop_egg, :build_version, :try_count, :functional_egg67 => [], :functional_egg68 => [])
+  params.require(:test_data).permit(:egg_version, :egg_dir, :dont_drop_db, :dont_stop_egg, :build_version, :try_count, :drop_db, :dont_install_egg, :functional_egg67 => [], :functional_egg68 => [])
 end

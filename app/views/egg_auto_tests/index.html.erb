@@ -33,14 +33,16 @@
               <%= f.input :build_version, label: 'Выберите сборку:', collection: @dir, required: false %>
               <%= f.button :submit, 'Запустить', id: 'run-button', class: 'btn-primary', onclick: "clear_log_egg(); document.getElementById('download-link').style.display = 'none';"%>
               <a class="btn btn-primary form-group" id="download-link" href="" style="display: none;" onclick="this.style.display = 'none';">Скачать лог</a>
-              <!--<a class="btn btn-primary form-group" id="tester" href="egg_auto_tests/tester" data-remote="true">Click</a>-->
+              <a class="btn btn-primary form-group" id="tester" href="egg_auto_tests/tester" data-remote="true">Click</a>
             </div>
             <!-- Вторая вкладка -->
             <div class="tab-pane fade" id="input" role="tabpanel" aria-labelledby="input-tab">
               <%= f.input :egg_dir, label: 'Каталог eGG:', required: false, input_html: {value: 'C:\\EGG'} %>
               <%= f.input :try_count, label: 'Кол-во попыток отправки в СМЭВ:', required: false, input_html: {value: '3'} %>
+              <%= f.input :drop_db, as: :boolean, :label => 'Удалять БД перед тестом', checked_value: true, unchecked_value: false, input_html: {checked: true} %>
               <%= f.input :dont_drop_db, as: :boolean, :label => 'Не удалять БД и eGG после теста', checked_value: true, unchecked_value: false, input_html: {checked: false} %>
               <%= f.input :dont_stop_egg, as: :boolean, :label => 'Не останавливать eGG после теста', checked_value: true, unchecked_value: false, input_html: {checked: false} %>
+              <%= f.input :dont_install_egg, as: :boolean, :label => 'Не устанавливать eGG', checked_value: true, unchecked_value: false, input_html: {checked: false} %>
             </div>
           </div>
         <!--%= f.input :dont_clear_db, as: :boolean, :label => 'Не очищать БД после теста', checked_value: true, unchecked_value: false, input_html: {checked: false} %-->

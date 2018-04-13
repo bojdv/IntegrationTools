@@ -4,12 +4,12 @@
 
 ППС
 
-Схемы с описанием прикладных частей электроных сообщений, используемых в расчетной сети Банка России.
+Схемы с описанием прикладных частей электронных сообщений, используемых в расчетной сети Банка России.
 
 -->
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ed="urn:cbr-ru:ed:v2.0" xmlns:lt="urn:cbr-ru:ed:leaftypes:v2.0" targetNamespace="urn:cbr-ru:ed:v2.0" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2018.1.1">
-	<xs:include schemaLocation="cbr_ed_objects_v2018.1.1.xsd"/>
-	<xs:import namespace="urn:cbr-ru:ed:leaftypes:v2.0" schemaLocation="cbr_ed_leaftypes_v2018.1.1.xsd"/>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ed="urn:cbr-ru:ed:v2.0" xmlns:lt="urn:cbr-ru:ed:leaftypes:v2.0" targetNamespace="urn:cbr-ru:ed:v2.0" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2018.3.0">
+	<xs:include schemaLocation="cbr_ed_objects_v2018.3.0.xsd"/>
+	<xs:import namespace="urn:cbr-ru:ed:leaftypes:v2.0" schemaLocation="cbr_ed_leaftypes_v2018.3.0.xsd"/>
 	<xs:annotation>
 		<xs:documentation>Прикладные части ЭС</xs:documentation>
 	</xs:annotation>
@@ -89,15 +89,10 @@
 						<xs:documentation>Payer's Account Debit Date (Field 71).</xs:documentation>
 					</xs:annotation>
 				</xs:attribute>
-				<xs:attribute name="SystemCode" type="lt:TwoDigitCodeType">
+				<xs:attribute name="SystemCode" type="lt:SystemCodeType" use="required">
 					<xs:annotation>
 						<xs:documentation>Признак системы обработки.</xs:documentation>
 						<xs:documentation>Fund transfer service (urgent/non-urgent).</xs:documentation>
-					</xs:annotation>
-				</xs:attribute>
-				<xs:attribute name="SessionID" type="lt:SessionIDType">
-					<xs:annotation>
-						<xs:documentation>Номер рейса (сеанса)</xs:documentation>
 					</xs:annotation>
 				</xs:attribute>
 				<xs:attribute name="PaymentID" type="lt:PaymentIDType">

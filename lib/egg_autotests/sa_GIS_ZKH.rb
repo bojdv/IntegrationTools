@@ -8,7 +8,7 @@ class SA_GIS_ZKH
     @egg_version = egg_version
     @try_count = try_count
 
-    @menu_name = 'Проверка СА ГИС ЖКХ'
+    @menu_name = 'СА ГИС ЖКХ'
     @category = Category.find_by_category_name('СА ГИС ЖКХ')
     @manager = QueueManager.find_by_manager_name('iTools[EGG]')
     @result = Hash.new
@@ -19,6 +19,7 @@ class SA_GIS_ZKH
     begin
       count = 1
       until @result["paymentRequest_test"] == "true" or count > @try_count
+        insert_inn
         sleep 2
         xml_name = 'Payment_request'
         functional = "#{@functional}. #{xml_name}. Попытка #{count}"
@@ -75,6 +76,7 @@ class SA_GIS_ZKH
     begin
       count = 1
       until @result["paymentCancellation_test"] == "true" or count > @try_count
+        insert_inn
         sleep 2
         xml_name = 'Payment_Cancellation_request'
         functional = "#{@functional}. #{xml_name}. Попытка #{count}"
@@ -127,6 +129,7 @@ class SA_GIS_ZKH
     begin
       count = 1
       until @result["paymentDetails_test"] == "true" or count > @try_count
+        insert_inn
         sleep 2
         xml_name = 'Payment_Details_request'
         functional = "#{@functional}. #{xml_name}. Попытка #{count}"

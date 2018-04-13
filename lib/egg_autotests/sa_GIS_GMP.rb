@@ -10,7 +10,7 @@ class SA_GIS_GMP
     @egg_version = egg_version
     @try_count = try_count
 
-    @menu_name = 'Проверка СА ГИС ГМП'
+    @menu_name = 'СА ГИС ГМП'
     @category = Category.find_by_category_name('СА ГИС ГМП')
     @manager = QueueManager.find_by_manager_name('iTools[EGG]')
     @result = Hash.new

@@ -1,34 +1,35 @@
 require 'zip'
 module EggAutoTestsHelper
 
-  class Logger_egg
+  class Logger_egg # Класс логирования в браузер и БД
 
     def initialize
-      @log_egg = Hash.new
-      @log_dir = "#{Rails.root}/log/egg_log/#{Time.now.strftime('%Y-%m-%d(%H-%M-%S)')}"
-      Dir.mkdir @log_dir
+      @log_egg = Hash.new # Переменная класса, пустой хэш. В него пишется весь лог.
+      @log_dir = "#{Rails.root}/log/egg_log/#{Time.now.strftime('%Y-%m-%d(%H-%M-%S)')}" # Переменная с именем каталога для логов, имя генерится с текущим временем.
+      Dir.mkdir @log_dir # Создаем каталог для логов
     end
-    attr_accessor :log_egg, :log_dir
+    attr_accessor :log_egg, :log_dir # Создаются методы для доступа к переменным класса на чтение и запись.
 
-    def write_to_log(component, action, result = '')
-      if @log_egg.has_key?(component)
-        @log_egg[component][action] = result
-      else
-        @log_egg[component] = {action => result}
+    def write_to_log(functional, action, result = '') # Метод для записи в лог html.
+      # Параметры: functional - Корневое имя теста, action - действие (левая колонка в логе), result - результат (правая колонка в логе), его можно не указывать при вызове.
+      if @log_egg.has_key?(functional) # Если хэш уже содержит ключ с именем такого теста, то делаем из этого ключа хэш с ключом action и значением result
+        @log_egg[functional][action] = result # Таким образом мы формируем единую таблицу с одним заголовком functional для каждого теста
+      else # Если ключ новый, то просто создаем новый хэш
+        @log_egg[functional] = {action => result}
       end
     end
 
-    def write_to_browser(text)
-      if text.include?('--')
+    def write_to_browser(text) # Метод для записи текста в лог браузера. text - текст сообщения
+      if text.include?('--') # Если в тексте есть тире, то вставляем в лог разделитель. это сделано, если вызов идет из метода puts_line_egg
         $browser_egg[:message] += "#{text}\n"
       else
-        $browser_egg[:message] += "[#{Time.now.strftime('%H:%M:%S')}]: #{text}\n"
+        $browser_egg[:message] += "[#{Time.now.strftime('%H:%M:%S')}]: #{text}\n" # Вставляем временную метку перед текстом и сам текст
       end
     end
 
-    def make_log
-      log_file_name = "log_egg_autotests_#{Time.now.strftime('%Y-%m-%d(%H-%M-%S)')}.html"
-      template = File.read("#{Rails.root}/lib/egg_autotests/logs/log_template.html.erb")
+    def make_log # Метод формирующий  файл лога
+      log_file_name = "log_egg_autotests_#{Time.now.strftime('%Y-%m-%d(%H-%M-%S)')}.html" # формируем имя файла
+      template = File.read("#{Rails.root}/lib/egg_autotests/logs/log_template.html.erb") # читаем шаблон для лога
       result = ERB.new(template).result(binding)
       File.open("#{@log_dir}/#{log_file_name}", 'w+') do |f|
         f.write result
@@ -44,26 +45,11 @@ module EggAutoTestsHelper
       end
       FileUtils.rm Dir.glob("#{@log_dir}/*.log")
       FileUtils.rm Dir.glob("#{@log_dir}/*.html")
+      FileUtils.rm Dir.glob("#{@log_dir}/*.txt")
+      FileUtils.rm Dir.glob("#{@log_dir}/*.1")
       return zipfile_name
     end
   end
-
-  # def $log_egg.write_to_browser(to_browser)
-  #   # if to_browser
-  #     if to_browser.include?('--')
-  #       $browser_egg[:message] += "#{to_browser}\n"
-  #     else
-  #       $browser_egg[:message] += "[#{Time.now.strftime('%H:%M:%S')}]: #{to_browser}\n"
-  #     end
-  #   # end
-  #   # if to_log
-  #   #   if to_log.include?('Ошибка')
-  #   #     $log_egg.error(to_log)
-  #   #   else
-  #   #     $log_egg.info(to_log)
-  #   #   end
-  #   # end
-  # end
 
   def response_ajax_auto_egg(text, time = 3000)
     respond_to do |format|
@@ -90,7 +76,9 @@ module EggAutoTestsHelper
     end
   end
 
-  def send_to_amq_and_receive_egg(manager, xml, functional, ignore_ticket = false) # Отправка сообщений в Active MQ по протоколу OpenWire
+  def send_to_amq_and_receive_egg(manager, xml, functional, ignore_ticket = false) # Отправка сообщений в Active MQ по протоколу OpenWire.
+    # manager - объект менеджера очередей, xml - объект XML сообщения или класса REXML, functional - имя теста, ignore_ticket - игнорирование промежуточного тикета
+    # Метод возвращает текст XML сообщения, полученного от ЕГГ
     java_import 'org.apache.activemq.ActiveMQConnectionFactory'
     java_import 'javax.jms.Session'
     java_import 'javax.jms.TextMessage'
@@ -156,6 +144,7 @@ module EggAutoTestsHelper
   end
 
   def send_to_amq_egg(manager, xml, queue = manager.queue_out) # Отправка сообщений в Active MQ по протоколу OpenWire
+    # Метод ничего не возвращает
     java_import 'org.apache.activemq.ActiveMQConnectionFactory'
     java_import 'javax.jms.Session'
     java_import 'javax.jms.TextMessage'
@@ -190,7 +179,7 @@ module EggAutoTestsHelper
     end
   end
 
-  def receive_from_amq_egg(manager, ignore_ticket = false) # Отправка сообщений в Active MQ по протоколу OpenWire
+  def receive_from_amq_egg(manager, ignore_ticket = false) # Получение сообщений из Active MQ по протоколу OpenWire
     java_import 'org.apache.activemq.ActiveMQConnectionFactory'
     java_import 'javax.jms.Session'
     java_import 'javax.jms.TextMessage'
@@ -236,13 +225,13 @@ module EggAutoTestsHelper
     end
   end
 
-  def colorize_egg(egg_version, functional, color)
+  def colorize_egg(egg_version, functional, color) # Метод окраски сообщений. Аргументы - версия ЕГГ, имя меню, цвет
     $browser_egg[:event] = 'colorize_egg'
     $browser_egg[:egg_version] = egg_version
     $browser_egg[:functional] = functional
     $browser_egg[:color] = color
   end
-  def puts_line_egg
+  def puts_line_egg # Метод, который вставляет в лог браузера пунктирную линию
     return '--'*40
   end
   def puts_time_egg(startTime, endTime)
@@ -279,27 +268,34 @@ module EggAutoTestsHelper
     end
   end
 
-  def delete_db_egg
+  def delete_db_egg(functional)
     java_import 'oracle.jdbc.OracleDriver'
     java_import 'java.sql.DriverManager'
     begin
-      $log_egg.write_to_browser("Удаляем БД 'egg_autotest'")
-      $log_egg.write_to_log("Завершение тестов", "Удаляем БД 'egg_autotest'", "...")
+      $log_egg.write_to_browser("Удаляем БД '#{@db_username}'")
+      $log_egg.write_to_log("#{functional}", "Удаляем БД '#{@db_username}'", "...")
       url = "jdbc:oracle:thin:@vm-corint:1521:corint"
       connection = java.sql.DriverManager.getConnection(url, "sys as sysdba", "waaaaa");
       stmt = connection.create_statement
-      stmt.executeUpdate("drop user egg_autotest cascade")
+      stmt.executeUpdate(%Q{BEGIN
+  EXECUTE IMMEDIATE 'DROP USER #{@db_username} cascade';
+EXCEPTION
+  WHEN OTHERS THEN
+    IF SQLCODE != -1918 THEN
+      RAISE;
+    END IF;
+END;})
     rescue Exception => msg
       $log_egg.write_to_browser("Ошибка! #{msg}")
-      $log_egg.write_to_log("Завершение тестов", "Ошибка при удалении БД 'egg_autotest'", "#{msg}")
+      $log_egg.write_to_log("Завершение тестов", "Ошибка при удалении БД '#{@db_username}'", "#{msg}")
       return true
     ensure
       stmt.close
       connection.close
     end
     sleep 0.5
-    $log_egg.write_to_browser("Удалили БД 'egg_autotest'")
-    $log_egg.write_to_log("Завершение тестов", "Результат удаления БД 'egg_autotest'", "Done!")
+    $log_egg.write_to_browser("Удалили БД '#{@db_username}'")
+    $log_egg.write_to_log("Завершение тестов", "Результат удаления БД '#{@db_username}'", "Done!")
   end
 
   def start_servicemix_egg(dir)
@@ -370,21 +366,23 @@ module EggAutoTestsHelper
       return false
     end
   end
-  def get_decode_answer(xml)
+
+  def get_decode_answer(xml) # Метод, который получает текст XML и возвращает раскодированный текст тега '//mq:Answer'
     response = Document.new(xml)
     answer = response.elements['//mq:Answer'].text
     answer_decode = Base64.decode64(answer)
     answer_decode = answer_decode.force_encoding("utf-8")
     return answer_decode
   end
-  def get_decode_request(xml)
+
+  def get_decode_request(xml) # Тоже, что и get_decode_answer
     request = Document.new(xml)
     answer = request.elements['//mq:Request'].text
     answer_decode = Base64.decode64(answer)
     answer_decode = answer_decode.force_encoding("utf-8")
     return answer_decode
   end
-  def get_encode_request(xml)
+  def get_encode_request(xml) # Метод, который получает XML для запроса и возвращает раскодированный тег '//mq:Answer'
     request = Document.new(xml)
     answer = request.elements['//mq:Answer'].text
     answer_decode = Base64.encode64(answer)
@@ -393,8 +391,10 @@ module EggAutoTestsHelper
     $log_egg.write_to_browser("Раскодировали запрос!")
     return answer_decode
   end
-  def validate_egg_xml(xsd_in, xml, functional)
+  def validate_egg_xml(xsd_in, xml, functional) # Метод валидации по XSD. xsd_in - путь к XSD, xml - текст XML, functional - название теста
+    # Ничего не возвращает, а только пишет в лог результат
     begin
+      Dir.chdir File.expand_path File.dirname(xsd_in)
       xsd = Nokogiri::XML::Schema(File.read(xsd_in))
       xml = Nokogiri::XML(xml)
       result = xsd.validate(xml)
@@ -416,47 +416,49 @@ module EggAutoTestsHelper
     end
   end
 
-  def ufebs_file_count(functional, packetepd = false, gis_type = 'gis_gmp')
-    if gis_type == 'gis_gmp'
+  def ufebs_file_count(functional, packetepd = false, gis_type = 'gis_gmp') # Метод, который возвращает кол-во полученных из УФЭБС файлов
+    # functional - название тест, packetepd - признак, что это запрос packetepd, gis_type - тип адаптера, по умолчанию ГИС ГМП, если другое, то будет ГИС ЖКХ
+    if gis_type == 'gis_gmp' # Анализируем тип адаптера и соответственно выбираем каталог, куда класть файлы
       dir = 'C:/data/inbox/1/inbound/all'
     else
       dir = 'C:/data/inbox/GIS_ZKH/inbound/all'
     end
-    code_adps000 = 'ADPS000'
-    code_adps001 = 'ADPS001'
-    fail_code = 'ADP0001'
-    adps000_count = 0
-    adps001_count = 0
-    count = 60
+    code_adps000 = 'ADPS000' # Переменная хранит код промежуточного тикета от адаптера
+    code_adps001 = 'ADPS001' # Переменная хранит код успешного сообщения от СМЭВ
+    fail_code = 'ADP0001' # Переменная хранит код ошибки из СМЭВ, что сервис недоступен
+    adps000_count = 0 # Счетчик промежуточных квитков
+    adps001_count = 0 # Счетчик финальных успешных квитков
+    count = 60 # Ожидание ответа в секундах
     $log_egg.write_to_browser("Ждем ответ в течении #{count} секунд")
-    packetepd ? positive_code = 3 : positive_code = 1
-    until adps001_count == positive_code or count < 0
-      if File.directory?(dir)
-        Dir.entries(dir).each_entry do |entry|
-          adps001_count += 1 if entry.include?(code_adps001)
-          count = 0 if entry.include?(fail_code)
+    packetepd ? positive_code = 3 : positive_code = 1 # Если мы проверяем запрос packetepd, то будем ждать от адаптера 3 файла с успешным кодом ADPS001, если другие запросы, то один файл.
+    until adps001_count == positive_code or count < 0 # Просматриваем каталог, пока не обнаружим нужное кол-во файлов с кодом ADPS001 или пока не пройдет время count
+      if File.directory?(dir) # Проверяем существует ли директория
+        Dir.entries(dir).each_entry do |entry| # Просматриваем каждый файл в каталоге, имя файла пишется в переменную entry
+          adps001_count += 1 if entry.include?(code_adps001) # Если файл содержит в своем имени нужный код, то добавляем +1 к счетчику adps001_count
+          count = 0 if entry.include?(fail_code) # Если обнаружили файл с кодом ошибки, то выходим из цикла, больше ждать нет смысла.
         end
-        puts "Wait ufebs answer..."
+        puts "Wait ufebs answer...#{count}"
       end
       sleep 1
-      count -=1
-    end
+      count -=1 # Уменьшаем счетчик на 1 секунду
+    end # Этот цикл нужен для того, что бы ждать, пока в каталоге появятся нужные файлы, больше он ничего не делает.
     adps001_count = 0
+    # А теперь проходим по каталогу и смотрим по факту, какие файлы там есть.
     if File.directory?(dir)
       $log_egg.write_to_browser("Получили ответ из каталога #{dir}")
       $log_egg.write_to_log(functional, "Получение ответа", "Получили ответ из каталога #{dir}")
       Dir.entries(dir).each_entry do |entry|
         file_path = "#{dir}/#{entry}"
-        if File.file?(file_path)
+        if File.file?(file_path) # Выводим список файлов в каталоге
           input_xml = File.open(file_path, 'r'){ |file| file.read }
           $log_egg.write_to_browser("Файлы в каталоге: #{entry}")
           $log_egg.write_to_log(functional, "Файлы в каталоге: #{entry}", "#{input_xml}")
         end
-        if entry.include?(code_adps000)
+        if entry.include?(code_adps000) # Плюсуем счетчик квитков о доставке, если нашли нужный код в имени файла
           adps000_count += 1
-        elsif entry.include?(code_adps001)
+        elsif entry.include?(code_adps001) # Плюсуем счетчик финальных квитков, если нашли нужный код в имени файла
           adps001_count += 1
-        elsif entry != '.' && entry != '..'
+        elsif entry != '.' && entry != '..' # Если в каталоге есть в каталоге файл с любым статусом, кроме тех, что выше, то сообщаем об ошибке.
           filepath = "#{dir}/#{entry}"
           $log_egg.write_to_browser("Путь файла: #{filepath}")
           file = File.open(filepath, 'r'){ |file| file.read }
@@ -465,7 +467,7 @@ module EggAutoTestsHelper
         end
       end
     end
-    return adps000_count, adps001_count
+    return adps000_count, adps001_count # Возвращаем кол-во файлов с каждым статусом
   end
 
   def download_installer_egg # Качаем сборку с ftp
@@ -500,12 +502,13 @@ module EggAutoTestsHelper
     end
   end
 
-  def egg_run?
-    log_path = "#{tests_params_egg[:egg_dir]}\\apache-servicemix-6.1.2\\data\\log\\servicemix.log"
+  def egg_log_include?(egg_dir, text)
+    log_path = "#{egg_dir}\\apache-servicemix-6.1.2\\data\\log\\servicemix.log"
     begin
       file = File.open(log_path, 'r'){ |file| file.read }
-      file.include?('Successfully') ? true : false
+      file.include?(text) ? true : false
     rescue Exception => msg
+      puts msg
       return false
     end
   end
@@ -518,6 +521,31 @@ module EggAutoTestsHelper
     rescue Exception => msg
       $log_egg.write_to_browser("Ошибка! #{msg}")
       $log_egg.write_to_log("Завершение тестов", "Ошибка при копировании логов", "Ошибка! #{msg}\n#{msg.backtrace.join("\n")}")
+    end
+  end
+
+  def insert_inn # Метод вставляет в таблицу zkh_inn запись с поставщиком для тестов. Ничего не возвращает.
+    begin
+      url = "jdbc:oracle:thin:@vm-corint:1521:corint"
+      connection = java.sql.DriverManager.getConnection(url, "#{@db_username}", "#{@db_username}");
+      stmt = connection.create_statement
+      # stmt.executeUpdate("TRUNCATE TABLE zkh_inn")
+      # $log_egg.write_to_browser("Очистили таблицу ZKH_INN")
+      #$log_egg.write_to_log(functional, "Очистили таблицу ZKH_INN")
+      stmt.executeUpdate("insert into zkh_inn (inn, kpp, name, account, bank_name, bank_bik) values (5406562465, 540501001, 'ФОНД МОДЕРНИЗАЦИИ И РАЗВИТИЯ ЖИЛИЩНО-КОММУНАЛЬНОГО ХОЗЯЙСТВА МУНИЦИПАЛЬНЫХ ОБРАЗОВАНИЙ НОВОСИБИРСКОЙ ОБЛАСТИ', 40604810200290003717, '\"ГАЗПРОМБАНК\" (АКЦИОНЕРНОЕ ОБЩЕСТВО)', '045004783')")
+    ensure
+      stmt.close if stmt
+      connection.close if connection
+    end
+  end
+  def get_installer_config
+    case # Определяем название файла с конфигом инсталлятора
+      when tests_params_egg[:build_version].include?('6.9')
+        "optionsEgg69.txt"
+      when tests_params_egg[:build_version].include?('6.10')
+        "optionsEgg610.txt"
+      else
+        "optionsEgg69.txt"
     end
   end
 end

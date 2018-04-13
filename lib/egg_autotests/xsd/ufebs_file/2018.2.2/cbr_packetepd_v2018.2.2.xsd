@@ -7,18 +7,18 @@
 Схемы с описанием прикладных частей электроных сообщений, используемых в расчетной сети Банка России.
 
 -->
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ed="urn:cbr-ru:ed:v2.0" xmlns:lt="urn:cbr-ru:ed:leaftypes:v2.0" targetNamespace="urn:cbr-ru:ed:v2.0" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2018.1.1">
-	<xs:import namespace="urn:cbr-ru:ed:leaftypes:v2.0" schemaLocation="cbr_ed_leaftypes_v2018.1.1.xsd"/>
-	<xs:include schemaLocation="cbr_ed_objects_v2018.1.1.xsd"/>
-	<xs:include schemaLocation="cbr_ed101_v2018.1.1.xsd"/>
-	<xs:include schemaLocation="cbr_ed103_v2018.1.1.xsd"/>
-	<xs:include schemaLocation="cbr_ed104_v2018.1.1.xsd"/>
-	<xs:include schemaLocation="cbr_ed105_v2018.1.1.xsd"/>
-	<xs:include schemaLocation="cbr_ed107_v2018.1.1.xsd"/>
-	<xs:include schemaLocation="cbr_ed108_v2018.1.1.xsd"/>
-	<xs:include schemaLocation="cbr_ed109_v2018.1.1.xsd"/>
-	<xs:include schemaLocation="cbr_ed110_v2018.1.1.xsd"/>
-	<xs:include schemaLocation="cbr_ed111_v2018.1.1.xsd"/>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ed="urn:cbr-ru:ed:v2.0" xmlns:lt="urn:cbr-ru:ed:leaftypes:v2.0" targetNamespace="urn:cbr-ru:ed:v2.0" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2018.2.2">
+	<xs:import namespace="urn:cbr-ru:ed:leaftypes:v2.0" schemaLocation="../../../../../../../../EGG/apache-servicemix-6.1.2/app/smx/resourceapp/wsdl/XSD/CBR/2018.2.3/ed/cbr_ed_leaftypes_v2018.2.0.xsd"/>
+	<xs:include schemaLocation="../../../../../../../../EGG/apache-servicemix-6.1.2/app/smx/resourceapp/wsdl/XSD/CBR/2018.2.3/ed/cbr_ed_objects_v2018.2.2.xsd"/>
+	<xs:include schemaLocation="cbr_ed101_v2018.2.2.xsd"/>
+	<xs:include schemaLocation="../../../../../../../../EGG/apache-servicemix-6.1.2/app/smx/resourceapp/wsdl/XSD/CBR/2018.2.3/ed/cbr_ed103_v2018.2.2.xsd"/>
+	<xs:include schemaLocation="cbr_ed104_v2018.2.2.xsd"/>
+	<xs:include schemaLocation="cbr_ed105_v2018.2.2.xsd"/>
+	<xs:include schemaLocation="../../../../../../../../EGG/apache-servicemix-6.1.2/app/smx/resourceapp/wsdl/XSD/CBR/2018.2.3/ed/cbr_ed107_v2018.2.2.xsd"/>
+	<xs:include schemaLocation="cbr_ed108_v2018.2.2.xsd"/>
+	<xs:include schemaLocation="../../../../../../../../EGG/apache-servicemix-6.1.2/app/smx/resourceapp/wsdl/XSD/CBR/2018.2.3/ed/cbr_ed109_v2018.2.2.xsd"/>
+	<xs:include schemaLocation="../../../../../../../../EGG/apache-servicemix-6.1.2/app/smx/resourceapp/wsdl/XSD/CBR/2018.2.3/ed/cbr_ed110_v2018.2.2.xsd"/>
+	<xs:include schemaLocation="../../../../../../../../EGG/apache-servicemix-6.1.2/app/smx/resourceapp/wsdl/XSD/CBR/2018.2.3/ed/cbr_ed111_v2018.2.2.xsd"/>
 	<xs:annotation>
 		<xs:documentation>Прикладные части ЭС</xs:documentation>
 	</xs:annotation>

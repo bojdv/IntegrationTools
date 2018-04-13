@@ -1,8 +1,8 @@
 #require "#{Rails.root}/lib/egg_autotests/egg_autotests_list.rb"
 
-class IA_UFEBS_GIS_GMP
+class IA_JPMorgan_GIS_GMP
 
-  def initialize(pass_menu_color, fail_menu_color, not_find_xml, not_receive_answer, egg_version, try_count, ufebs_version)
+  def initialize(pass_menu_color, fail_menu_color, not_find_xml, not_receive_answer, egg_version, try_count)
     @pass_menu_color = pass_menu_color
     @fail_menu_color = fail_menu_color
     @not_find_xml = not_find_xml
@@ -16,7 +16,7 @@ class IA_UFEBS_GIS_GMP
     @dir_inbound = 'C:/data/inbox/1/inbound'
     @result = Hash.new
     @functional = "Проверка ИА УФЭБС (ГИС ГМП)"
-    @ufebs_version = ufebs_version #\app\smx\resourceapp.war\wsdl\XSD\CBR\х\ed\cbr_ed101_vх.xsd
+    @ufebs_version = '2018.2.2' #\app\smx\resourceapp.war\wsdl\XSD\CBR\х\ed\cbr_ed101_vх.xsd
   end
 
   def ed101_test
@@ -36,14 +36,11 @@ class IA_UFEBS_GIS_GMP
         raise @not_find_xml if xml.nil?
         $log_egg.write_to_log(functional, "Получили xml", "Получили xml: #{xml.xml_name}\n#{xml.xml_text}")
         xml_rexml = Document.new(xml.xml_text)
-        xsd = "#{Rails.root}/lib/egg_autotests/xsd/ufebs_file/#{@ufebs_version}/cbr_#{xml_name}_v#{@ufebs_version}.xsd"
+        xsd = "#{Rails.root}/lib/egg_autotests/xsd/ufebs_file/cbr_#{xml_name}_v#{@ufebs_version}.xsd"
         xml_rexml.elements["//ed:#{xml_root_element}"].attributes['EDNo'] = Random.rand(1000..50000)
         $log_egg.write_to_browser("Валидируем XML для запроса...")
         $log_egg.write_to_log(functional, "Валидация исходящей XML", "Валидируем XML для запроса:\n#{xml.xml_name}\nПо XSD:\n #{xsd}")
-        if !validate_egg_xml(xsd, xml_rexml.to_s, functional)
-          @result["ed101_test"] = "false"
-          return
-        end
+        validate_egg_xml(xsd, xml_rexml.to_s, functional)
         FileUtils.rm_r @dir_inbound if File.directory?(@dir_inbound)# Чистим каталог для получения
         $log_egg.write_to_browser("Удалили каталог #{@dir_inbound}...")
         $log_egg.write_to_log(functional, "Удаляем каталог для отправления", "Удалили каталог #{@dir_inbound}")
@@ -94,7 +91,7 @@ class IA_UFEBS_GIS_GMP
         raise @not_find_xml if xml.nil?
         $log_egg.write_to_log(functional, "Получили xml", "Получили xml: #{xml.xml_name}\n#{xml.xml_text}")
         xml_rexml = Document.new(xml.xml_text)
-        xsd = "#{Rails.root}/lib/egg_autotests/xsd/ufebs_file/#{@ufebs_version}/cbr_#{xml_name}_v#{@ufebs_version}.xsd"
+        xsd = "#{Rails.root}/lib/egg_autotests/xsd/ufebs_file/cbr_#{xml_name}_v#{@ufebs_version}.xsd"
         xml_rexml.elements["//ed:#{xml_root_element}"].attributes['EDNo'] = Random.rand(1000..50000)
         $log_egg.write_to_browser("Валидируем XML для запроса...")
         $log_egg.write_to_log(functional, "Валидация исходящей XML", "Валидируем XML для запроса:\n#{xml.xml_name}\nПо XSD:\n #{xsd}")
@@ -149,7 +146,7 @@ class IA_UFEBS_GIS_GMP
         raise @not_find_xml if xml.nil?
         $log_egg.write_to_log(functional, "Получили xml", "Получили xml: #{xml.xml_name}\n#{xml.xml_text}")
         xml_rexml = Document.new(xml.xml_text)
-        xsd = "#{Rails.root}/lib/egg_autotests/xsd/ufebs_file/#{@ufebs_version}/cbr_#{xml_name}_v#{@ufebs_version}.xsd"
+        xsd = "#{Rails.root}/lib/egg_autotests/xsd/ufebs_file/cbr_#{xml_name}_v#{@ufebs_version}.xsd"
         xml_rexml.elements["//ed:#{xml_root_element}"].attributes['EDNo'] = Random.rand(1000..50000)
         $log_egg.write_to_browser("Валидируем XML для запроса...")
         $log_egg.write_to_log(functional, "Валидация исходящей XML", "Валидируем XML для запроса:\n#{xml.xml_name}\nПо XSD:\n #{xsd}")
@@ -205,7 +202,7 @@ class IA_UFEBS_GIS_GMP
         raise @not_find_xml if xml.nil?
         $log_egg.write_to_log(functional, "Получили xml", "Получили xml: #{xml.xml_name}\n#{xml.xml_text}")
         xml_rexml = Document.new(xml.xml_text)
-        xsd = "#{Rails.root}/lib/egg_autotests/xsd/ufebs_file/#{@ufebs_version}/cbr_#{xml_name}_v#{@ufebs_version}.xsd"
+        xsd = "#{Rails.root}/lib/egg_autotests/xsd/ufebs_file/cbr_#{xml_name}_v#{@ufebs_version}.xsd"
         xml_rexml.elements["//ed:#{xml_root_element}"].attributes['EDNo'] = Random.rand(1000..50000)
         xml_rexml.elements["//ed:#{xml_root_element}"].attributes['ChargeOffDate'] = date
         xml_rexml.elements["//ed:#{xml_root_element}"].attributes['EDDate'] = date
@@ -267,7 +264,7 @@ class IA_UFEBS_GIS_GMP
         raise @not_find_xml if xml.nil?
         $log_egg.write_to_log(functional, "Получили xml", "Получили xml: #{xml.xml_name}\n#{xml.xml_text}")
         xml_rexml = Document.new(xml.xml_text)
-        xsd = "#{Rails.root}/lib/egg_autotests/xsd/ufebs_file/#{@ufebs_version}/cbr_#{xml_name}_v#{@ufebs_version}.xsd"
+        xsd = "#{Rails.root}/lib/egg_autotests/xsd/ufebs_file/cbr_#{xml_name}_v#{@ufebs_version}.xsd"
         xml_rexml.elements["//ed:#{xml_root_element}"].attributes['EDNo'] = Random.rand(1000..50000)
         xml_rexml.elements["//ed:ED101"].attributes['EDNo'] = Random.rand(1000..50000)
         xml_rexml.elements["//ed:ED104"].attributes['EDNo'] = Random.rand(1000..50000)

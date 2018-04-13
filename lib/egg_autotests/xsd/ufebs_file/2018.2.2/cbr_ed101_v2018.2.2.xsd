@@ -7,17 +7,17 @@
 Схемы с описанием прикладных частей электроных сообщений, используемых в расчетной сети Банка России.
 
 -->
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ed="urn:cbr-ru:ed:v2.0" xmlns:lt="urn:cbr-ru:ed:leaftypes:v2.0" targetNamespace="urn:cbr-ru:ed:v2.0" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2018.1.1">
-	<xs:include schemaLocation="cbr_ed_objects_v2018.1.1.xsd"/>
-	<xs:import namespace="urn:cbr-ru:ed:leaftypes:v2.0" schemaLocation="cbr_ed_leaftypes_v2018.1.1.xsd"/>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ed="urn:cbr-ru:ed:v2.0" xmlns:lt="urn:cbr-ru:ed:leaftypes:v2.0" targetNamespace="urn:cbr-ru:ed:v2.0" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2018.2.2">
+	<xs:include schemaLocation="../../../../../../../../EGG/apache-servicemix-6.1.2/app/smx/resourceapp/wsdl/XSD/CBR/2018.2.3/ed/cbr_ed_objects_v2018.2.2.xsd"/>
+	<xs:import namespace="urn:cbr-ru:ed:leaftypes:v2.0" schemaLocation="../../../../../../../../EGG/apache-servicemix-6.1.2/app/smx/resourceapp/wsdl/XSD/CBR/2018.2.3/ed/cbr_ed_leaftypes_v2018.2.0.xsd"/>
 	<xs:annotation>
 		<xs:documentation>Прикладные части ЭС</xs:documentation>
 	</xs:annotation>
-	<xs:element name="ED104" type="ed:ED104"/>
-	<xs:complexType name="ED104">
+	<xs:element name="ED101" type="ed:ED101"/>
+	<xs:complexType name="ED101">
 		<xs:annotation>
-			<xs:documentation>Инкассовое поручение</xs:documentation>
-			<xs:documentation>Collection Order</xs:documentation>
+			<xs:documentation>Платежное поручение</xs:documentation>
+			<xs:documentation>Customer Credit Transfer</xs:documentation>
 		</xs:annotation>
 		<xs:complexContent>
 			<xs:extension base="ed:EPDComplete">
@@ -46,16 +46,10 @@
 							<xs:documentation>Authorities Information (fields 101, 104-110).</xs:documentation>
 						</xs:annotation>
 					</xs:element>
-					<xs:element name="ArrestID" type="lt:Max25TextType" minOccurs="0">
-						<xs:annotation>
-							<xs:documentation>Идентификатор ареста (ограничения).</xs:documentation>
-							<xs:documentation>Arrest (restriction) on account ID.</xs:documentation>
-						</xs:annotation>
-					</xs:element>
 					<xs:element name="InitialED" type="ed:EDRefID" minOccurs="0">
 						<xs:annotation>
-							<xs:documentation>Идентификаторы исходного ЭПС.</xs:documentation>
-							<xs:documentation>Initial FTI Identifiers.</xs:documentation>
+							<xs:documentation>Идентификаторы исходного ЭПС (поля 203-205).</xs:documentation>
+							<xs:documentation>Initial FTI Identifiers (fields 203-205).</xs:documentation>
 						</xs:annotation>
 					</xs:element>
 					<xs:element name="ProcessingDetails" type="ed:ProcessingDetails" minOccurs="0">
@@ -65,7 +59,7 @@
 						</xs:annotation>
 					</xs:element>
 				</xs:sequence>
-				<xs:attribute name="TransKind" type="lt:TwoDigitCodeType" use="required" fixed="06">
+				<xs:attribute name="TransKind" type="lt:TwoDigitCodeType" use="required" fixed="01">
 					<xs:annotation>
 						<xs:documentation>Вид операции (поле 18).</xs:documentation>
 						<xs:documentation>FTI Type (Field 18).</xs:documentation>
@@ -75,12 +69,6 @@
 					<xs:annotation>
 						<xs:documentation>Очередность платежа (поле 21).</xs:documentation>
 						<xs:documentation>FTI Sequence (Field 21).</xs:documentation>
-					</xs:annotation>
-				</xs:attribute>
-				<xs:attribute name="ReceiptDateCollectBank" type="lt:DateType">
-					<xs:annotation>
-						<xs:documentation>Дата поступления документов в банк получателя (поле 48). Дата представления документов получателем средств в обслуживающий его банк.</xs:documentation>
-						<xs:documentation>Date of acception (receiving) of the documents to Beneficiary's Bank (Field 48). Date of FTI's submission of Benefitiary (Creditor) to his serving Bank.</xs:documentation>
 					</xs:annotation>
 				</xs:attribute>
 				<xs:attribute name="ReceiptDate" type="lt:DateType">
@@ -98,7 +86,7 @@
 				<xs:attribute name="ChargeOffDate" type="lt:DateType">
 					<xs:annotation>
 						<xs:documentation>Списано со счета плательщика (поле 71). Дата списания денежных средств со счета плательщика.</xs:documentation>
-						<xs:documentation>Debit Date (Field 71).</xs:documentation>
+						<xs:documentation>Payer's Account Debit Date (Field 71).</xs:documentation>
 					</xs:annotation>
 				</xs:attribute>
 				<xs:attribute name="SystemCode" type="lt:TwoDigitCodeType">
@@ -114,14 +102,8 @@
 				</xs:attribute>
 				<xs:attribute name="PaymentID" type="lt:PaymentIDType">
 					<xs:annotation>
-						<xs:documentation>Уникальный идентификатор платежа, присвоенный получателем средств (поле 22).</xs:documentation>
-						<xs:documentation>Unique Payment Identifier assigned by the (ultimate) creditor (Field 22).</xs:documentation>
-					</xs:annotation>
-				</xs:attribute>
-				<xs:attribute name="IPBIC" type="lt:BICRUIDType">
-					<xs:annotation>
-						<xs:documentation>БИК косвенного участника-плательщика.</xs:documentation>
-						<xs:documentation>National BIC of Indirect Participant.</xs:documentation>
+						<xs:documentation>Уникальный идентификатор платежа, присвоенный получателем средств (поле 22)</xs:documentation>
+						<xs:documentation>Unique Payment Identifier assigned by the (ultimate) creditor (Field 22) OR Unique credit ID</xs:documentation>
 					</xs:annotation>
 				</xs:attribute>
 			</xs:extension>

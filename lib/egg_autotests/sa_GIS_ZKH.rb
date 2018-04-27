@@ -1,12 +1,13 @@
 class SA_GIS_ZKH
 
-  def initialize(pass_menu_color, fail_menu_color, not_find_xml, not_receive_answer, egg_version, try_count)
+  def initialize(pass_menu_color, fail_menu_color, not_find_xml, not_receive_answer, egg_version, try_count, db_username)
     @pass_menu_color = pass_menu_color
     @fail_menu_color = fail_menu_color
     @not_find_xml = not_find_xml
     @not_receive_answer = not_receive_answer
     @egg_version = egg_version
     @try_count = try_count
+    @db_username = db_username
 
     @menu_name = 'СА ГИС ЖКХ'
     @category = Category.find_by_category_name('СА ГИС ЖКХ')
@@ -19,7 +20,7 @@ class SA_GIS_ZKH
     begin
       count = 1
       until @result["paymentRequest_test"] == "true" or count > @try_count
-        insert_inn
+        insert_inn(@db_username)
         sleep 2
         xml_name = 'Payment_request'
         functional = "#{@functional}. #{xml_name}. Попытка #{count}"
@@ -76,7 +77,7 @@ class SA_GIS_ZKH
     begin
       count = 1
       until @result["paymentCancellation_test"] == "true" or count > @try_count
-        insert_inn
+        insert_inn(@db_username)
         sleep 2
         xml_name = 'Payment_Cancellation_request'
         functional = "#{@functional}. #{xml_name}. Попытка #{count}"
@@ -129,7 +130,7 @@ class SA_GIS_ZKH
     begin
       count = 1
       until @result["paymentDetails_test"] == "true" or count > @try_count
-        insert_inn
+        insert_inn(@db_username)
         sleep 2
         xml_name = 'Payment_Details_request'
         functional = "#{@functional}. #{xml_name}. Попытка #{count}"

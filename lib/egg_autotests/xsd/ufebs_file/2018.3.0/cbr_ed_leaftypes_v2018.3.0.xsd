@@ -263,6 +263,7 @@
 			<xs:enumeration value="UNPY"/>
 			<xs:enumeration value="JCBB"/>
 			<xs:enumeration value="AMEX"/>
+			<xs:enumeration value="FSSS"/>
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="ClientIDType">
@@ -289,11 +290,7 @@
 			<xs:documentation>Код. Код условия. Текстовый, 4 значный.</xs:documentation>
 			<xs:documentation>Code. Condition Code. Text, 4 character.</xs:documentation>
 		</xs:annotation>
-		<xs:restriction base="bt:CodeCategory">
-			<xs:enumeration value="RSRV"/>
-			<xs:enumeration value="ERCP"/>
-			<xs:enumeration value="COVR"/>
-		</xs:restriction>
+		<xs:restriction base="bt:CodeCategory"/>
 	</xs:simpleType>
 	<xs:simpleType name="ControlCodeType">
 		<xs:annotation>
@@ -535,18 +532,8 @@
 			<xs:documentation>Code. Text, 4 characters.</xs:documentation>
 		</xs:annotation>
 		<xs:restriction base="bt:CodeCategory">
-			<xs:enumeration value="ADJW"/>
 			<xs:enumeration value="CLOS"/>
 			<xs:enumeration value="INCC"/>
-			<xs:enumeration value="LQMW"/>
-			<xs:enumeration value="MDUW"/>
-			<xs:enumeration value="MTCN"/>
-			<xs:enumeration value="NURC"/>
-			<xs:enumeration value="PRES"/>
-			<xs:enumeration value="REGS"/>
-			<xs:enumeration value="STDW"/>
-			<xs:enumeration value="URGC"/>
-			<xs:enumeration value="BALF"/>
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="FNameIDType">
@@ -1673,7 +1660,6 @@
 			<xs:enumeration value="URGN"/>
 			<xs:enumeration value="NURG"/>
 			<xs:enumeration value="CONS"/>
-			<xs:enumeration value="MTCN"/>
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="SecurityAmountType">
@@ -1898,12 +1884,6 @@
 			<xs:documentation>Идентификатор. Тип рейса. Текстовый, 4 знака.</xs:documentation>
 			<xs:documentation>Identifier. Cycle Type. Text, 4 character.</xs:documentation>
 		</xs:annotation>
-		<xs:restriction base="bt:CodeCategory">
-			<xs:enumeration value="EODD"/>
-			<xs:enumeration value="PART"/>
-			<xs:enumeration value="PTRS"/>
-			<xs:enumeration value="SNLT"/>
-			<xs:enumeration value="SODD"/>
-		</xs:restriction>
+		<xs:restriction base="bt:CodeCategory"/>
 	</xs:simpleType>
 </xs:schema>

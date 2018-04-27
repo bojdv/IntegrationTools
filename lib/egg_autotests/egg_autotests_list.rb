@@ -27,10 +27,8 @@ class EggAutotestsList
     case # Определяем версию форматов по версии сборки
       when build_version.include?('6.9')
         @ufebs_version = '2018.2.2' #\app\smx\resourceapp.war\wsdl\XSD\CBR\х\ed\cbr_ed101_vх.xsd
-      when build_version.include?('6.10')
-        @ufebs_version = '2018.3.0'
       else
-        @ufebs_version = '2018.2.2'
+        @ufebs_version = '2018.3.0'
     end
 
   end
@@ -38,15 +36,15 @@ class EggAutotestsList
   def runTest_egg(components) # Запуск автотестов
 
     if components.include?('ИА УФЭБС (ГИС ЖКХ)') # Проверяем содержит ли переданный массив нужный пункт меню
-      ia_ufebs_gis_gkh = IA_UFEBS_GIS_ZKH.new(@pass_menu_color, @fail_menu_color, @not_find_xml, @not_receive_answer, @egg_version, @try_count, @ufebs_version)
+      ia_ufebs_gis_gkh = IA_UFEBS_GIS_ZKH.new(@pass_menu_color, @fail_menu_color, @not_find_xml, @not_receive_answer, @egg_version, @try_count, @ufebs_version, @db_username)
       #ia_ufebs_gis_gkh.providerCatalog_test
-      ia_ufebs_gis_gkh.ed101_test
+      #ia_ufebs_gis_gkh.ed101_test
       ia_ufebs_gis_gkh.ed108_test
-      ia_ufebs_gis_gkh.packetepd_test
+      #ia_ufebs_gis_gkh.packetepd_test
     end
 
     if components.include?('СА ГИС ЖКХ')
-      sa_gis_zkh = SA_GIS_ZKH.new(@pass_menu_color, @fail_menu_color, @not_find_xml, @not_receive_answer, @egg_version, @try_count)
+      sa_gis_zkh = SA_GIS_ZKH.new(@pass_menu_color, @fail_menu_color, @not_find_xml, @not_receive_answer, @egg_version, @try_count, @db_username)
       sa_gis_zkh.paymentRequest_test
       sa_gis_zkh.paymentCancellation_test
       sa_gis_zkh.paymentDetails_test
@@ -55,10 +53,10 @@ class EggAutotestsList
     if components.include?('ИА УФЭБС (ГИС ГМП)')
       ia_ufebs_gis_gmp = IA_UFEBS_GIS_GMP.new(@pass_menu_color, @fail_menu_color, @not_find_xml, @not_receive_answer, @egg_version, @try_count, @ufebs_version)
       ia_ufebs_gis_gmp.ed101_test
-      # ia_ufebs_gis_gmp.ed104_test
-      # ia_ufebs_gis_gmp.ed105_test
-      # ia_ufebs_gis_gmp.ed108_test
-      # ia_ufebs_gis_gmp.packetepd_test
+      ia_ufebs_gis_gmp.ed104_test
+      ia_ufebs_gis_gmp.ed105_test
+      ia_ufebs_gis_gmp.ed108_test
+      ia_ufebs_gis_gmp.packetepd_test
     end
 
     if components.include?('ИА Active MQ')
@@ -74,7 +72,7 @@ class EggAutotestsList
 
     if components.include?('ИА JPMorgan (ГИС ГМП)')
       ia_jpmorgan_gis_gmp = IA_JPMorgan_GIS_GMP.new(@pass_menu_color, @fail_menu_color, @not_find_xml, @not_receive_answer, @egg_version, @try_count)
-      ia_jpmorgan_gis_gmp.run_RequestMessage
+      ia_jpmorgan_gis_gmp.payment
     end
 
     if components.include?('ИА ZKH-Loader/СА ZkhPayees')

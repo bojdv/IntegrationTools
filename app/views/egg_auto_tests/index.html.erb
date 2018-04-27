@@ -33,7 +33,7 @@
               <%= f.input :build_version, label: 'Выберите сборку:', collection: @dir, required: false %>
               <%= f.button :submit, 'Запустить', id: 'run-button', class: 'btn-primary', onclick: "clear_log_egg(); document.getElementById('download-link').style.display = 'none';"%>
               <a class="btn btn-primary form-group" id="download-link" href="" style="display: none;" onclick="this.style.display = 'none';">Скачать лог</a>
-              <a class="btn btn-primary form-group" id="tester" href="egg_auto_tests/tester" data-remote="true">Click</a>
+              <!--<a class="btn btn-primary form-group" id="tester" href="egg_auto_tests/tester" data-remote="true">Click</a>-->
             </div>
             <!-- Вторая вкладка -->
             <div class="tab-pane fade" id="input" role="tabpanel" aria-labelledby="input-tab">

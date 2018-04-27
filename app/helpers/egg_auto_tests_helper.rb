@@ -68,7 +68,7 @@ module EggAutoTestsHelper
     rescue Exception => msg
       puts msg.backtrace.join("\n")
       $log_egg.write_to_browser("Ошибка! #{msg}")
-      $log_egg.write_to_log("Завершение тестов", "Ошибка при завершении тестов:", "#{msg.backtrace.join("\n")}")
+      $log_egg.write_to_log(@end_test_message, "Ошибка при завершении тестов:", "#{msg.backtrace.join("\n")}")
     ensure
       respond_to do |format|
         format.js { render :js => "kill_listener_egg(); download_link_egg('#{log_file_name}')" }
@@ -238,7 +238,7 @@ module EggAutoTestsHelper
     dif = (endTime-startTime).to_i.abs
     min = dif/1.minutes
     $log_egg.write_to_browser("Завершили проверку в #{Time.now.strftime('%H-%M-%S')} за: #{min} мин, #{dif-(min*1.minutes)} сек")
-    $log_egg.write_to_log("Завершение тестов", "Завершили проверку", "Завершили проверку в #{Time.now.strftime('%H-%M-%S')} за: #{min} мин, #{dif-(min*1.minutes)} сек")
+    $log_egg.write_to_log(@end_test_message, "Завершили проверку", "Завершили проверку в #{Time.now.strftime('%H-%M-%S')} за: #{min} мин, #{dif-(min*1.minutes)} сек")
   end
 
   def dir_empty_egg?(egg_dir)
@@ -247,23 +247,23 @@ module EggAutoTestsHelper
       sleep 0.5
       if Dir.entries("#{egg_dir}").size <= 2
         $log_egg.write_to_browser("Ошибка! Каталог '#{egg_dir}' пустой")
-        $log_egg.write_to_log("Установка/запуск eGG", "Проверка наличия каталога '#{egg_dir}'", "Ошибка! Каталог '#{egg_dir}' пустой")
+        $log_egg.write_to_log(@run_test_message, "Проверка наличия каталога '#{egg_dir}'", "Ошибка! Каталог '#{egg_dir}' пустой")
         return true
       else
         $log_egg.write_to_browser("Done! Каталог #{egg_dir} найден и не пустой")
-        $log_egg.write_to_log("Установка/запуск eGG", "Проверка наличия каталога '#{egg_dir}'", "Done! Каталог #{egg_dir} найден и не пустой")
+        $log_egg.write_to_log(@run_test_message, "Проверка наличия каталога '#{egg_dir}'", "Done! Каталог #{egg_dir} найден и не пустой")
         log_file_path = "#{tests_params_egg[:egg_dir]}\\apache-servicemix-6.1.2\\data\\log\\servicemix.log"
         log_dir = "#{tests_params_egg[:egg_dir]}\\apache-servicemix-6.1.2\\data\\log\\servicemix.log"
         if File.exist?(log_file_path)
           FileUtils.rm_r "#{tests_params_egg[:egg_dir]}\\apache-servicemix-6.1.2\\data\\log\\."
           $log_egg.write_to_browser("Done! Удалили старые логи из каталога #{log_dir}")
-          $log_egg.write_to_log("Установка/запуск eGG", "Удаляем старые логи", "Done! Удалили логи из каталога #{log_dir}")
+          $log_egg.write_to_log(@run_test_message, "Удаляем старые логи", "Done! Удалили логи из каталога #{log_dir}")
         end
         return false
       end
     rescue Exception
       $log_egg.write_to_browser("Ошибка! Каталог '#{egg_dir}' не найден")
-      $log_egg.write_to_log("Установка/запуск eGG", "Проверка наличия каталога '#{egg_dir}'", "Ошибка! Каталог '#{egg_dir}' не найден")
+      $log_egg.write_to_log(@run_test_message, "Проверка наличия каталога '#{egg_dir}'", "Ошибка! Каталог '#{egg_dir}' не найден")
       return true
     end
   end
@@ -273,7 +273,7 @@ module EggAutoTestsHelper
     java_import 'java.sql.DriverManager'
     begin
       $log_egg.write_to_browser("Удаляем БД '#{@db_username}'")
-      $log_egg.write_to_log("#{functional}", "Удаляем БД '#{@db_username}'", "...")
+      $log_egg.write_to_log(functional, "Удаляем БД '#{@db_username}'", "...")
       url = "jdbc:oracle:thin:@vm-corint:1521:corint"
       connection = java.sql.DriverManager.getConnection(url, "sys as sysdba", "waaaaa");
       stmt = connection.create_statement
@@ -287,7 +287,7 @@ EXCEPTION
 END;})
     rescue Exception => msg
       $log_egg.write_to_browser("Ошибка! #{msg}")
-      $log_egg.write_to_log("Завершение тестов", "Ошибка при удалении БД '#{@db_username}'", "#{msg}")
+      $log_egg.write_to_log(functional, "Ошибка при удалении БД '#{@db_username}'", "#{msg}")
       return true
     ensure
       stmt.close
@@ -295,12 +295,12 @@ END;})
     end
     sleep 0.5
     $log_egg.write_to_browser("Удалили БД '#{@db_username}'")
-    $log_egg.write_to_log("Завершение тестов", "Результат удаления БД '#{@db_username}'", "Done!")
+    $log_egg.write_to_log(functional, "Результат удаления БД '#{@db_username}'", "Done!")
   end
 
   def start_servicemix_egg(dir)
     $log_egg.write_to_browser("Запускаем Servicemix...")
-    $log_egg.write_to_log("Установка/запуск eGG", "Запускаем Servicemix...", "Ждем окончания запуска eGG")
+    $log_egg.write_to_log(@run_test_message, "Запускаем Servicemix...", "Ждем окончания запуска eGG")
     begin
       Dir.chdir "#{dir}\\apache-servicemix-6.1.2\\bin"
       startcrypt = "#{dir}\\apache-servicemix-6.1.2\\bin\\startcrypt.bat"
@@ -323,13 +323,13 @@ END;})
     rescue Exception => msg
       #$log_egg.write_to_browser("Ошибка! #{msg}", "Ошибка! #{msg}")
       $log_egg.write_to_browser("Ошибка! #{msg}")
-      $log_egg.write_to_log("Установка/запуск eGG", "Ошибка запуска Servicemix...", "#{msg}")
+      $log_egg.write_to_log(@run_test_message, "Ошибка запуска Servicemix...", "#{msg}")
       stop_servicemix_egg
     end
   end
 
   def stop_servicemix_egg(dir = false)
-    $log_egg.write_to_log("Завершение тестов", "Останавливаем Servicemix...", "Ждем окончания остановки eGG")
+    $log_egg.write_to_log(@end_test_message, "Останавливаем Servicemix...", "Ждем окончания остановки eGG")
     $log_egg.write_to_browser("Останавливаем Servicemix...")
     Dir.chdir "#{dir}\\apache-servicemix-6.1.2\\bin"
     @servicemix_stop_thread_egg = Thread.new do
@@ -352,7 +352,7 @@ END;})
       end
       sleep 1
     end
-    $log_egg.write_to_log("Завершение тестов", "Результат остановки Servicemix", "Done! Остановили Servicemix...")
+    $log_egg.write_to_log(@end_test_message, "Результат остановки Servicemix", "Done! Остановили Servicemix...")
     $log_egg.write_to_browser("Done! Остановили Servicemix...")
   end
 
@@ -400,20 +400,40 @@ END;})
       result = xsd.validate(xml)
       a = "."
       Random.rand(1..6).times {a += "."}
-        if result.any?
-          $log_egg.write_to_browser("Валидация не пройдена!")
-          $log_egg.write_to_log(functional, "Валидация не пройдена!#{a}", "#{result.join('<br/>')}")
-          return false
-        else
-          $log_egg.write_to_browser("Валидация прошла успешно!")
-          $log_egg.write_to_log(functional, "Результат выполнения валидации#{a}", "Валидация прошла успешно!")
-          return true
-        end
+      if result.any?
+        $log_egg.write_to_browser("Валидация не пройдена!")
+        $log_egg.write_to_log(functional, "Валидация не пройдена!#{a}", "#{result.join('<br/>')}")
+        return false
+      else
+        $log_egg.write_to_browser("Валидация прошла успешно!")
+        $log_egg.write_to_log(functional, "Результат выполнения валидации#{a}", "Валидация прошла успешно!")
+        return true
+      end
     rescue Exception => msg
       #$log_egg.write_to_browser("Ошибка! #{msg}\n#{msg.backtrace.join("\n")}", "Ошибка! #{msg}")
       $log_egg.write_to_browser("Ошибка! #{msg}")
       $log_egg.write_to_log("Валидация XML по XSD", "Ошибка при валидации по XSD#{a}", "Ошибка при валидации по XSD #{xsd_in}: #{msg}")
     end
+  end
+
+  def get_file_body(dir)
+    body = String.new
+    count = 60 # Ожидание ответа в секундах
+    until body.size > 0 or count == 0
+      if File.directory?(dir) # Проверяем существует ли директория
+        Dir.entries(dir).each_entry do |entry| # Просматриваем каждый файл в каталоге, имя файла пишется в переменную entry
+          file_path = "#{dir}/#{entry}"
+          if File.file?(file_path)
+            body = File.open(file_path, 'r'){|file| file.read}
+            #File.delete file_path
+          end
+        end
+        puts "Wait JPM answer...#{count}"
+      end
+      sleep 1
+      count -=1 # Уменьшаем счетчик на 1 секунду
+    end
+    return body
   end
 
   def ufebs_file_count(functional, packetepd = false, gis_type = 'gis_gmp') # Метод, который возвращает кол-во полученных из УФЭБС файлов
@@ -472,7 +492,7 @@ END;})
 
   def download_installer_egg # Качаем сборку с ftp
     $log_egg.write_to_browser("Скачиваем инсталлятор eGG #{tests_params_egg[:build_version]}...")
-    $log_egg.write_to_log("Установка/запуск eGG", "Скачиваем инсталлятор eGG #{tests_params_egg[:build_version]}...", "Запустили задачу в #{Time.now.strftime('%H-%M-%S')}")
+    $log_egg.write_to_log(@run_test_message, "Скачиваем инсталлятор eGG #{tests_params_egg[:build_version]}...", "Запустили задачу в #{Time.now.strftime('%H-%M-%S')}")
     begin
       ftp = Net::FTP.new('server-ora-bssi')
       ftp.login
@@ -482,13 +502,13 @@ END;})
     rescue Exception => msg
       #$log_egg.write_to_browser("Ошибка! #{msg}", "Ошибка! #{msg}")
       $log_egg.write_to_browser("Ошибка! #{msg}")
-      $log_egg.write_to_log("Установка/запуск eGG", "Ошибка при скачивании инсталлятора", "Ошибка! #{msg}")
+      $log_egg.write_to_log(@run_test_message, "Ошибка при скачивании инсталлятора", "Ошибка! #{msg}")
     end
   end
 
   def copy_installer_egg # Копируем сборку в каталог C:\EGG_Installer
     $log_egg.write_to_browser("Копируем инсталлятор...")
-    $log_egg.write_to_log("Установка/запуск eGG", "Копируем инсталлятор...", "Запустили задачу в #{Time.now.strftime('%H-%M-%S')}")
+    $log_egg.write_to_log(@run_test_message, "Копируем инсталлятор...", "Запустили задачу в #{Time.now.strftime('%H-%M-%S')}")
     begin
       FileUtils.cp(@build_file_egg, @installer_path_egg)
       unless File.exist?(@installer_path_egg)
@@ -498,7 +518,7 @@ END;})
       File.delete(@build_file_egg)
     rescue Exception => msg
       $log_egg.write_to_browser("Ошибка! #{msg}")
-      $log_egg.write_to_log("Установка/запуск eGG", "Ошибка при копировании инсталлятора", "Ошибка! #{msg}")
+      $log_egg.write_to_log(@run_test_message, "Ошибка при копировании инсталлятора", "Ошибка! #{msg}")
     end
   end
 
@@ -517,35 +537,44 @@ END;})
     begin
       FileUtils.cp_r("#{tests_params_egg[:egg_dir]}/apache-servicemix-6.1.2/data/log/.", $log_egg.log_dir) # копируем лог сервисмикса
       FileUtils.cp_r Dir.glob("#{tests_params_egg[:egg_dir]}/*.txt"), $log_egg.log_dir # копируем лог инсталлятора
-      $log_egg.write_to_log("Завершение тестов", "Копирование логов eGG", "Done!")
+      $log_egg.write_to_log(@end_test_message, "Копирование логов eGG", "Done!")
     rescue Exception => msg
       $log_egg.write_to_browser("Ошибка! #{msg}")
-      $log_egg.write_to_log("Завершение тестов", "Ошибка при копировании логов", "Ошибка! #{msg}\n#{msg.backtrace.join("\n")}")
+      $log_egg.write_to_log(@end_test_message, "Ошибка при копировании логов", "Ошибка! #{msg}\n#{msg.backtrace.join("\n")}")
     end
   end
 
-  def insert_inn # Метод вставляет в таблицу zkh_inn запись с поставщиком для тестов. Ничего не возвращает.
+  def insert_inn(db_user) # Метод вставляет в таблицу zkh_inn запись с поставщиком для тестов. Ничего не возвращает.
     begin
       url = "jdbc:oracle:thin:@vm-corint:1521:corint"
-      connection = java.sql.DriverManager.getConnection(url, "#{@db_username}", "#{@db_username}");
+      puts "USER=#{@db_username.to_s}"
+      connection = java.sql.DriverManager.getConnection(url, @db_username, @db_username);
       stmt = connection.create_statement
       # stmt.executeUpdate("TRUNCATE TABLE zkh_inn")
       # $log_egg.write_to_browser("Очистили таблицу ZKH_INN")
       #$log_egg.write_to_log(functional, "Очистили таблицу ZKH_INN")
-      stmt.executeUpdate("insert into zkh_inn (inn, kpp, name, account, bank_name, bank_bik) values (5406562465, 540501001, 'ФОНД МОДЕРНИЗАЦИИ И РАЗВИТИЯ ЖИЛИЩНО-КОММУНАЛЬНОГО ХОЗЯЙСТВА МУНИЦИПАЛЬНЫХ ОБРАЗОВАНИЙ НОВОСИБИРСКОЙ ОБЛАСТИ', 40604810200290003717, '\"ГАЗПРОМБАНК\" (АКЦИОНЕРНОЕ ОБЩЕСТВО)', '045004783')")
+      #stmt.executeUpdate("insert into zkh_inn (inn, kpp, name, account, bank_name, bank_bik) values (5406562465, 540501001, 'ФОНД МОДЕРНИЗАЦИИ И РАЗВИТИЯ ЖИЛИЩНО-КОММУНАЛЬНОГО ХОЗЯЙСТВА МУНИЦИПАЛЬНЫХ ОБРАЗОВАНИЙ НОВОСИБИРСКОЙ ОБЛАСТИ', 40604810200290003717, '\"ГАЗПРОМБАНК\" (АКЦИОНЕРНОЕ ОБЩЕСТВО)', '045004783')")
+      stmt.executeUpdate("insert into zkh_inn (inn, kpp, name, account, bank_name, bank_bik) values (9909400765, 774763002, 'ООО Межгосударственный банк', 30301810000006000001, 'ПАО СБЕРБАНК', '044525225')")
     ensure
       stmt.close if stmt
       connection.close if connection
     end
   end
+
   def get_installer_config
     case # Определяем название файла с конфигом инсталлятора
       when tests_params_egg[:build_version].include?('6.9')
         "optionsEgg69.txt"
       when tests_params_egg[:build_version].include?('6.10')
         "optionsEgg610.txt"
+      when tests_params_egg[:build_version].include?('6.11')
+        "optionsEgg611.txt"
       else
         "optionsEgg69.txt"
     end
+  end
+
+  def pu
+    puts @a
   end
 end

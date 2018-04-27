@@ -19,7 +19,7 @@
   </style>
 </head>
 <BODY>
-<div class='header' align="center"><img src="<%=Rails.root%>/app/assets/images/bss_logo.png" alt='logo'></div>
+<div class='header' align="center"><img src="\\kc-14-52\Share\bss_logo.png" alt='logo'></div>
 <div class='content'>
   <DIV class='div1' align="center">
     <h2>Результаты выполнения автотестов для продукта Egg</h2>
@@ -32,7 +32,7 @@
         <% if value.is_a?(Hash) %>
           <% @result = true %>
           <% value.each do |key2, value2| %>
-            <% @result = false if key2.include?("Проверка не пройдена!") || key2.include?("Случилось непредвиденное") || key2.include?("Ошибка при выполнении проверки")%>
+            <% @result = false if key2.include?("Проверка не пройдена!") || key2.include?("Случилось непредвиденное") || key2.include?("Ошибка")%>
           <% end %>
           <% if @result %>
               <li><a href="#<%= key %>"><font color="green"><%= key %></font></a></li>

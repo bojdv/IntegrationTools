@@ -1,13 +1,14 @@
 
 class IA_UFEBS_GIS_ZKH
 
-  def initialize(pass_menu_color, fail_menu_color, not_find_xml, not_receive_answer, egg_version, try_count, ufebs_version)
+  def initialize(pass_menu_color, fail_menu_color, not_find_xml, not_receive_answer, egg_version, try_count, ufebs_version, db_username)
     @pass_menu_color = pass_menu_color
     @fail_menu_color = fail_menu_color
     @not_find_xml = not_find_xml
     @not_receive_answer = not_receive_answer
     @egg_version = egg_version
     @try_count = try_count
+    @db_username = db_username
 
     @menu_name = 'ИА УФЭБС (ГИС ЖКХ)' # Название меню. Используется, что бы программа поняла, какому пункту изменить цвет после проверки.
     @category = Category.find_by_category_name('ИА УФЭБС ГИС ЖКХ') # Создаем переменную, содержащую категорию с нужным имененм из XML Sender
@@ -15,7 +16,6 @@ class IA_UFEBS_GIS_ZKH
     @dir_inbound = 'C:/data/inbox/GIS_ZKH/inbound' # Каталог, от куда читаем файлы
     @result = Hash.new # пустой хэш, в который пишутся результаты выполнения теста
     @functional = "Проверка ИА УФЭБС (ГИС ЖКХ)" # Имя корневого раздела теста в логе html
-    @ufebs_version = '2018.2.2' #\app\smx\resourceapp.war\wsdl\XSD\CBR\х\ed\cbr_ed101_vх.xsd
     @ufebs_version = ufebs_version #\app\smx\resourceapp.war\wsdl\XSD\CBR\х\ed\cbr_ed101_vх.xsd
   end
 
@@ -25,8 +25,8 @@ class IA_UFEBS_GIS_ZKH
       count = 1 # Номер попытки для вывода в лог
       xml_name = 'ed101' # Название XML в XML_sender, которую будем использовать
       until @result["ed101_test"] == "true" or count > @try_count # Выполняем цикл, пока результат не будет true или пока счетчик не превысит число попыток
-        insert_inn # Вставляем в БД запись с поставщиком
         functional = "#{@functional}. #{xml_name}. Попытка #{count}" # Формируем название теста для лога
+        insert_inn(@db_username) # Вставляем в БД запись с поставщиком
         xml_root_element = 'ED101'  # Корневой элемент, просто, что бы не писать руками в куче мест
         date = Date.parse("#{Random.rand(2010..2017)}-#{Random.rand(1..11)}-#{Random.rand(1..28)}")  # Формируем случайную дату
         $log_egg.write_to_log(functional, "Начали проверку в #{Time.now.strftime('%H-%M-%S')}", "#{@menu_name} #{xml_name}")  # Публикуем запись в html лог. Параметры см. в описании метода
@@ -82,10 +82,10 @@ class IA_UFEBS_GIS_ZKH
     begin
       count = 1
       until @result["ed108_test"] == "true" or count > @try_count
-        insert_inn
         xml_name = 'ed108'
-        functional = "#{@functional}. #{xml_name}. Попытка #{count}"
         xml_root_element = 'ED108'
+        functional = "#{@functional}. #{xml_name}. Попытка #{count}"
+        insert_inn(@db_username)
         date = Date.parse("#{Random.rand(2010..2017)}-#{Random.rand(1..11)}-#{Random.rand(1..28)}")
         $log_egg.write_to_log(functional, "Начали проверку в #{Time.now.strftime('%H-%M-%S')}", "#{@menu_name} #{xml_name}")
         $log_egg.write_to_browser("#{puts_line_egg}")
@@ -145,10 +145,10 @@ class IA_UFEBS_GIS_ZKH
     begin
       count = 1
       until @result["packetepd_test"] == "true" or count > @try_count
-        insert_inn
         xml_name = 'packetepd'
         functional = "#{@functional}. #{xml_name}. Попытка #{count}"
         xml_root_element = 'PacketEPD'
+        insert_inn(@db_username)
         date = Date.parse("#{Random.rand(2010..2017)}-#{Random.rand(1..11)}-#{Random.rand(1..28)}")
         $log_egg.write_to_log(functional, "Начали проверку в #{Time.now.strftime('%H-%M-%S')}", "#{@menu_name} #{xml_name}")
         $log_egg.write_to_browser("#{puts_line_egg}")

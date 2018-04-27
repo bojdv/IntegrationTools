@@ -42,6 +42,7 @@ class IA_UFEBS_GIS_GMP
         $log_egg.write_to_log(functional, "Валидация исходящей XML", "Валидируем XML для запроса:\n#{xml.xml_name}\nПо XSD:\n #{xsd}")
         if !validate_egg_xml(xsd, xml_rexml.to_s, functional)
           @result["ed101_test"] = "false"
+          colorize_egg(@egg_version, @menu_name, @fail_menu_color)
           return
         end
         FileUtils.rm_r @dir_inbound if File.directory?(@dir_inbound)# Чистим каталог для получения

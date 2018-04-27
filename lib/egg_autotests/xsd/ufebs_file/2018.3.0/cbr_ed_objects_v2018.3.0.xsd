@@ -225,7 +225,7 @@
 		</xs:attribute>
 		<xs:attribute name="AccountType" type="lt:AccountType" use="required">
 			<xs:annotation>
-				<xs:documentation>Типа номера счета.</xs:documentation>
+				<xs:documentation>Тип номера счета.</xs:documentation>
 				<xs:documentation>Account Type.</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
@@ -281,7 +281,7 @@
 		</xs:attribute>
 		<xs:attribute name="RegulationAccountType" type="lt:AccountType" use="required">
 			<xs:annotation>
-				<xs:documentation>Типа счета в соответствии с нормативом.</xs:documentation>
+				<xs:documentation>Тип счета в соответствии с нормативом.</xs:documentation>
 				<xs:documentation>Account Type according to regulation.</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
@@ -611,6 +611,12 @@
 				<xs:annotation>
 					<xs:documentation>Информация о счетах участника перевода денежных средств.</xs:documentation>
 					<xs:documentation>Participant’s Accounts information.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="PoolSPInfo" type="ed:PoolSPInfo" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Информация об участниках пула ликвидности.</xs:documentation>
+					<xs:documentation>Primary account of liquidity pool (LP) OR List of Subordinate Accounts of LP.</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 			<xs:element name="LegacySystemParticipantInfo" type="ed:LegacySystemParticipantInfoType" minOccurs="0">
@@ -3050,33 +3056,6 @@
 			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
-	<xs:complexType name="WideCustomerMemoOrder">
-		<xs:annotation>
-			<xs:documentation>Реквизиты по дебету/кредиту</xs:documentation>
-		</xs:annotation>
-		<xs:sequence>
-			<xs:element name="AccName" type="lt:Max160TextType" minOccurs="0">
-				<xs:annotation>
-					<xs:documentation>Наименование счета</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-		</xs:sequence>
-		<xs:attribute name="Acc" type="lt:AccountNumberRUIDType" use="required">
-			<xs:annotation>
-				<xs:documentation>Лицевой счет/корсчет</xs:documentation>
-			</xs:annotation>
-		</xs:attribute>
-		<xs:attribute name="BIC" type="lt:BICRUIDType" use="required">
-			<xs:annotation>
-				<xs:documentation>БИК ПБР/КО</xs:documentation>
-			</xs:annotation>
-		</xs:attribute>
-		<xs:attribute name="OperationSum" type="lt:KopeckAmountType" use="required">
-			<xs:annotation>
-				<xs:documentation>Сумма операции</xs:documentation>
-			</xs:annotation>
-		</xs:attribute>
-	</xs:complexType>
 	<xs:complexType name="OpPreciousMetal">
 		<xs:annotation>
 			<xs:documentation>Операция с драгоценными металлами.</xs:documentation>
@@ -3104,6 +3083,23 @@
 			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
+	<xs:complexType name="InitialEDInfo">
+		<xs:annotation>
+			<xs:documentation>Информация о транзакционном пакете ЭС</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="EDRefID" type="ed:EDRefID">
+				<xs:annotation>
+					<xs:documentation>Идентификаторы транзакционного пакета ЭС</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="PacketStatus" type="lt:OneDigitCodeType">
+			<xs:annotation>
+				<xs:documentation>Статус транзакционного пакета ЭС</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
 	<xs:complexType name="ESIDResponse">
 		<xs:annotation>
 			<xs:documentation>Общие реквизиты служебно-информационного пакета для ЭКО</xs:documentation>
@@ -3111,9 +3107,9 @@
 		<xs:complexContent>
 			<xs:extension base="ed:ESID">
 				<xs:sequence>
-					<xs:element name="InitialEDInfo" type="ed:EDRefID" minOccurs="0">
+					<xs:element name="InitialEDInfo" type="ed:InitialEDInfo" minOccurs="0">
 						<xs:annotation>
-							<xs:documentation>Информация об исходном пакете ЭС</xs:documentation>
+							<xs:documentation>Информация об исходном транзакционном пакете ЭС</xs:documentation>
 						</xs:annotation>
 					</xs:element>
 					<xs:element name="InitialED" type="ed:EDRefID" minOccurs="0">

@@ -76,6 +76,12 @@ class EggAutotestsList
       ia_jpmorgan_gis_gmp.payment
     end
 
+    if components.include?('ИА JPMorgan (ГИС ЖКХ)')
+      ia_jpmorgan_gis_zkh = ia_JPMorgan_GIS_ZKH.new(@pass_menu_color, @fail_menu_color, @not_find_xml, @not_receive_answer, @egg_version, @try_count)
+      ia_jpmorgan_gis_zkh.payment
+      ia_jpmorgan_gis_zkh.payment_cancellation
+    end
+
     if components.include?('ИА ZKH-Loader/СА ZkhPayees')
       ia_zkh_loader = IA_ZKH_Loader.new(@pass_menu_color, @fail_menu_color, @egg_version, @egg_dir, @db_username)
       ia_zkh_loader.providerCatalogFile_test

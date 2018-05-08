@@ -16,7 +16,7 @@ class EggAutoTestsController < ApplicationController
                         'ИА УФЭБС (ГИС ГМП)',
                         'ИА УФЭБС (ГИС ЖКХ)',
                         'ИА JPMorgan (ГИС ГМП)',
-                        'ИА JPMorgan (ГИС ЖКХ). Ждем Дину.',
+                        'ИА JPMorgan (ГИС ЖКХ)',
                         'ИА ZKH-Loader/СА ZkhPayees',
                         'СА ГИС ГМП',
                         'СА ГИС ЖКХ']

@@ -10,6 +10,7 @@ require_dependency "#{Rails.root}/lib/egg_autotests/sa_GIS_ZKH"
 require_dependency "#{Rails.root}/lib/egg_autotests/ia_UFEBS_GIS_ZKH"
 require_dependency "#{Rails.root}/lib/egg_autotests/ia_ZKH_Loader"
 require_dependency "#{Rails.root}/lib/egg_autotests/ia_JPMorgan_GIS_GMP"
+require_dependency "#{Rails.root}/lib/egg_autotests/ia_JPMorgan_GIS_ZKH"
 
 class EggAutotestsList
 

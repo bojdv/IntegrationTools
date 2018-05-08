@@ -39,6 +39,7 @@
     <orderEntry type="library" scope="PROVIDED" name="autoprefixer-rails (v7.2.4, jruby-9.1.15.0-p0) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="bcrypt (v3.1.11, jruby-9.1.15.0-p0) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="bootstrap (v4.0.0.beta3, jruby-9.1.15.0-p0) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="bootstrap-editable-rails (v0.0.9, jruby-9.1.15.0-p0) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="builder (v3.2.3, jruby-9.1.15.0-p0) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="bundler (v1.16.1, jruby-9.1.15.0-p0) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="capybara (v2.17.0, jruby-9.1.15.0-p0) [gem]" level="application" />

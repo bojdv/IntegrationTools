@@ -1,0 +1,60 @@
+<% provide(:title, "Отчет по тестированию") %>
+<!--<link href="app/assets/x-editable/bootstrap-editable.css" rel="stylesheet">-->
+<!--<script src="C:\Users\Pekav\RubymineProjects\IntegrationTools\app\assets\x-editable\bootstrap-editable.js"></script>-->
+<style type="text/css">
+  body {
+    padding-top: 50px;
+    padding-bottom: 30px;
+  }
+
+  table.table > tbody > tr > td {
+    height: 30px;
+    vertical-align: middle;
+  }
+</style>
+<h2>Example</h2>
+<div style="float: right; margin-bottom: 10px">
+  <label style="display: inline-block; margin-right: 50px"><input type="checkbox" id="autoopen" style="vertical-align: baseline">&nbsp;auto-open next field</label>
+  <button id="enable" class="btn btn-default">enable / disable</button>
+</div>
+<p>Click to edit</p>
+<table id="user" class="table table-bordered table-striped" style="clear: both">
+  <tbody>
+  <tr>
+    <td width="35%">Simple text field</td>
+    <td width="65%"><a href="#" id="username" data-type="text" data-pk="1" data-title="Enter username">superuser</a></td>
+  </tr>
+  </tbody>
+</table>
+
+<div class="col">
+  <div class="row">
+    <div class="col-md placeholder">
+      <div class="form-group container">
+        <b>Заполните параметры для построения отчета</b>
+        <a href="#" id="username" class="answer" data-type="text" data-resource="post" data-name="username" data-url="/posts/1" data-original-title="Enter username">superuser</a>
+        <%= simple_form_for :report_params, remote: 'true', url: test_reports_run_path, html: {class: 'form-group' } do |f| %>
+          <%= f.input :labels, label: 'Метки, используемые в доработках:', required: false, placeholder: 'Например: esia_identification' %>
+          <%= f.input :backlog_keys, label: 'Ключи задач на оценку из бэклога:', required: false, placeholder: 'Например: BACKLOG-14044, BACKLOG-16261' %>
+          <%= f.input :project_keys, label: 'Ключи проектов:', required: false, placeholder: 'Например: PRJ-24521' %>
+          <%= f.input :project_codes, label: 'Коды проектов:', required: false, placeholder: 'Например: 24521_BSS_13_Identification' %>
+          <%= f.input :start_test, label: 'Дата начала тестирования', required: false, input_html: {type: :date} %>
+          <%= f.input :end_test, label: 'Дата окончания тестирования', required: false, input_html: {type: :date} %>
+          <%= f.input :test_plan, label: 'Ссылка на план тестирования:', required: false %>
+          <%= f.input :test_rail, label: 'Ссылка на TestRail:', required: false %>
+          <%= f.input :build_link, label: 'Ссылка на сборку:', required: false %>
+          <%= f.input :testing, as: :text, :label => 'Что было проверено', :required => false, placeholder: 'Описание по пунктам'%>
+          <%= f.input :not_testing, as: :text, :label => 'Что не было проверено', :required => false, placeholder: 'Описание по пунктам'%>
+          <%= f.input :build_quality, label: 'Качество сборки:', required: false, collection: ['Отличное', 'Хорошее', 'Удовлетворительное', 'Не известно'] %>
+          <%= f.input :build_intention, label: 'Цель выдачи:', required: false, collection: ['Приемка ДЭИС', 'Выдача в банк'] %>
+          <%= f.input :limitation, as: :text, label: 'Ограничения:', required: false%>
+          <%= f.button :submit, 'Построить отчет', id: 'run-button', class: 'btn-primary' %>
+          <a class="btn btn-primary" id="tester" href="test_reports/tester" data-remote="true">Click</a>
+        <% end %>
+      </div>
+      <div class="col-md-1 placeholder" id="select_product">
+        <a class="btn btn-primary form-group" id="download-link" href="" style="display: none;" onclick="this.style.display = 'none';">Скачать лог</a>
+      </div>
+    </div>
+  </div>
+<%= render 'layouts/modal_xml_sender' %>

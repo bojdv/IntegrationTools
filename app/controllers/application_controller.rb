@@ -3,6 +3,7 @@ class ApplicationController < ActionController::Base
   include SessionsHelper
   include XmlSenderHelper
   include ActionController::Live
+  include TestReportsHelper
   require 'rubygems'
   require 'java'
   # Библиотеки AMQ

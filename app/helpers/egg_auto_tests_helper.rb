@@ -231,9 +231,11 @@ module EggAutoTestsHelper
     $browser_egg[:functional] = functional
     $browser_egg[:color] = color
   end
+
   def puts_line_egg # Метод, который вставляет в лог браузера пунктирную линию
     return '--'*40
   end
+
   def puts_time_egg(startTime, endTime)
     dif = (endTime-startTime).to_i.abs
     min = dif/1.minutes
@@ -382,6 +384,7 @@ END;})
     answer_decode = answer_decode.force_encoding("utf-8")
     return answer_decode
   end
+
   def get_encode_request(xml) # Метод, который получает XML для запроса и возвращает раскодированный тег '//mq:Answer'
     request = Document.new(xml)
     answer = request.elements['//mq:Answer'].text
@@ -391,6 +394,7 @@ END;})
     $log_egg.write_to_browser("Раскодировали запрос!")
     return answer_decode
   end
+
   def validate_egg_xml(xsd_in, xml, functional) # Метод валидации по XSD. xsd_in - путь к XSD, xml - текст XML, functional - название теста
     # Ничего не возвращает, а только пишет в лог результат
     begin
@@ -574,7 +578,4 @@ END;})
     end
   end
 
-  def pu
-    puts @a
-  end
 end

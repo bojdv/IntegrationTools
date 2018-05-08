@@ -13,6 +13,11 @@
 //= require jquery
 //= require rails-ujs
 //= require jquery.contextMenu.js
+
+//= require bootstrap
+//= require bootstrap-editable
+//= require bootstrap-editable-rails
+
 //= require_tree .
 //= require popper
 //= require bootstrap-sprockets

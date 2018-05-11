@@ -131,8 +131,8 @@ class EggAutoTestsController < ApplicationController
     send_file "#{$log_egg.log_dir}/#{params[:filename]}"
   end
   def tester
-    @a = "waa"
-    pu
+
+    puts "YES" if  a
   end
 end
 

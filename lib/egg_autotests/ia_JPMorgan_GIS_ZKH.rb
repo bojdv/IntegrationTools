@@ -67,7 +67,7 @@ class IA_JPMorgan_GIS_ZKH
         count +=1
       end
     rescue Exception => msg
-      @result["Payment"] = "false"
+      @result["payment"] = "false"
       $log_egg.write_to_browser("Ошибка! #{msg}")
       $log_egg.write_to_log(functional, "Ошибка!", "Ошибка! #{msg}\n#{msg.backtrace.join("\n")}")
       colorize_egg(@egg_version, @menu_name, @fail_menu_color)

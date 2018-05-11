@@ -77,7 +77,7 @@ class EggAutotestsList
     end
 
     if components.include?('ИА JPMorgan (ГИС ЖКХ)')
-      ia_jpmorgan_gis_zkh = ia_JPMorgan_GIS_ZKH.new(@pass_menu_color, @fail_menu_color, @not_find_xml, @not_receive_answer, @egg_version, @try_count)
+      ia_jpmorgan_gis_zkh = IA_JPMorgan_GIS_ZKH.new(@pass_menu_color, @fail_menu_color, @not_find_xml, @not_receive_answer, @egg_version, @try_count)
       ia_jpmorgan_gis_zkh.payment
       ia_jpmorgan_gis_zkh.payment_cancellation
     end

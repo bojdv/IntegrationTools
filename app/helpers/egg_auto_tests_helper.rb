@@ -418,7 +418,7 @@ END;})
 
   def get_file_body(dir)
     body = String.new
-    count = 60 # Ожидание ответа в секундах
+    count = 80 # Ожидание ответа в секундах
     until body.size > 0 or count == 0
       if File.directory?(dir) # Проверяем существует ли директория
         Dir.entries(dir).each_entry do |entry| # Просматриваем каждый файл в каталоге, имя файла пишется в переменную entry

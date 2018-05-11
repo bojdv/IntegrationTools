@@ -104,7 +104,7 @@ class IA_JPMorgan_GIS_ZKH
           $log_egg.write_to_log(functional, "Проверка не пройдена!", "Не получили ответ от eGG")
           colorize_egg(@egg_version, @menu_name, @fail_menu_color)
         else
-          expected_result_cancellation = '1Cancellation' # Текст, который должен быть в XML, если она успешна
+          expected_result_cancellation = 'Cancellation' # Текст, который должен быть в XML, если она успешна
           $log_egg.write_to_browser("Получили ответ из каталога #{@dir_inbound}!")
           $log_egg.write_to_log(functional, "Ответ от eGG!", "Done! Получили ответ из каталога #{@dir_inbound}!")
           if answer.include?(@expected_result) and answer.include?(expected_result_cancellation)

@@ -68,6 +68,8 @@ class EggAutotestsList
     if components.include?('СА ГИС ГМП')
       sa_gis_gmp = SA_GIS_GMP.new(@pass_menu_color, @fail_menu_color, @not_find_xml, @not_receive_answer, @egg_version, @try_count)
       sa_gis_gmp.run_RequestMessage
+      sa_gis_gmp.run_Payment_refinement
+      sa_gis_gmp.run_Payment_cancellation
       sa_gis_gmp.run_Charges
     end
 

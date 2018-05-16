@@ -11,6 +11,7 @@ require_dependency "#{Rails.root}/lib/egg_autotests/ia_UFEBS_GIS_ZKH"
 require_dependency "#{Rails.root}/lib/egg_autotests/ia_ZKH_Loader"
 require_dependency "#{Rails.root}/lib/egg_autotests/ia_JPMorgan_GIS_GMP"
 require_dependency "#{Rails.root}/lib/egg_autotests/ia_JPMorgan_GIS_ZKH"
+require_dependency "#{Rails.root}/lib/egg_autotests/sa_SPEP"
 
 class EggAutotestsList
 
@@ -89,5 +90,14 @@ class EggAutotestsList
       ia_zkh_loader.providerCatalogFile_test
       ia_zkh_loader.providerCatalogMQ_test
     end
+
+    if components.include?('СА SPEP')
+      sa_spep = SA_SPEP.new(@pass_menu_color, @fail_menu_color, @not_find_xml, @not_receive_answer, @egg_version, @try_count)
+      sa_spep.verifycertificate_ok
+      sa_spep.verifycertificatewithreport
+      sa_spep.verifycertificate_crl
+      sa_spep.verifycertificate_nocert
+    end
+
   end
 end

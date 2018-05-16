@@ -4,7 +4,11 @@ class TestReportsController < ApplicationController
   end
 
   def run
-    response_ajax_reports("Не заполнены метки") and return if report_params[:labels].empty?
+    #response_ajax_reports("Не заполнены метки") and return if report_params[:labels].empty? # добавить все условия
+    backlog_keys = report_params[:backlog_keys].split('-')
+    #a = Hash[*backlog_keys]
+    p backlog_keys
+    #data = JIRA_Report.new(label)
   end
 
   def tester

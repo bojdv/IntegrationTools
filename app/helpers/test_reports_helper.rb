@@ -6,7 +6,27 @@ module TestReportsHelper
     end
   end
 
-  def select_data
+  class JIRA_Report
+    def initialize(label, key, project_name)
+      @labels = label
+    end
+
+    def select_data
+      select = <<-query
+SELECT * 
+FROM view_itools_report
+WHERE 
+label in ('sn_activemq_2.12', 'sn_fcm_2.12')
+or
+(project_key in ('BACKLOG', 'PRJ') and issuenum in ('16836', '18509', '25150'))
+or
+project_name in ('25150_BSS_2_STDv2.12')
+
+      query
+    end
+  end
+
+  def select_data1
     url = "jdbc:oracle:thin:@vm-jiratest-db.bss.lan:1521:JIRATEST"
     connection = java.sql.DriverManager.getConnection(url, "JIRA_PekAV", "JIRA_PekAV");
     stmt = connection.create_statement

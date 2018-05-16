@@ -41,7 +41,7 @@ class EggAutoTestsController < ApplicationController
     response_ajax_auto_egg("Не выбран функционал для проверки") and return if tests_params_egg[:egg_version] == 'eGG 6.7' and tests_params_egg[:functional_egg67].nil?
     response_ajax_auto_egg("Не выбрана сборка") and return if tests_params_egg[:build_version].empty?
     begin
-      @db_username = "egg_autotest_bojdv"
+      @db_username = "egg_autotest"
       @build_file_egg = "#{Rails.root}/egg-#{tests_params_egg[:build_version]}-installer-windows.exe"
       @installer_path_egg = "C:/EGG_Installer/egg-#{tests_params_egg[:build_version]}-installer-windows.exe"
       @run_test_message = "Установка/запуск eGG #{tests_params_egg[:build_version]}"

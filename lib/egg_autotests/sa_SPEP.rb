@@ -14,7 +14,7 @@ class SA_SPEP
     @category = Category.find_by_category_name('СА SPEP')
     @manager = QueueManager.find_by_manager_name('iTools[EGG]')
     @result = Hash.new
-    @functional = "Проверка адаптера СА SPEP"
+    @functional = "Проверка адаптера по проверке квалифицированного сертификата"
   end
 
   def verifycertificate_ok

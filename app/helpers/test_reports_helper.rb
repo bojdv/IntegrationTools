@@ -47,7 +47,6 @@ module TestReportsHelper
       keys.each_index  do |index|
         array << keys[index] + '-' + numbers[index]
       end
-      puts array
       return array.join(',').delete('\'')
     end
 
@@ -74,7 +73,6 @@ module TestReportsHelper
       ORDER BY issuenum asc
       query
       begin
-        puts select
         url = "jdbc:oracle:thin:@jira-db.bss.lan:1521:JIRACLUSTER"
         connection = java.sql.DriverManager.getConnection(url, "JIRA_GUEST_PROM_PEKAV", "JIRA_GUEST_PROM_PEKAV");
         stmt = connection.create_statement
@@ -153,7 +151,6 @@ module TestReportsHelper
       ORDER BY issue_type desc
       query
       begin
-        puts select
         url = "jdbc:oracle:thin:@jira-db.bss.lan:1521:JIRACLUSTER"
         connection = java.sql.DriverManager.getConnection(url, "JIRA_GUEST_PROM_PEKAV", "JIRA_GUEST_PROM_PEKAV");
         stmt = connection.create_statement
@@ -176,7 +173,6 @@ module TestReportsHelper
         stmt.close
         connection.close
       end
-      puts nullable_lebels
       return nullable_lebels, worklog_time, worklog_autor.uniq
     end
 
@@ -189,7 +185,6 @@ module TestReportsHelper
       ORDER BY issue_type desc
       query
       begin
-        puts select
         url = "jdbc:oracle:thin:@jira-db.bss.lan:1521:JIRACLUSTER"
         connection = java.sql.DriverManager.getConnection(url, "JIRA_GUEST_PROM_PEKAV", "JIRA_GUEST_PROM_PEKAV");
         stmt = connection.create_statement
@@ -217,7 +212,6 @@ module TestReportsHelper
       WHERE issue_type in ('Дефект', 'Консультация', 'Тестирование') and label in (#{@labels})
       query
       begin
-        puts select
         url = "jdbc:oracle:thin:@jira-db.bss.lan:1521:JIRACLUSTER"
         connection = java.sql.DriverManager.getConnection(url, "JIRA_GUEST_PROM_PEKAV", "JIRA_GUEST_PROM_PEKAV");
         stmt = connection.create_statement

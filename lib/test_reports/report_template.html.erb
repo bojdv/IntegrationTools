@@ -90,7 +90,7 @@
         <td>Версия продукта</td>
         <td><%=	report_params[:build_version]  %></td>
       </tr>
-      <%	 if @build_links.size > 1 %>
+      <%	 if report_params[:build_link].size > 1 %>
       <tr>
         <td rowspan="<%= @build_links.size %>">Ссылки на сборки</td>
         <td><a href="<%= @build_links.first %>" target="_blank" title=""><%= @build_links.first %></a></td>
@@ -103,18 +103,14 @@
       <%	 end %>
       <tr>
         <td>Release Note</td>
-        <td></td>
+        <td><a href="https://jira.bssys.com/issues/?jql=key in (<%=	@rn  %>)" target="_blank" title="Wiki"><%=@rn%></a></td>
       </tr>
       <tr bgcolor="#99CC00">
         <td colspan="2"><strong><span style="color: #ffffff;">Тестовое покрытие</span></strong></td>
       </tr>
       <tr>
         <td>Выполненное тестирование</td>
-        <td><%=	report_params[:testing]  %></td>
-      </tr>
-      <tr>
-        <td>Не выполненное тестирование</td>
-        <td><%=	report_params[:not_testing]  %></td>
+        <td><%=	report_params[:testing].inspect.gsub('\n', '<br>').slice(1..-2)  %></td>
       </tr>
       <tr bgcolor="#99CC00">
         <td colspan="2"><strong><span style="color: #ffffff;">Оценка качества</span></strong></td>
@@ -131,7 +127,7 @@
       </tr>
       <tr>
         <td>Ограничения</td>
-        <td><%=	report_params[:limitation]  %></td>
+        <td><%=	report_params[:limitation].inspect.gsub('\n', '<br>').slice(1..-2)  %></td>
       </tr>
       <tr bgcolor="#99CC00">
         <td colspan="2"><strong><span style="color: #ffffff;">Трудозатраты</span></strong></td>
@@ -167,7 +163,12 @@
       </tr>
       <tr>
         <td>Осталось часов по оценке тестирования</td>
-        <td><%= @backlog_estimate-(all_worklog.to_f/60) %>ч</td>
+        <% time = @backlog_estimate-(all_worklog.to_f/60) %>
+        <% if time >= 0%>
+        <td><font color="green"><%= time %>ч</font></td>
+          <%	 else %>
+          <td><font color="red"><%= time %>ч</font></td>
+          <%	 end %>
       </tr>
       <tr bgcolor="#99CC00">
         <td colspan="2"><strong><span style="color: #ffffff;">Информация о дефектах</span></strong></td>

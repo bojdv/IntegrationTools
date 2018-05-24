@@ -10,8 +10,9 @@ class TestReportsController < ApplicationController
     @report = JIRA_Report.new(report_params[:backlog_keys], report_params[:labels], worklog_autor)
     @backlog_estimate, @project_estimate, @testing_worklogtime, @defect_worklogtime, @consultation_worklogtime, @agreement_worklogtime, @defect_count, @defect_true_count, @defect_open_count, @defect_bkv_count, @test_tasks, @def_tasks, @cons_tasks = @report.select_all
     @build_links = @report.get_task_array(report_params[:build_link])
+    @rn = report_params[:release_note]
     @nullable_lebels, @worklog_time, @worklog_autor = @report.select_custom
-    @nullable_lebels
+    @nullable_lebels.delete_if {|key, value| @nullable_lebels.values.count(value) > 1}
     @worklog_autor = @report.get_value_from_hash(worklog_autor, @worklog_autor)
     @deis_def = @report.select_deis
     make_log_reports
@@ -21,6 +22,9 @@ class TestReportsController < ApplicationController
     log_file_name = "Test_Report_#{Time.now.strftime('%Y-%m-%d(%H-%M-%S)')}.html" # формируем имя файла
     template = File.read("#{Rails.root}/lib/test_reports/report_template.html.erb") # читаем шаблон для лога
     result = ERB.new(template).result(binding)
+    if not Dir.exist?("#{Rails.root}/lib/test_reports/reports/")
+      Dir.mkdir("#{Rails.root}/lib/test_reports/reports/")
+    end
     File.open("#{Rails.root}/lib/test_reports/reports/#{log_file_name}", 'w+') do |f|
       f.write result
     end
@@ -35,8 +39,9 @@ class TestReportsController < ApplicationController
   end
 
   def tester
-    worklog_autor = {0=>["[eGG ASM 6.10.27] Error resolving artifactcom.oracle:ojdbc7:jar:12.1.0.1.0", "BSSEGGBH-42", "Р”РµС„РµРєС‚", "Р—Р°РєСЂС‹С‚"], 1=>["[eGG ASM 6.10.27] Error resolving artifactcom.oracle:ojdbc7:jar:12.1.0.1.0", "BSSEGGBH-42", "Р”РµС„РµРєС‚", "Р—Р°РєСЂС‹С‚"]}
-    puts worklog_autor.to_a.uniq.to_h
+    worklog_autor = {0=>["[eGG ASM 6.10.27] Error resolving artifactcom.oracle:ojdbc7:jar:12.1.0.1.0", "BSSEGGBH-42", "Р”РµС„РµРєС‚", "Р—Р°РєСЂС‹С‚"], 1=>["[eGG ASM 6.10.27] Error resolving artifactcom.oracle:ojdbc7:jar:12.1.0.1.0", "BSSEGGBH-42", "Р”РµС„РµРєС‚", "Р—Р°РєСЂС‹С‚"], 2=>["[eGG ASM 6.10.27] Error resolving artifactcom.oracle:ojdbc7:jar:12.1.0.1.0", "BSSEGGBH-43", "Р”РµС„РµРєС‚", "Р—Р°РєСЂС‹С‚"]}
+    worklog_autor.delete_if {|key, value| worklog_autor.values.count(value) > 1}
+    puts worklog_autor
   end
 
   private
@@ -47,7 +52,7 @@ class TestReportsController < ApplicationController
                                           :backlog_keys,
                                           :test_plan,
                                           :test_rail,
-                                          :build_version,
+                                          :release_note,
                                           :build_link,
                                           :testing,
                                           :not_testing,

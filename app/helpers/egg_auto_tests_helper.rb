@@ -578,4 +578,8 @@ END;})
     end
   end
 
+  def test_m
+    puts "Hi"
+  end
+
 end

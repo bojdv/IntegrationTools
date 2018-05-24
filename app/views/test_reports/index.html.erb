@@ -1,0 +1,28 @@
+<% provide(:title, "Отчет по тестированию") %>
+<div class="col">
+  <div class="row">
+    <div class="col-md placeholder">
+      <div class="form-group container">
+        <b>Заполните параметры для построения отчета</b>
+        <%= simple_form_for :report_params, remote: 'true', url: test_reports_run_path, html: {class: 'form-group' } do |f| %>
+          <%= f.input :product, label: 'Выберите продукт:', required: false, collection: ['eGG', 'ТИР', 'FRAUD-Анализ', 'MoneyTrans', 'Сервер нотификаций', 'ЭПОС'] %>
+          <%= f.input :summary, label: 'Название доработки:', required: false %>
+          <%= f.input :labels, label: 'Метки, используемые в доработках:', required: false, placeholder: 'Например: esia_identification' %>
+          <%= f.input :backlog_keys, label: 'Ключи задач на оценку из бэклога:', required: false, placeholder: 'Например: BACKLOG-14044, BACKLOG-16261' %>
+          <%= f.input :test_plan, label: 'Ссылка на план тестирования:', required: false %>
+          <%= f.input :test_rail, label: 'Ссылка на TestRail:', required: false %>
+          <%= f.input :build_version, label: 'Версия продукта:', required: false %>
+          <%= f.input :build_link, label: 'Ссылки на сборки:', required: false, placeholder: 'Можно через запятую' %>
+          <%= f.input :testing, as: :text, :label => 'Что было проверено', :required => false, placeholder: 'Описание по пунктам'%>
+          <!--%= f.input :not_testing, as: :text, :label => 'Что не было проверено', :required => false, placeholder: 'Описание по пунктам'%-->
+          <%= f.input :build_quality, label: 'Качество сборки:', required: false, collection: ['Отличное', 'Хорошее', 'Удовлетворительное', 'Не известно'] %>
+          <!--%= f.input :build_intention, label: 'Цель выдачи:', required: false, collection: ['Приемка ДЭИС', 'Выдача в банк'] %-->
+          <%= f.input :limitation, as: :text, label: 'Ограничения:', required: false%>
+          <%= f.button :submit, 'Построить отчет', id: 'run-button', class: 'btn-primary', onclick: "document.getElementById('download-link').style.display = 'none';" %>
+          <a class="btn btn-primary form-group" id="download-link" href="" style="display: none;" onclick="this.style.display = 'none';">Скачать лог</a>
+          <!--a class="btn btn-primary" id="tester" href="test_reports/tester" data-remote="true">Click</a-->
+        <% end %>
+      </div>
+    </div>
+  </div>
+<%= render 'layouts/modal_xml_sender' %>

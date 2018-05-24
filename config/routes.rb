@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  get 'test_reports/index'
+
   get 'cc_format_validator/index'
 
   get 'egg_auto_tests/index'
@@ -62,6 +64,12 @@ Rails.application.routes.draw do
   get '/cc_format_validator/start' => 'cc_format_validator#start'
   get '/cc_format_validator/stop' => 'cc_format_validator#stop'
   get '/cc_format_validator/clear_log' => 'cc_format_validator#clear_log'
+
+  # Test Reports
+  get '/test_reports' => 'test_reports#index'
+  get '/test_reports/tester' => 'test_reports#tester'
+  post '/test_reports/run' => 'test_reports#run'
+  get '/test_reports/download_log_reports' => 'test_reports#download_log_reports'
 
   root 'main_page#index'
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html

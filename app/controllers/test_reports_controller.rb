@@ -57,7 +57,6 @@ class TestReportsController < ApplicationController
                                           :testing,
                                           :not_testing,
                                           :build_quality,
-                                          :build_intention,
                                           :limitation)
   end
 end

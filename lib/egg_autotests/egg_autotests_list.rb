@@ -30,7 +30,7 @@ class EggAutotestsList
       when build_version.include?('6.9')
         @ufebs_version = '2018.2.2' #\app\smx\resourceapp.war\wsdl\XSD\CBR\х\ed\cbr_ed101_vх.xsd
       else
-        @ufebs_version = '2018.3.1'
+        @ufebs_version = '2018.3.2'
     end
 
   end

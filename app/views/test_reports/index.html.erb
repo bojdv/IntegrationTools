@@ -7,7 +7,7 @@
           <%= f.input :product, label: 'Выберите продукт:', required: false, collection: ['eGG', 'ТИР', 'FRAUD-Анализ', 'MoneyTrans', 'Сервер нотификаций', 'ЭПОС'] %>
           <%= f.input :summary, label: 'Название доработки:', required: false %>
           <%= f.input :labels, label: 'Метки, используемые в доработках:', required: false, placeholder: 'Например: esia_identification' %>
-          <%= f.input :backlog_keys, label: 'Ключи задач на оценку из бэклога:', required: false, placeholder: 'Например: BACKLOG-14044, BACKLOG-16261' %>
+          <%= f.input :backlog_keys, label: 'Ключи задач на оценку из бэклога (тестирования):', required: false, placeholder: 'Например: BACKLOG-14044, BACKLOG-16261' %>
           <%= f.input :test_plan, label: 'Ссылка на план тестирования:', required: false %>
           <%= f.input :test_rail, label: 'Ссылка на TestRail:', required: false %>
           <%= f.input :release_note, label: 'Ссылка на RN в JIRA', required: false, placeholder: 'Ключ задачи, где сделали RN, например: BSSEGGSA-66' %>

@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  get 'test_plans/index'
+
   get 'test_reports/index'
 
   get 'cc_format_validator/index'
@@ -70,6 +72,10 @@ Rails.application.routes.draw do
   get '/test_reports/tester' => 'test_reports#tester'
   post '/test_reports/run' => 'test_reports#run'
   get '/test_reports/download_log_reports' => 'test_reports#download_log_reports'
+
+  # Test Plans
+  get '/test_plans' => 'test_plans#index'
+  get '/test_plans/tester' => 'test_plans#tester'
 
   root 'main_page#index'
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html

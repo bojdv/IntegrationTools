@@ -1,0 +1,22 @@
+<% provide(:title, 'Новый план тестирования') %>
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Новый план тестирования</title>
+</head>
+<body>
+<div class="container">
+  <%= simple_form_for @new_plan, remote: true, html: { class: 'form-group' } do |f| %>
+    <%= f.input :name, :label => 'Название плана тестирования', :required => false %>
+    <%= f.association :product, :required => false, :label => 'Продукт', label_method: :product_name, prompt: 'Выберите продукт' %>
+    <%= f.input :finish_date, :label => 'Дата завершения тестирования', :required => false , :order => [:day, :month, :year], include_blank: true%>
+    <%= f.input :status, :label => 'Статус тестирования', :required => false, :collection => ['Новый', 'В работе', 'Завершен'] %>
+    <%= f.input :comment, as: :text, :label => 'Комментарий тестировщика <u>при окончании тестирования</u>'.html_safe, :placeholder => 'Какие были сложности? В чем причина превышений?', input_html: { style: "height:300px"} %>
+    <%= f.button :submit, 'Создать план', class: 'btn btn-primary' %>
+  <%	 end %>
+  <%= link_to 'Назад', test_plans_path, {:class => "btn btn-primary" } %>
+</div>
+<%= render 'layouts/modal_xml_sender' %>
+</body>
+</html>

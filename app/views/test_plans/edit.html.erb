@@ -1,0 +1,23 @@
+<% provide(:title, 'Изменить план тестирования') %>
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Изменить план тестирования</title>
+</head>
+<body>
+<div class="container">
+<%= simple_form_for @edit_plan, remote: true, html: { class: 'form-group' } do |f| %>
+  <%= f.input :name, :label => 'Название плана тестирования', :required => false %>
+  <%= f.association :product, :required => false, :label => 'Продукт', label_method: :product_name, prompt: 'Выберите продукт' %>
+  <%= f.input :finish_date, as: :date, :label => 'Дата завершения тестирования', :required => false , :order => [:day, :month, :year], include_blank: true%>
+  <%= f.input :status, :label => 'Статус тестирования', :required => false, :collection => ['Новый', 'В работе', 'Завершен'] %>
+  <%= f.input :comment, as: :text, :label => 'Комментарий тестировщика при окончании тестирования', :placeholder => 'Какие были сложности? В чем причина превышений?', input_html: { style: "height:300px"} %>
+  <%= f.button :submit, 'Изменить план', class: 'btn btn-primary form-group' %>
+    <%= link_to 'Удалить план', url_for(@edit_plan), {:class => "btn btn-danger  form-group", method: :delete, data: { confirm: 'Вы уверены, что хотите удалить план тестирования?' }} %>
+<%	 end %>
+<%= link_to 'Назад', test_plans_path, {:class => "btn btn-primary  form-group"} %>
+</div>
+<%= render 'layouts/modal_xml_sender' %>
+</body>
+</html>

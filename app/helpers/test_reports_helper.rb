@@ -13,7 +13,7 @@ module TestReportsHelper
       @labels = get_task_list(labels)
       @project_keys, @project_numbers, @project_name, @project_key = select_prjUrlKeyName
       @worklog_autor = get_task_list(worklog_autor.keys.join(','))
-      @projects = split_task(@project_keys.split(','), @project_numbers.split(','))
+      @projects = split_task(@project_keys.split(','), @project_numbers.split(',')) if !@project_keys.nil?
 
       @defect_count = Array.new
       @defect_true_count = Array.new
@@ -78,13 +78,24 @@ module TestReportsHelper
     # СЕЛЕКТЫ!
 
     def select_backlog_project_estimate # Плановые оценки тестирования и МП
-      select = <<-query
+      if @project_keys.nil?
+        select = <<-query
+      SELECT exptest, prjtest, project_key, issuenum
+      FROM view_itools_report
+      WHERE
+      project_key in (#{@backlog_keys}) and issuenum in (#{@backlog_numbers})
+      ORDER BY issuenum asc
+        query
+      else
+        select = <<-query
       SELECT exptest, prjtest, project_key, issuenum
       FROM view_itools_report
       WHERE
       project_key in (#{@backlog_keys}, #{@project_keys}) and issuenum in (#{@backlog_numbers}, #{@project_numbers})
       ORDER BY issuenum asc
-      query
+        query
+      end
+
       begin
         puts "Select select_backlog_project_estimate:\n" + select
         url = "jdbc:oracle:thin:@jira-db.bss.lan:1521:JIRACLUSTER"
@@ -370,10 +381,14 @@ module TestReportsHelper
         stmt.close
         connection.close
       end
-      project_url.uniq!
-      prj_key = get_task_key(project_url.join(','))
-      prj_number = get_task_number(project_url.join(','))
-      return prj_key,  prj_number, get_task_list(project_name.uniq.join(',')), get_task_list(project_key.uniq.join(','))
+      if project_name.any?
+        project_url.uniq!
+        prj_key = get_task_key(project_url.join(','))
+        prj_number = get_task_number(project_url.join(','))
+        return prj_key,  prj_number, get_task_list(project_name.uniq.join(',')), get_task_list(project_key.uniq.join(','))
+      else
+        return nil
+      end
     end
 
   end

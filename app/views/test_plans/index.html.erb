@@ -1,0 +1,93 @@
+<% provide(:title, 'Планы тестирования') %>
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Планы тестирования</title>
+</head>
+<body>
+<div class="container-fluid">
+  <ul class="nav nav-tabs" id="mqTab" role="tablist">
+    <li class="nav-item">
+      <a class="nav-link active" id="output-tab" data-toggle="tab" href="#egg" role="tab" aria-controls="output" aria-selected="true">BSS e-Goverment Gate</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="input-tab" data-toggle="tab" href="#fraud" role="tab" aria-controls="input" aria-selected="false">Fraud-Анализ</a>
+    </li>
+  </ul>
+  <!-- EGG -->
+  <div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade show active" id="egg" role="tabpanel" aria-labelledby="output-tab">
+      <div class="container-fluid">
+        <br/>
+        <div style="height:600px;width:1500px;border:3px solid dodgerblue;font:14px/18px Calibri, Garamond, Serif;overflow:auto;">
+          <table class="table table-dark">
+            <thead>
+            <tr>
+              <th scope="col">Название плана</th>
+              <th scope="col">Дата создания</th>
+              <th scope="col">Дата окончания работ</th>
+              <th scope="col">Статус</th>
+              <th scope="col">Автор</th>
+              <th scope="col">Редактировать</th>
+            </tr>
+            </thead>
+            <tbody>
+            <%	 unless @egg_plans.nil?  %>
+              <% @egg_plans.order(created_at: :desc).each do |plan| %>
+                <tr>
+                  <td><%= link_to plan.name, test_plan_path(plan) %></td>
+                  <td><%= plan.created_at %></td>
+                  <td><%= plan.finish_date %></td>
+                  <td><%= plan.status %></td>
+                  <td><%= User.where(:id => 10000).pluck(:email).join %></td>
+                  <%	 if logged_in? and plan.status != 'Завершен' %><td><%= link_to 'Редактировать', edit_test_plan_path(plan) %></td><% end %>
+                </tr>
+              <% end %>
+            <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <!-- Вторая вкладка -->
+    <div class="tab-pane fade" id="fraud" role="tabpanel" aria-labelledby="input-tab">
+      <div class="container-fluid">
+        <br/>
+        <div style="height:600px;width:1500px;border:3px solid dodgerblue;font:14px/18px Calibri, Garamond, Serif;overflow:auto;">
+          <table class="table table-dark">
+            <thead>
+            <tr>
+              <th scope="col">Название плана</th>
+              <th scope="col">Дата создания</th>
+              <th scope="col">Дата окончания работ</th>
+              <th scope="col">Статус</th>
+              <th scope="col">Автор</th>
+              <th scope="col">Редактировать</th>
+            </tr>
+            </thead>
+            <tbody>
+            <%	 unless @fraud_plans.nil?  %>
+              <% @fraud_plans.order(created_at: :desc).each do |plan| %>
+                <tr>
+                  <td><%= link_to plan.name, test_plan_path(plan) %></td>
+                  <td><%= plan.created_at %></td>
+                  <td><%= plan.finish_date %></td>
+                  <td><%= plan.status %></td>
+                  <td><%= User.where(:id => 10000).pluck(:email).join %></td>
+                  <%	 if logged_in? and plan.status != 'Завершен' %><td><%= link_to 'Редактировать', edit_test_plan_path(plan) %></td><% end %>
+                </tr>
+              <% end %>
+            <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div><br>
+  <%	 if logged_in? %>
+    <%= link_to 'Новый план тестирования', new_test_plan_path, {:class => "btn btn-primary form-group" } %>
+  <%	 end %>
+</div>
+</body>
+</html>

@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  get 'features/index'
+
   get 'test_plans/index'
 
   get 'test_reports/index'
@@ -74,8 +76,10 @@ Rails.application.routes.draw do
   get '/test_reports/download_log_reports' => 'test_reports#download_log_reports'
 
   # Test Plans
-  get '/test_plans' => 'test_plans#index'
   get '/test_plans/tester' => 'test_plans#tester'
+  resources :test_plans do
+    resources :features
+  end
 
   root 'main_page#index'
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html

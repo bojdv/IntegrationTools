@@ -1,19 +1,4 @@
 Rails.application.routes.draw do
-  get 'features/index'
-
-  get 'test_plans/index'
-
-  get 'test_reports/index'
-
-  get 'cc_format_validator/index'
-
-  get 'egg_auto_tests/index'
-
-  get 'egg_autotests/index'
-
-  get 'tir_auto_tests/index'
-
-  get 'simple_tests/index'
 
   get 'sessions/new'
   get 'users/new'

@@ -22,6 +22,7 @@
               <th scope="col">Дата окончания работ</th>
               <th scope="col">Статус</th>
               <th scope="col">Автор</th>
+              <th scope="col">Комментарий</th>
               <th scope="col">Редактировать</th>
             </tr>
             </thead>
@@ -33,7 +34,8 @@
                   <td><%= plan.created_at %></td>
                   <td><%= plan.finish_date %></td>
                   <td><%= plan.status %></td>
-                  <td><%= User.where(:id => 10000).pluck(:email).join %></td>
+                  <td><%= User.where(:id => plan.user_id).pluck(:email).join %></td>
+                  <td><%	 if !plan.comment.empty? %><a tabindex="0" class="show-popover" data-toggle="popover" title="Комментарий" data-content="<%= plan.comment%>">Комментарий</a><%  end %></td>
                   <%	 if logged_in? and plan.status != 'Завершен' %><td><%= link_to 'Редактировать', edit_test_plan_path(plan) %></td><% end %>
                 </tr>
               <% end %>

@@ -58,7 +58,7 @@ class FeaturesController < ApplicationController
 
   private
   def feature_params
-    params.require(:feature).permit(:name, :labels, :project_name, :backlog, :feature_url, :test_scope, :tz, :milestone, :testcases, :analytic => [], :developer => [], :manager => [], :qa => [])
+    params.require(:feature).permit(:name, :labels, :project_name, :backlog, :feature_url, :test_scope, :tz, :testcases, :start_date, :end_date, :project_plan, :comment, :analytic => [], :developer => [], :manager => [], :qa => [])
   end
 
   def share_var
@@ -76,6 +76,9 @@ class FeaturesController < ApplicationController
     @manager = {'KosAS' => 'Космин Александр',
                  'KhmVM' => 'Хмельницкий Валерий',
                  'GolAV' => 'Головченко Андрей',
-                 'ldi' => 'Ляпин Дмитрий'}
+                 'ldi' => 'Ляпин Дмитрий',
+                  'StoEA' => 'Столбов Евгений',
+                'LogVA' => 'Логинов Всеволод',
+                'KonSA' => 'Кондрашов Сергей' }
   end
 end

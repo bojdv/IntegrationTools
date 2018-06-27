@@ -43,6 +43,10 @@ class TestPlansController < ApplicationController
         @deis_defect_worklogtime = @report.select_deis_worklog
         @deis_def, @deis_defect_true_count = @report.select_deis
         @other_tasks = @report.select_other_task
+        @worklog_per_date, worklog_sum_per_date = @report.select_worklog_per_date
+        start_test_date, end_test_date = find_max_test_dates(@show_plan)
+        @worklog_sum_per_date = [worklog_sum_per_date,[{date: start_test_date, value: 0}, {date: end_test_date, value: @project_estimate}]]
+
 
         @report_feature = Array.new
         @show_plan.features.each_with_index do |f, i|
@@ -50,6 +54,17 @@ class TestPlansController < ApplicationController
         end
       end
     end
+    # @data = MG.data_graphic({
+    #                     title: "Downloads",
+    #                     description: "This graphic shows a time-series of downloads.",
+    #                     data: [{date: Date('2014-11-02'), value: 12},
+    #                            {date:  Date('2014-11-02'),value: 18}],
+    #                     width: 600,
+    #                     height: 250,
+    #                     target: '#downloads',
+    #                     x_accessor: 'date',
+    #                     y_accessor: 'value'
+    #                 })
   end
 
   def edit

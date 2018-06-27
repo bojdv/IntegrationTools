@@ -498,15 +498,14 @@ END;})
     $log_egg.write_to_browser("Скачиваем инсталлятор eGG #{tests_params_egg[:build_version]}...")
     $log_egg.write_to_log(@run_test_message, "Скачиваем инсталлятор eGG #{tests_params_egg[:build_version]}...", "Запустили задачу в #{Time.now.strftime('%H-%M-%S')}")
     begin
-      ftp = Net::FTP.new('server-ora-bssi')
+      ftp = Net::FTP.new('10.1.1.163')
       ftp.login
-      ftp.chdir("build-release/egg/#{tests_params_egg[:build_version]}")
+      ftp.chdir("build-release/egg-installer/#{tests_params_egg[:build_version]}")
       ftp.passive = true
-      ftp.getbinaryfile("egg-#{tests_params_egg[:build_version]}-installer-windows.exe", localfile = File.basename(@build_file_egg))
+      ftp.getbinaryfile("egg-installer-#{tests_params_egg[:build_version]}-installer-windows.exe", localfile = File.basename(@build_file_egg))
     rescue Exception => msg
-      #$log_egg.write_to_browser("Ошибка! #{msg}", "Ошибка! #{msg}")
       $log_egg.write_to_browser("Ошибка! #{msg}")
-      $log_egg.write_to_log(@run_test_message, "Ошибка при скачивании инсталлятора", "Ошибка! #{msg}")
+      $log_egg.write_to_log(@run_test_message, "Ошибка при скачивании инсталлятора", "Ошибка! #{msg}. #{msg.backtrace.join("\n")}")
     end
   end
 

@@ -1,9 +1,4 @@
 <% provide(:title, @show_plan.name) %>
-<!DOCTYPE HTML>
-<html>
-<head>
-  <meta charset="utf-8">
-</head>
 <div class="container-fluid"><br/>
   <h4>Общая информация</h4>
   <div style="height:600px;width:1500px;border:3px solid dodgerblue;font:14px/18px Calibri, Garamond, Serif;overflow:auto;">
@@ -11,7 +6,13 @@
       <tr>
         <th scope="col">Название доработки</th>
         <% @show_plan.features.each do |f| %>
-          <td><%= f.name %></td>
+          <td style="color:yellow"><b><%= f.name %></b> <%= link_to '(edit)', "#{@show_plan.id}/features/#{f.id}/edit" %></td>
+        <%  end %>
+      </tr>
+      <tr>
+        <th scope="col">Даты тестирования (план)</th>
+        <% @show_plan.features.each do |f| %>
+          <td><%= "Старт: #{f.start_date}<br>".html_safe %><%= "Конец: #{f.end_date}" %></td>
         <%  end %>
       </tr>
       <tr>
@@ -45,57 +46,51 @@
         <%  end %>
       </tr>
       <tr>
-        <th scope="col">Milestone</th>
+        <th scope="col">Ссылка на TestRail</th>
         <% @show_plan.features.each do |f| %>
-          <% if !f.milestone.nil? %>
-            <td><a href=<%= f.milestone %> target="_blank">MileStone</a></td>
-          <%	 end %>
+          <td><% if !f.testcases.nil? %><a href=<%= f.testcases %> target="_blank">TastRail</a><%	 end %></td>
         <%  end %>
       </tr>
       <tr>
-        <th scope="col">Ссылка на ТК</th>
+        <th scope="col">Требования</th>
         <% @show_plan.features.each do |f| %>
-          <% if !f.testcases.nil? %>
-            <td><a href=<%= f.testcases %> target="_blank">TastRail</a></td>
-          <%	 end %>
+          <td><% if !f.tz.nil? %><a tabindex="0" class="show-popover" data-toggle="popover" title="Требования" data-content="<%= f.tz%>">Требования</a><%	 end %></td>
+        <%  end %>
+      </tr>
+      <tr>
+        <th scope="col">План проекта</th>
+        <% @show_plan.features.each do |f| %>
+          <td><% if !f.project_plan.nil? %><a href=<%= f.project_plan %> target="_blank">План проекта</a><%	 end %></td>
         <%  end %>
       </tr>
       <tr>
         <th scope="col">Аналитики</th>
         <% @show_plan.features.each do |f| %>
-          <%	 if !f.analytic.nil? %>
-            <td><%= f.analytic.join('<br>').html_safe %></td>
-          <%  end %>
+          <td><%	 if !f.analytic.nil? %><%= f.analytic.join('<br>').html_safe %><%  end %></td>
         <%  end %>
       </tr>
       <tr>
         <th scope="col">Разработчики</th>
         <% @show_plan.features.each do |f| %>
-          <%	 if !f.developer.nil? %>
-            <td><%= f.developer.join('<br>').html_safe %></td>
-          <%  end %>
+          <td><%	 if !f.developer.nil? %><%= f.developer.join('<br>').html_safe %><%  end %></td>
         <%  end %>
       </tr>
       <tr>
         <th scope="col">Тестировщики</th>
         <% @show_plan.features.each do |f| %>
-          <%	 if !f.qa.nil? %>
-            <td><%= f.qa.join('<br>').html_safe %></td>
-          <%  end %>
+          <td><%	 if !f.qa.nil? %><%= f.qa.join('<br>').html_safe %><%  end %></td>
         <%	 end %>
       </tr>
       <tr>
         <th scope="col">Менеджер проекта</th>
         <% @show_plan.features.each do |f| %>
-          <%	 if !f.manager.nil? %>
-            <td><%= f.manager.join('<br>').html_safe %></td>
-          <%  end %>
+          <td><%	 if !f.manager.nil? %><%= f.manager.join('<br>').html_safe %><%  end %></td>
         <%  end %>
       </tr>
       <tr>
-        <th scope="col">Редактировать</th>
-        <% @show_plan.features.each do |f|  %>
-          <td><%= link_to 'Редактировать', "#{@show_plan.id}/features/#{f.id}/edit" %></td>
+        <th scope="col">Комментарий</th>
+        <% @show_plan.features.each do |f| %>
+          <td><%	 if !f.comment.empty? %><a tabindex="0" class="show-popover" data-toggle="popover" title="Комментарий" data-content="<%= f.comment%>">Комментарий</a><%  end %></td>
         <%  end %>
       </tr>
     </table>
@@ -124,11 +119,16 @@
         <!-- Группировка -->
         <div id="accordion">
           <!-- Первая группа. Трудозатраты/ информация о дефектах -->
+          <%	all_worklog = @testing_worklogtime + @defect_worklogtime + @deis_defect_worklogtime + @consultation_worklogtime + @agreement_worklogtime  %>
+          <%	 progress = (all_worklog/@project_estimate*100)/60 %>
           <div class="card">
             <div class="card-header" id="headingMain">
               <h5 class="mb-0">
                 <button class="btn btn-link" data-toggle="collapse" data-target="#collapseMain" aria-expanded="true" aria-controls="collapseMain">
                   Трудозатраты/ информация о дефектах
+                  <div class="progress">
+                    <div class="progress-bar" role="progressbar" style="width: <%=progress%>%;" aria-valuemin="0" aria-valuemax="100"><%=progress%>%</div>
+                  </div>
                 </button>
               </h5>
             </div>
@@ -172,7 +172,6 @@
                       </tr>
                       <tr>
                         <td>Все трудозатраты по тестированию</td>
-                        <%	all_worklog = @testing_worklogtime + @defect_worklogtime + @deis_defect_worklogtime + @consultation_worklogtime + @agreement_worklogtime  %>
                         <td><%= all_worklog/60 %>ч <%= all_worklog%60 %>м</td>
                       </tr>
                       <tr>
@@ -215,6 +214,16 @@
                       </tr>
                       </tbody>
                     </table>
+                  </div>
+                </div>
+                <div class="row justify-content-start">
+                  <div class="col-md-auto">
+                    <div id="chart"></div>
+                    <%= metrics_graphic_for @worklog_per_date, title: "График списаний", description: "Списания по задаче в разрезе дней/часов", width: 600, height: 250, target: '#chart', x_accessor: 'date', y_accessor: 'value', time_format: '%Y-%m-%d' %>
+                  </div>
+                  <div class="col-md-auto">
+                    <div id="chart2"></div>
+                    <%= metrics_graphic_for @worklog_sum_per_date, title: "Фактические списания к плановым", description: "Зеленая линия - плановые списания", width: 600, height: 250, target: '#chart2', x_accessor: 'date', y_accessor: 'value', time_format: '%Y-%m-%d' %>
                   </div>
                 </div>
               </div>
@@ -332,16 +341,22 @@
         <%	 @backlog_estimate, @project_estimate = f.select_backlog_project_estimate %>
         <%	 @testing_worklogtime, @test_tasks = f.select_test_worklog %>
         <%	 @defect_worklogtime, @consultation_worklogtime, @agreement_worklogtime, @def_tasks, @cons_tasks, @agree_tasks, @open_def, @open_def_bkv = f.select_inner_tasks_worklog %>
-
+        <%	 @worklog_per_date, worklog_sum_per_date = f.select_worklog_per_date
+             @worklog_sum_per_date = [worklog_sum_per_date,[{date: @show_plan.features[i].start_date, value: 0}, {date: @show_plan.features[i].end_date, value: @project_estimate}]] %>
         <div class="tab-pane fade" id="id<%= id %>" role="tabpanel" aria-labelledby="<%= id %>">
           <!-- Группировка -->
           <div id="accordion<%=id %>">
             <!-- Первая группа. Трудозатраты -->
+            <%	all_worklog = @testing_worklogtime + @defect_worklogtime + @consultation_worklogtime + @agreement_worklogtime  %>
+            <%	 progress = (all_worklog/@project_estimate*100)/60 %>
             <div class="card">
               <div class="card-header" id="heading<%= id %>">
                 <h5 class="mb-0">
                   <button class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= id %>" aria-expanded="true" aria-controls="collapse<%= id %>">
-                    Трудозатраты
+                    Трудозатраты тестирования
+                    <div class="progress">
+                      <div class="progress-bar" role="progressbar" style="width: <%=progress%>%;" aria-valuemin="0" aria-valuemax="100"><%=progress%>%</div>
+                    </div>
                   </button>
                 </h5>
               </div>
@@ -381,7 +396,6 @@
                         </tr>
                         <tr>
                           <td>Все трудозатраты по тестированию</td>
-                          <%	all_worklog = @testing_worklogtime + @defect_worklogtime + @consultation_worklogtime + @agreement_worklogtime  %>
                           <td><%= all_worklog/60 %>ч <%= all_worklog%60 %>м</td>
                         </tr>
                         <tr>
@@ -416,6 +430,16 @@
                         </tr>
                         </tbody>
                       </table>
+                    </div>
+                  </div>
+                  <div class="row justify-content-start">
+                    <div class="col-md-auto">
+                      <div id="chart_<%=id %>"></div>
+                      <%= metrics_graphic_for @worklog_per_date, title: "График списаний", description: "Списания по задаче в разрезе дней/часов", width: 600, height: 250, target: "#chart_#{id}", x_accessor: 'date', y_accessor: 'value', time_format: '%Y-%m-%d' %>
+                    </div>
+                    <div class="col-md-auto">
+                      <div id="chart2_<%=id %>"></div>
+                      <%= metrics_graphic_for @worklog_sum_per_date, title: "Фактические списания к плановым", description: "Зеленая линия - плановые списания", width: 600, height: 250, target: "#chart2_#{id}", x_accessor: 'date', y_accessor: 'value', time_format: '%Y-%m-%d' %>
                     </div>
                   </div>
                 </div>
@@ -567,7 +591,5 @@
     </div>
   </div>
 <%  else %>
-<div class="container-fluid"><h5>В БД JIRA не найдено данных для метрик</h5></div>
+  <div class="container-fluid"><h5>В БД JIRA не найдено данных для метрик</h5></div>
 <%	 end %>
-</body>
-</html>

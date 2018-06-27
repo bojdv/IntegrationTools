@@ -7,9 +7,9 @@ module TestReportsHelper
   end
 
   class JIRA_Report
-    def initialize(backlog_keys, labels, worklog_autor)
-      @backlog_keys = get_task_key(backlog_keys)
-      @backlog_numbers = get_task_number(backlog_keys)
+    def initialize(backlog_keys = nil, labels, worklog_autor)
+      @backlog_keys = backlog_keys.nil? ? nil : get_task_key(backlog_keys)
+      @backlog_numbers = backlog_keys.nil? ? nil : get_task_number(backlog_keys)
       @labels = get_task_list(labels)
       @project_keys, @project_numbers, @project_name, @project_key = select_prjUrlKeyName
       @worklog_autor = get_task_list(worklog_autor.keys.join(','))
@@ -78,12 +78,22 @@ module TestReportsHelper
     # СЕЛЕКТЫ!
 
     def select_backlog_project_estimate # Плановые оценки тестирования и МП
-      if @project_keys.nil?
+      backlog_estimate = Array.new
+      project_estimate  = Array.new
+      if @project_keys.nil? and !@backlog_keys.nil?
         select = <<-query
       SELECT exptest, prjtest, project_key, issuenum
       FROM view_itools_report
       WHERE
       project_key in (#{@backlog_keys}) and issuenum in (#{@backlog_numbers})
+      ORDER BY issuenum asc
+        query
+      elsif @backlog_keys.nil?  and !@project_keys.nil?
+        select = <<-query
+      SELECT exptest, prjtest, project_key, issuenum
+      FROM view_itools_report
+      WHERE
+      project_key in (#{@project_keys}) and issuenum in (#{@project_numbers})
       ORDER BY issuenum asc
         query
       else
@@ -102,8 +112,6 @@ module TestReportsHelper
         connection = java.sql.DriverManager.getConnection(url, "JIRA_GUEST_PROM_PEKAV", "JIRA_GUEST_PROM_PEKAV");
         stmt = connection.create_statement
         rs = stmt.execute_query(select)
-        backlog_estimate = Array.new
-        project_estimate  = Array.new
         while (rs.next()) do
           backlog_estimate << rs.getString('exptest')
           project_estimate << rs.getString('prjtest')
@@ -161,7 +169,7 @@ module TestReportsHelper
       or
       issue_type = 'Согласование' and label in (#{@labels}) and worklogautor in (#{@worklog_autor})
       GROUP BY summary, project_key, issuenum, issue_type, status, reporter, priority
-      ORDER BY issuenum asc
+      ORDER BY status desc
       query
       begin
         puts "Select select_inner_tasks_worklog:\n" + select
@@ -218,7 +226,7 @@ module TestReportsHelper
       FROM view_itools_report
       WHERE project_name in (#{@project_name}) and issue_type in ('Дефект') and etap = 'Приемка ДЭИС'
       GROUP BY summary, issue_type, project_key, issuenum, status, reasolution
-      ORDER BY issue_type desc
+      ORDER BY status desc
       query
       begin
         puts "Select select_deis:\n" + select
@@ -389,6 +397,38 @@ module TestReportsHelper
       else
         return nil
       end
+    end
+
+    def select_worklog_per_date
+      select = <<-query
+      SELECT trunc(worklogdate) as worklogdate, sum(NVL(worklogtime,0)) as worklogtime
+      FROM view_itools_report
+      WHERE
+      label in (#{@labels}) and worklogautor in (#{@worklog_autor})
+      GROUP BY trunc(worklogdate)
+      ORDER BY trunc(worklogdate) asc
+      query
+      begin
+        puts "Select select_worklog_per_date:\n" + select
+        url = "jdbc:oracle:thin:@jira-db.bss.lan:1521:JIRACLUSTER"
+        connection = java.sql.DriverManager.getConnection(url, "JIRA_GUEST_PROM_PEKAV", "JIRA_GUEST_PROM_PEKAV");
+        stmt = connection.create_statement
+        rs = stmt.execute_query(select)
+        worklog_per_date = Array.new
+        worklog_sum_per_date = Array.new
+        hours = 0
+        while (rs.next()) do
+          hours = hours + rs.getString('worklogtime').to_i
+          hash_worklog_per_date = {date: rs.getString('worklogdate').to_date, value: rs.getString('worklogtime').to_i/60}
+          worklog_per_date << hash_worklog_per_date
+          hash_sum_worklog_per_date = {date: rs.getString('worklogdate').to_date, value: hours/60}
+          worklog_sum_per_date << hash_sum_worklog_per_date
+        end
+      ensure
+        stmt.close
+        connection.close
+      end
+      return worklog_per_date, worklog_sum_per_date
     end
 
   end

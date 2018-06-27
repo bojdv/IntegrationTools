@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180619122634) do
+ActiveRecord::Schema.define(version: 20180625104533) do
 
   create_table "categories", force: :cascade do |t|
     t.integer "product_id", limit: 10, precision: 10
@@ -43,13 +43,17 @@ ActiveRecord::Schema.define(version: 20180619122634) do
     t.string "backlog"
     t.string "feature_url"
     t.text "test_scope"
-    t.string "tz"
-    t.string "milestone"
     t.string "testcases"
     t.string "analytic"
     t.string "developer"
     t.string "qa"
     t.string "manager"
+    t.text "comment"
+    t.string "project_plan"
+    t.string "test_report_link"
+    t.date "start_date"
+    t.date "end_date"
+    t.text "tz"
     t.index ["test_plan_id"], name: "index_features_on_test_plan_id"
   end
 

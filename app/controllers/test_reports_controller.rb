@@ -9,8 +9,9 @@ class TestReportsController < ApplicationController
     response_ajax_reports("Не указана задача с оценкой тестирования") and return if report_params[:backlog_keys].empty?
     worklog_autor = {'bojdv' => 'Бойко Дина', 'pekav' => 'Пехов Алексей', 'kotvv' => 'Коцупенко Владимир', 'shpae' => 'Шпинько Александр', 'tkans'=>'Ткаченко Никита', 'pasap'=>'Пащенко Анастасия', 'e.vasilyeva'=>'Васильева Елена'}
     @report = JIRA_Report.new(report_params[:backlog_keys], report_params[:labels], worklog_autor)
-
-    @backlog_estimate, @project_estimate = @report.select_backlog_project_estimate
+    #@backlog_estimate, @project_estimate = @report.select_backlog_project_estimate
+    @backlog_estimate = @report.select_backlog_estimate
+    @project_estimate = @report.select_project_estimate
     @testing_worklogtime, @test_tasks = @report.select_test_worklog
     @defect_worklogtime, @consultation_worklogtime, @agreement_worklogtime, @def_tasks, @cons_tasks, @agree_tasks, @open_def, @open_def_bkv = @report.select_inner_tasks_worklog
     @deis_def, @deis_defect_true_count = @report.select_deis

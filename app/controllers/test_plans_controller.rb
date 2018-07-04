@@ -1,17 +1,22 @@
 class TestPlansController < ApplicationController
 
   helper TestReportsHelper
+  helper XmlSenderHelper
   $qa = {'bojdv' => 'Бойко Дина',
          'pekav' => 'Пехов Алексей',
          'kotvv' => 'Коцупенко Владимир',
          'shpae' => 'Шпинько Александр',
          'tkans'=>'Ткаченко Никита',
          'pasap'=>'Пащенко Анастасия',
-         'e.vasilyeva'=>'Васильева Елена'}
+         'e.vasilyeva'=>'Васильева Елена',
+         'chivs'=>'Чиркова Вера'}
 
   def index
     @egg_plans = TestPlan.where(:product_id => '10002')
     @fraud_plans = TestPlan.where(:product_id => '10006')
+    @mt_plans = TestPlan.where(:product_id => '10007')
+    @sn_plans = TestPlan.where(:product_id => '10003')
+    @tir_plans = TestPlan.where(:product_id => '10001')
   end
 
   def new
@@ -37,7 +42,8 @@ class TestPlansController < ApplicationController
       @backlog, @labels = get_list_of_value(@show_plan)
       @report = JIRA_Report.new(@backlog, @labels, $qa) # Общий отчет по тестированию
       unless @report.project_name.nil?
-        @backlog_estimate, @project_estimate = @report.select_backlog_project_estimate
+        @backlog_estimate = @report.select_backlog_estimate
+        @project_estimate = @report.select_project_estimate
         @testing_worklogtime, @test_tasks = @report.select_test_worklog
         @defect_worklogtime, @consultation_worklogtime, @agreement_worklogtime, @def_tasks, @cons_tasks, @agree_tasks, @open_def, @open_def_bkv = @report.select_inner_tasks_worklog
         @deis_defect_worklogtime = @report.select_deis_worklog
@@ -45,26 +51,18 @@ class TestPlansController < ApplicationController
         @other_tasks = @report.select_other_task
         @worklog_per_date, worklog_sum_per_date = @report.select_worklog_per_date
         start_test_date, end_test_date = find_max_test_dates(@show_plan)
-        @worklog_sum_per_date = [worklog_sum_per_date,[{date: start_test_date, value: 0}, {date: end_test_date, value: @project_estimate}]]
-
-
+        @worklog_sum_per_date = [worklog_sum_per_date,[{date: start_test_date, value: 0}, {date: end_test_date, value: @project_estimate}], [{date: start_test_date, value: 0}, {date: end_test_date, value: @backlog_estimate}]]
+        if @backlog_estimate == 0
+          @use_tester_estimate = false
+        else
+          @project_estimate/@backlog_estimate >= 2 ? @use_tester_estimate = true : @use_tester_estimate = false
+        end
         @report_feature = Array.new
         @show_plan.features.each_with_index do |f, i|
           @report_feature[i] = JIRA_Report.new(f.backlog, f.labels, $qa)
         end
       end
     end
-    # @data = MG.data_graphic({
-    #                     title: "Downloads",
-    #                     description: "This graphic shows a time-series of downloads.",
-    #                     data: [{date: Date('2014-11-02'), value: 12},
-    #                            {date:  Date('2014-11-02'),value: 18}],
-    #                     width: 600,
-    #                     height: 250,
-    #                     target: '#downloads',
-    #                     x_accessor: 'date',
-    #                     y_accessor: 'value'
-    #                 })
   end
 
   def edit
@@ -72,9 +70,9 @@ class TestPlansController < ApplicationController
   end
 
   def update
-    response_ajax("<h5>Не заполнены параметры:</h5>#{@empty_filds.join}", 4000) and return unless get_empty_fields(new_plan_params).empty?
+    response_ajax("<h5>Не заполнены параметры:</h5>#{@empty_filds.join}", 4000) and return unless get_empty_fields(update_plan_params).empty?
     @update_plan = TestPlan.find(params[:id])
-    if @update_plan.update(new_plan_params)
+    if @update_plan.update(update_plan_params)
       respond_to do |format|
         format.js { render :js => "window.location= '#{url_for(test_plans_url)}'" }
       end
@@ -86,20 +84,43 @@ class TestPlansController < ApplicationController
 
   def destroy
     @test_plan = TestPlan.find(params[:id])
-    puts test_plans_path
     @test_plan.destroy
     redirect_to test_plans_path
   end
 
+  def make_report
+    begin
+      @plan = TestPlan.find(report_params[:plan_id])
+      testplan_report = TestPlanReport.new(@plan, report_params[:builds], report_params[:version], report_params[:minus], report_params[:rn])
+      filepath = testplan_report.make_testplan_reports
+      @plan.update_attributes(:report_url => filepath)
+    rescue Exception => msg
+      response_ajax("Ошибка! #{msg} #{msg.backtrace.join("\n")}", 10000) and return
+    end
+    link = "<a href=\"/test_plans/download_test_report?url=#{filepath}\">Скачать отчет</a>"
+    response_ajax("Отчет успешно сформирован и доступен в списке планов тестирования!<br>#{link}", 10000)
+  end
+
+  def download_test_report
+    #Dir.chdir "#{Rails.root}"
+    send_file params[:url]
+  end
+
 
   def tester
-    @show_plan = TestPlan.find(10041)
-    puts @show_plan.features.any?
+    a = rand(100000)
+    puts a
   end
 
   private
 
   def new_plan_params
     params.require(:test_plan).permit(:name, :product_id, :finish_date, :status, :comment).merge(:user_id => current_user.id.inspect)
+  end
+  def update_plan_params
+    params.require(:test_plan).permit(:name, :product_id, :finish_date, :status, :comment)
+  end
+  def report_params
+    params.require(:report_params).permit(:plan_id, :builds, :version, :minus, :rn)
   end
 end

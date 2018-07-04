@@ -14,7 +14,7 @@
 //= require rails-ujs
 //= require jquery.contextMenu.js
 
-//= require metrics-graphics-rails
-//= require_tree .
 //= require popper
+//= require metrics-graphics-rails
 //= require bootstrap-sprockets
+//= require_tree .

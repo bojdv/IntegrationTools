@@ -62,6 +62,8 @@ Rails.application.routes.draw do
 
   # Test Plans
   get '/test_plans/tester' => 'test_plans#tester'
+  post '/test_plans/make_report' => 'test_plans#make_report'
+  get '/test_plans/download_test_report' => 'test_plans#download_test_report'
   resources :test_plans do
     resources :features
   end

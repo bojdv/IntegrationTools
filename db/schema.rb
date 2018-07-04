@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180625104533) do
+ActiveRecord::Schema.define(version: 20180704082431) do
 
   create_table "categories", force: :cascade do |t|
     t.integer "product_id", limit: 10, precision: 10
@@ -98,6 +98,7 @@ ActiveRecord::Schema.define(version: 20180625104533) do
     t.string "status"
     t.text "comment"
     t.integer "user_id", limit: 10, precision: 10
+    t.string "report_url"
     t.index ["product_id"], name: "index_test_plans_on_product_id"
   end
 

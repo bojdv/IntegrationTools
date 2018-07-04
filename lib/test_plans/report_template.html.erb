@@ -33,10 +33,13 @@
   #tab_3:checked ~ #txt_3,
   #tab_4:checked ~ #txt_4,
   #tab_5:checked ~ #txt_5 { display: block; }
+  td {
+    white-space:pre-wrap;
+  }
 </style>
 <div class="tabs">
   <input type="radio" name="inset" value="" id="tab_1" checked>
-  <label for="tab_1">Отчет по тестированию</label>
+  <label for="tab_1">Общая информация</label>
 
   <input type="radio" name="inset" value="" id="tab_2">
   <label for="tab_2">Задачи тестирования</label>
@@ -52,8 +55,10 @@
 
   <div id="txt_1">
     <div style="text-align: center;"></div>
-    <div style="text-align: center; "><strong>Отчет по тестированию продукта <%=	report_params[:product]  %></strong></div>
-    <div style="text-align: center;"><strong><%=	report_params[:summary]  %></strong></div><br>
+    <div style="text-align: center; "><strong>Отчет по тестированию продукта <%=	 Product.where(:id => @plan.id).pluck(:product_name).join %></strong></div>
+    <% @plan.features.each do |f| %>
+      <div style="text-align: center;"><strong><%=	f.name  %></strong></div><br>
+    <%  end %>
     <div style="font-weight: normal;"></div>
     <table border="2" cellspacing="2" cellpadding="3" width="1000" bordercolor="" align="center" style="font-weight: normal; text-align: left;" rules="all">
       <tbody>
@@ -74,69 +79,76 @@
       <%	 end %>
       <tr>
         <td>Даты проведения тестирования</td>
-        <td><%=	@worklog_time.min.to_date  %> - <%=	@worklog_time.max.to_date  %></td>
+        <td><%=	@start_test_date  %> - <%=	@end_test_date  %></td>
       </tr>
       <tr>
-        <td>QA инженеры</td>
-        <td><%=@worklog_autor %></td>
+        <td rowspan="<%= @qa.count %>">QA инженеры</td>
+          <td><%= @qa.first.join%></td>
       </tr>
-      <tr>
-        <td>Ссылка на план тестирования</td>
-        <td><a href="<%=	report_params[:test_plan]  %>" target="_blank" title="Wiki"><%=	report_params[:test_plan]  %></a></td>
-      </tr>
-      <tr>
-        <td>Ссылка на TestRail</td>
-        <td><a href="<%=	report_params[:test_rail]  %>" target="_blank" title="Wiki"><%=	report_params[:test_rail]  %></a></td>
-      </tr>
-      <tr bgcolor="#99CC00">
-        <td colspan="2"><strong><span style="color: #ffffff;"> Информация о сборке</span></strong><br />
-        </td>
-      </tr>
-      <!--tr>
-        <td>Версия продукта</td>
-        <td><!--%=	report_params[:build_version]  %></td>
-      </tr-->
-      <%	 if report_params[:build_link].size > 1 %>
-        <tr>
-          <td rowspan="<%= @build_links.size %>">Ссылки на сборки</td>
-          <td><a href="<%= @build_links.first %>" target="_blank" title=""><%= @build_links.first %></a></td>
-        </tr>
-        <%	 for i in 1...@build_links.size %>
+      <% if @qa.count > 1 %>
+        <% @qa.drop(1).each do |f| %>
           <tr>
-            <td><a href="<%= @build_links[i] %>" target="_blank" title=""><%= @build_links[i] %></a></td>
+            <td><%=f.join%></td>
           </tr>
         <%	 end %>
       <%	 end %>
       <tr>
+        <td>Ссылка на план тестирования</td>
+        <td><a href="http://vm-itools:3000/test_plans/<%=	@plan.id  %>" target="_blank" title="iTools"><%=	@plan.name %></a></td>
+      </tr>
+      <tr>
+        <td rowspan="<%= @plan.features.count %>">Ссылка на TestRail</td>
+          <td><% unless @plan.features.first.testcases.nil? %><a href=<%= @plan.features.first.testcases %> target="_blank"><%=@plan.features.first.testcases%></a><%	 end %></td>
+      </tr>
+      <% if @plan.features.count > 1 %>
+        <% @plan.features.drop(1).each do |f| %>
+        <tr>
+          <td><% unless f.testcases.nil? %><a href=<%= f.testcases %> target="_blank"><%=f.testcases%></a><%	 end %></td>
+        </tr>
+      <%	 end %>
+       <%	 end %>
+      <tr bgcolor="#99CC00">
+        <td colspan="2"><strong><span style="color: #ffffff;"> Информация о сборке</span></strong></td>
+      </tr>
+      <tr>
+        <td>Версия продукта</td>
+        <td><%= @version %></td>
+      </tr>
+      <tr>
+          <td>Ссылки на сборки</td>
+          <td><%= @build_links %></td>
+      </tr>
+      <tr>
         <td>Release Note</td>
-        <td><a href="https://jira.bssys.com/issues/?jql=key in (<%=	@rn  %>)" target="_blank" title="Wiki"><%=@rn%></a></td>
+        <td><%=@rn%></td>
       </tr>
       <tr bgcolor="#99CC00">
         <td colspan="2"><strong><span style="color: #ffffff;">Тестовое покрытие</span></strong></td>
       </tr>
       <tr>
-        <td>Выполненное тестирование</td>
-        <td><%=	report_params[:testing].inspect.gsub('\n', '<br>').slice(1..-2)  %></td>
+        <td rowspan="<%= @plan.features.count %>">Выполненное тестирование</td>
+          <td><%= @plan.features.first.name %>:<br><%= @plan.features.first.test_scope %></td>
       </tr>
+       <% if @plan.features.count > 1 %>
+        <% @plan.features.drop(1).each do |f| %>
+          <tr>
+            <td><% unless f.test_scope.nil? %><%= f.name %>:<br><%= f.test_scope %><%	 end %></td>
+          </tr>
+        <%	 end %>
+      <%	 end %>
       <tr bgcolor="#99CC00">
         <td colspan="2"><strong><span style="color: #ffffff;">Оценка качества</span></strong></td>
       </tr>
       <tr>
-        <td>
-          <div>Качество версии</div>
-        </td>
-        <td><%=	report_params[:build_quality]  %></td>
-      </tr>
-      <tr>
         <td>Ограничения</td>
-        <td><%=	report_params[:limitation].inspect.gsub('\n', '<br>').slice(1..-2)  %></td>
+        <td><%=	@minus  %></td>
       </tr>
       <tr bgcolor="#99CC00">
         <td colspan="2"><strong><span style="color: #ffffff;">Трудозатраты</span></strong></td>
       </tr>
       <tr>
         <td>Плановая оценка эксперта тестирования без рисков</td>
-        <td><a href="https://jira.bssys.com/issues/?jql=key in (<%=	report_params[:backlog_keys]  %>)" target="_blank" title="Wiki"><%=@backlog_estimate%>ч</a></td>
+        <td><a href="https://jira.bssys.com/issues/?jql=key in (<%=	@backlog%>)" target="_blank" title="Wiki"><%=@backlog_estimate%>ч</a></td>
       </tr>
       <tr>
         <td>Плановая оценка МП</td>
@@ -176,15 +188,25 @@
           <td><font color="red"><%= time.round(2) %>ч</font></td>
         <%	 end %>
       </tr>
+      <tr>
+        <td>Осталось часов по оценке МП</td>
+        <% time = @project_estimate-(all_worklog.to_f/60) %>
+        <% if time >= 0%>
+          <td><font color="green"><%= time.round(2) %>ч</font></td>
+        <%	 else %>
+          <td><font color="red"><%= time.round(2) %>ч</font></td>
+        <%	 end %>
+      </tr>
+
       <tr bgcolor="#99CC00">
         <td colspan="2"><strong><span style="color: #ffffff;">Информация о дефектах</span></strong></td>
       </tr>
       <tr>
         <td>Всего дефектов</td>
-        <td><%=	 @def_tasks.length %></td>
+        <td><a href="https://jira.bssys.com/issues/?jql=key in (<%=	get_task_list(@def_tasks)%>)" target="_blank" title="Wiki"><%=	@def_tasks.length %></a></td>
       </tr>
       <td>Дефекты с приемки (если была)</td>
-      <td><%= @deis_def.length%></td>
+      <td><a href="https://jira.bssys.com/issues/?jql=key in (<%=	get_task_list(@deis_def)%>)" target="_blank" title="Wiki"><%=	@deis_def.length %></td>
       </tr>
       <tr>
         <td>Всего подтвержденных дефектов с приемки</td>
@@ -193,7 +215,7 @@
       <tr>
       <tr>
         <td>Открытых дефектов (без приемки)</td>
-        <td><%=	 @open_def.length %></td>
+        <td><a href="https://jira.bssys.com/issues/?jql=key in (<%=	get_task_list(@open_def)%>)" target="_blank" title="Wiki"><%=	@open_def.length %></a></td>
       </tr>
       <tr>
         <td>Открытых БКВ</td>

@@ -77,35 +77,63 @@ module TestReportsHelper
 
     # СЕЛЕКТЫ!
 
-    def select_backlog_project_estimate # Плановые оценки тестирования и МП
+    # def select_backlog_project_estimate # Плановые оценки тестирования и МП
+    #   backlog_estimate = Array.new
+    #   project_estimate  = Array.new
+    #   if @project_keys.nil? and !@backlog_keys.nil?
+    #     select = <<-query
+    #   SELECT exptest, prjtest, project_key, issuenum
+    #   FROM view_itools_report
+    #   WHERE
+    #   project_key in (#{@backlog_keys}) and issuenum in (#{@backlog_numbers})
+    #   ORDER BY issuenum asc
+    #     query
+    #   elsif @backlog_keys.nil?  and !@project_keys.nil?
+    #     select = <<-query
+    #   SELECT exptest, prjtest, project_key, issuenum
+    #   FROM view_itools_report
+    #   WHERE
+    #   project_key in (#{@project_keys}) and issuenum in (#{@project_numbers})
+    #   ORDER BY issuenum asc
+    #     query
+    #   else
+    #     select = <<-query
+    #   SELECT exptest, prjtest, project_key, issuenum
+    #   FROM view_itools_report
+    #   WHERE
+    #   project_key in (#{@backlog_keys}, #{@project_keys}) and issuenum in (#{@backlog_numbers}, #{@project_numbers})
+    #   ORDER BY issuenum asc
+    #     query
+    #   end
+    #
+    #   begin
+    #     puts "Select select_backlog_project_estimate:\n" + select
+    #     url = "jdbc:oracle:thin:@jira-db.bss.lan:1521:JIRACLUSTER"
+    #     connection = java.sql.DriverManager.getConnection(url, "JIRA_GUEST_PROM_PEKAV", "JIRA_GUEST_PROM_PEKAV");
+    #     stmt = connection.create_statement
+    #     rs = stmt.execute_query(select)
+    #     while (rs.next()) do
+    #       backlog_estimate << rs.getString('exptest')
+    #       project_estimate << rs.getString('prjtest')
+    #     end
+    #   ensure
+    #     stmt.close
+    #     connection.close
+    #   end
+    #   return backlog_estimate.map(&:to_i).sum,
+    #       project_estimate.map(&:to_i).sum
+    # end
+
+    def select_backlog_estimate # Плановые оценки тестирования и МП
       backlog_estimate = Array.new
-      project_estimate  = Array.new
-      if @project_keys.nil? and !@backlog_keys.nil?
-        select = <<-query
+      return 0 if @backlog_keys.nil?
+      select = <<-query
       SELECT exptest, prjtest, project_key, issuenum
       FROM view_itools_report
       WHERE
       project_key in (#{@backlog_keys}) and issuenum in (#{@backlog_numbers})
       ORDER BY issuenum asc
-        query
-      elsif @backlog_keys.nil?  and !@project_keys.nil?
-        select = <<-query
-      SELECT exptest, prjtest, project_key, issuenum
-      FROM view_itools_report
-      WHERE
-      project_key in (#{@project_keys}) and issuenum in (#{@project_numbers})
-      ORDER BY issuenum asc
-        query
-      else
-        select = <<-query
-      SELECT exptest, prjtest, project_key, issuenum
-      FROM view_itools_report
-      WHERE
-      project_key in (#{@backlog_keys}, #{@project_keys}) and issuenum in (#{@backlog_numbers}, #{@project_numbers})
-      ORDER BY issuenum asc
-        query
-      end
-
+      query
       begin
         puts "Select select_backlog_project_estimate:\n" + select
         url = "jdbc:oracle:thin:@jira-db.bss.lan:1521:JIRACLUSTER"
@@ -114,14 +142,38 @@ module TestReportsHelper
         rs = stmt.execute_query(select)
         while (rs.next()) do
           backlog_estimate << rs.getString('exptest')
+        end
+      ensure
+        stmt.close
+        connection.close
+      end
+      return backlog_estimate.map(&:to_i).sum
+    end
+
+    def select_project_estimate # Плановые оценки тестирования и МП
+      project_estimate  = Array.new
+      select = <<-query
+      SELECT exptest, prjtest, project_key, issuenum
+      FROM view_itools_report
+      WHERE
+      project_key in (#{@project_keys}) and issuenum in (#{@project_numbers})
+      ORDER BY issuenum asc
+      query
+
+      begin
+        puts "Select select_backlog_project_estimate:\n" + select
+        url = "jdbc:oracle:thin:@jira-db.bss.lan:1521:JIRACLUSTER"
+        connection = java.sql.DriverManager.getConnection(url, "JIRA_GUEST_PROM_PEKAV", "JIRA_GUEST_PROM_PEKAV");
+        stmt = connection.create_statement
+        rs = stmt.execute_query(select)
+        while (rs.next()) do
           project_estimate << rs.getString('prjtest')
         end
       ensure
         stmt.close
         connection.close
       end
-      return backlog_estimate.map(&:to_i).sum,
-          project_estimate.map(&:to_i).sum
+      return project_estimate.map(&:to_i).sum
     end
 
     def select_test_worklog # списания в задачи с типом тестирование и их кол-во
@@ -192,17 +244,20 @@ module TestReportsHelper
         while (rs.next()) do
           case rs.getString('issue_type')
             when 'Дефект'
-              def_tasks[def_count] = [rs.getString('summary'), "#{rs.getString('project_key')}-#{rs.getString('issuenum')}", rs.getString('worklogtime'), rs.getString('status')]
+              def_tasks[def_count] = [rs.getString('summary'), "#{rs.getString('project_key')}-#{rs.getString('issuenum')}", rs.getString('priority'), rs.getString('worklogtime'), rs.getString('status')]
               def_count+=1
               defect_worklogtime << rs.getString('worklogtime') if rs.getString('worklogtime')
               open_def_bkv +=1 if (rs.getString('priority') == 'Блокирует' || rs.getString('priority') == 'Критический' || rs.getString('priority') == 'Высокий') and rs.getString('status') != 'Закрыт'
-              open_def[open_def_count] = [rs.getString('summary'), "#{rs.getString('project_key')}-#{rs.getString('issuenum')}", rs.getString('worklogtime'), rs.getString('status')] if rs.getString('status') != 'Закрыт' || rs.getString('status') != 'Отложен'
+              if rs.getString('status') != 'Закрыт' and rs.getString('status') != 'Отложен'
+                open_def[open_def_count] = [rs.getString('summary'), "#{rs.getString('project_key')}-#{rs.getString('issuenum')}", rs.getString('worklogtime'), rs.getString('status')]
+                open_def_count +=1
+              end
             when 'Консультация'
-              cons_task[cons_count] = [rs.getString('summary'), "#{rs.getString('project_key')}-#{rs.getString('issuenum')}", rs.getString('worklogtime'), rs.getString('status')]
+              cons_task[cons_count] = [rs.getString('summary'), "#{rs.getString('project_key')}-#{rs.getString('issuenum')}", rs.getString('priority'), rs.getString('worklogtime'), rs.getString('status')]
               cons_count+=1
               cons_worklogtime << rs.getString('worklogtime') if rs.getString('worklogtime')
             when 'Согласование'
-              agree_task[agree_count] = [rs.getString('summary'), "#{rs.getString('project_key')}-#{rs.getString('issuenum')}", rs.getString('worklogtime'), rs.getString('status')]
+              agree_task[agree_count] = [rs.getString('summary'), "#{rs.getString('project_key')}-#{rs.getString('issuenum')}", rs.getString('priority'), rs.getString('worklogtime'), rs.getString('status')]
               agree_count+=1
               agree_worklogtime << rs.getString('worklogtime') if rs.getString('worklogtime')
           end

@@ -1,0 +1,23 @@
+<!-- Modal -->
+<div class="modal fade" id="reportModal" tabindex="-1" role="dialog" aria-labelledby="reportModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="reportModalLabel">Дополнительные параметры отчета</h5>
+      </div>
+      <div class="col-md-12">
+        <div class="modal-body">
+          <%= simple_form_for :report_params, :remote => true, url: 'make_report', data: {type: :js}, html: { id: 'form-prefix-choice', class: 'form-group' }, :authenticity_token => true do |f| %>
+            <%= f.input :version, :label => 'Версия сборки', :required => false %>
+            <%= f.input :builds, as: :text, :label => 'Ссылки на сборки', :required => false, :placeholder => "1. \n2. ", :input_html => {style: "height:100px"} %>
+            <%= f.input :rn, :label => 'Ссылка на Release Note', :required => false %>
+            <%= f.input :minus, as: :text, :label => 'Ограничения', :required => false, :placeholder => "1. \n2. ", :input_html => {style: "height:100px"} %>
+            <%= f.input :plan_id, :label => false, :required => false, input_html: { value: @show_plan.id, :style=> 'display:none' } %>
+            <%= f.button :submit, 'Построить отчет', class: 'btn btn-primary form-group', id: "submit_prefix", :onclick =>"$('.modal').modal('hide');"%>
+            <button type="button" class="btn btn-primary form-group" id="modal-close-button" onclick="$('#reportModal').modal('hide')">Отменить</button>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

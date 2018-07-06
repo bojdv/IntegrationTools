@@ -72,7 +72,8 @@ class FeaturesController < ApplicationController
     @analytic = {'ZakDA' => 'Захарченко Дмитрий',
                   'BalYV' => 'Балакин Юрий',
                   's.ledentsov' => 'Леденцов Сергей',
-                  'ldi' => 'Ляпин Дмитрий'}
+                  'ldi' => 'Ляпин Дмитрий',
+                  'lartg' => 'Подкатилова Татьяна'}
     @manager = {'KosAS' => 'Космин Александр',
                  'KhmVM' => 'Хмельницкий Валерий',
                  'GolAV' => 'Головченко Андрей',

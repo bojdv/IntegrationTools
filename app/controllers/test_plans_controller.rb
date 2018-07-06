@@ -55,7 +55,7 @@ class TestPlansController < ApplicationController
         if @backlog_estimate == 0
           @use_tester_estimate = false
         else
-          @project_estimate/@backlog_estimate >= 2 ? @use_tester_estimate = true : @use_tester_estimate = false
+          @project_estimate/@backlog_estimate >= 2.5 ? @use_tester_estimate = true : @use_tester_estimate = false
         end
         @report_feature = Array.new
         @show_plan.features.each_with_index do |f, i|

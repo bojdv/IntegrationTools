@@ -55,7 +55,7 @@
 
   <div id="txt_1">
     <div style="text-align: center;"></div>
-    <div style="text-align: center; "><strong>Отчет по тестированию продукта <%=	 Product.where(:id => @plan.id).pluck(:product_name).join %></strong></div>
+    <div style="text-align: center; "><strong>Отчет по тестированию продукта <%=	 Product.where(:id => @plan.product_id).pluck(:product_name).join %></strong></div>
     <% @plan.features.each do |f| %>
       <div style="text-align: center;"><strong><%=	f.name  %></strong></div><br>
     <%  end %>
@@ -83,12 +83,12 @@
       </tr>
       <tr>
         <td rowspan="<%= @qa.count %>">QA инженеры</td>
-          <td><%= @qa.first.join%></td>
+          <td><%= @qa.first.join(', ')%></td>
       </tr>
       <% if @qa.count > 1 %>
         <% @qa.drop(1).each do |f| %>
           <tr>
-            <td><%=f.join%></td>
+            <td><%=f.join(', ')%></td>
           </tr>
         <%	 end %>
       <%	 end %>

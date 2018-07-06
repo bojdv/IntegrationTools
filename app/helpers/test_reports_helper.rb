@@ -128,14 +128,15 @@ module TestReportsHelper
       backlog_estimate = Array.new
       return 0 if @backlog_keys.nil?
       select = <<-query
-      SELECT exptest, prjtest, project_key, issuenum
+      SELECT exptest
       FROM view_itools_report
       WHERE
       project_key in (#{@backlog_keys}) and issuenum in (#{@backlog_numbers})
-      ORDER BY issuenum asc
+      GROUP BY exptest
+
       query
       begin
-        puts "Select select_backlog_project_estimate:\n" + select
+        puts "Select select_backlog_estimate:\n" + select
         url = "jdbc:oracle:thin:@jira-db.bss.lan:1521:JIRACLUSTER"
         connection = java.sql.DriverManager.getConnection(url, "JIRA_GUEST_PROM_PEKAV", "JIRA_GUEST_PROM_PEKAV");
         stmt = connection.create_statement
@@ -153,7 +154,7 @@ module TestReportsHelper
     def select_project_estimate # Плановые оценки тестирования и МП
       project_estimate  = Array.new
       select = <<-query
-      SELECT exptest, prjtest, project_key, issuenum
+      SELECT prjtest
       FROM view_itools_report
       WHERE
       project_key in (#{@project_keys}) and issuenum in (#{@project_numbers})
@@ -161,7 +162,7 @@ module TestReportsHelper
       query
 
       begin
-        puts "Select select_backlog_project_estimate:\n" + select
+        puts "Select select_project_estimate:\n" + select
         url = "jdbc:oracle:thin:@jira-db.bss.lan:1521:JIRACLUSTER"
         connection = java.sql.DriverManager.getConnection(url, "JIRA_GUEST_PROM_PEKAV", "JIRA_GUEST_PROM_PEKAV");
         stmt = connection.create_statement
@@ -374,7 +375,7 @@ module TestReportsHelper
       ORDER BY issue_type desc
       query
       begin
-        puts "Select select_nullable_task:\n" + select
+        puts "Select select_other_task:\n" + select
         url = "jdbc:oracle:thin:@jira-db.bss.lan:1521:JIRACLUSTER"
         connection = java.sql.DriverManager.getConnection(url, "JIRA_GUEST_PROM_PEKAV", "JIRA_GUEST_PROM_PEKAV");
         stmt = connection.create_statement

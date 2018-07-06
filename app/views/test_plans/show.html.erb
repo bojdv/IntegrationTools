@@ -60,7 +60,7 @@
       <tr>
         <th scope="col">План проекта</th>
         <% @show_plan.features.each do |f| %>
-          <td><% if !f.project_plan.nil? %><a href=<%= f.project_plan %> target="_blank">План проекта</a><%	 end %></td>
+          <td><% if !f.project_plan.nil? %><a tabindex="0" class="show-popover" data-toggle="popover" title="Требования" data-content="<%= simple_format(f.project_plan)%>">План проекта</a><%	 end %></td>
         <%  end %>
       </tr>
       <tr>
@@ -148,14 +148,6 @@
                         <td colspan="2"><strong><span style="color: #ffffff;">Трудозатраты тестирования</span></strong></td>
                       </tr>
                       <tr>
-                        <td>Плановая оценка эксперта тестирования без рисков</td>
-                        <td><a href="https://jira.bssys.com/issues/?jql=key in (<%=	@backlog%>)" target="_blank" title="Wiki"><%=@backlog_estimate%>ч</a></td>
-                      </tr>
-                      <tr>
-                        <td>Плановая оценка МП</td>
-                        <td><a href="https://jira.bssys.com/issues/?jql=key in (<%=	@report.projects  %>)" target="_blank" title="Wiki"><%=@project_estimate%>ч</a></td>
-                      </tr>
-                      <tr>
                         <td>Списания в задачи тестирования</td>
                         <td><%= @testing_worklogtime/60 %>ч <%= @testing_worklogtime%60 %>м</td>
                       </tr>
@@ -179,23 +171,32 @@
                         <td>Все трудозатраты по тестированию</td>
                         <td><%= all_worklog/60 %>ч <%= all_worklog%60 %>м</td>
                       </tr>
+                      <tr bgcolor="#99CC00">
+                        <td><strong><span style="color: #ffffff;">Попадание в оценку</span></strong></td>
+                        <td><strong><span style="color: #ffffff;">План</span></strong></td>
+                        <td><strong><span style="color: #ffffff;">Факт</span></strong></td>
+                        <td><strong><span style="color: #ffffff;">Осталось</span></strong></td>
+                      </tr>
                       <tr>
-                        <%	 if @use_tester_estimate %>
-                          <td>Осталось часов по оценке тестирования</td>
+                        <td>Оценка тестирования</td>
+                        <td><a href="https://jira.bssys.com/issues/?jql=key in (<%=	@backlog%>)" target="_blank" title="Wiki"><%=@backlog_estimate%>ч</a></td>
+                        <td><%= all_worklog/60 %>ч <%= all_worklog%60 %>м</td>
                           <% time = @backlog_estimate-(all_worklog.to_f/60) %>
                           <% if time >= 0%>
                             <td><font color="green"><%= time.round(2) %>ч</font></td>
                           <%	 else %>
                             <td><font color="red"><%= time.round(2) %>ч</font></td>
                           <%	 end %>
+                      </tr>
+                      <tr>
+                        <td>Оценка в проекте (менеджера)</td>
+                        <td><a href="https://jira.bssys.com/issues/?jql=key in (<%=	@report.projects  %>)" target="_blank" title="Wiki"><%=@project_estimate%>ч</a></td>
+                        <td><%= all_worklog/60 %>ч <%= all_worklog%60 %>м</td>
+                        <% time = @project_estimate-(all_worklog.to_f/60) %>
+                        <% if time >= 0%>
+                          <td><font color="green"><%= time.round(2) %>ч</font></td>
                         <%	 else %>
-                          <td>Осталось часов по оценке МП</td>
-                          <% time = @project_estimate-(all_worklog.to_f/60) %>
-                          <% if time >= 0%>
-                            <td><font color="green"><%= time.round(2) %>ч</font></td>
-                          <%	 else %>
-                            <td><font color="red"><%= time.round(2) %>ч</font></td>
-                          <%	 end %>
+                          <td><font color="red"><%= time.round(2) %>ч</font></td>
                         <%	 end %>
                       </tr>
                       </tbody>
@@ -354,7 +355,9 @@
       <!-- Следующие вкладки -->
 
       <% @report_feature.each_with_index do |f, i| %>
+        <% unless f.project_name.nil? %>
         <%	 id = rand(100000) %>
+        <%  @backlog = @show_plan.features[i].backlog %>
         <%	 @backlog_estimate = f.select_backlog_estimate %>
         <%	 @project_estimate = f.select_project_estimate %>
         <%	 @testing_worklogtime, @test_tasks = f.select_test_worklog %>
@@ -366,8 +369,13 @@
           <div id="accordion<%=id %>">
             <!-- Первая группа. Трудозатраты -->
             <%	all_worklog = @testing_worklogtime + @defect_worklogtime + @consultation_worklogtime + @agreement_worklogtime  %>
-            <%  @use_tester_estimate = false if @backlog_estimate == 0 %>
-            <%	 @use_tester_estimate ? estimate = @backlog_estimate : estimate = @project_estimate %>
+            <%
+            if @backlog_estimate == 0
+            @use_tester_estimate = false
+            else
+            @project_estimate/@backlog_estimate >= 2.5 ? @use_tester_estimate = true : @use_tester_estimate = false
+            end %>
+            <%	@use_tester_estimate ? estimate = @backlog_estimate : estimate = @project_estimate %>
             <%	 progress = (all_worklog/estimate*100)/60 %>
             <div class="card">
               <div class="card-header" id="heading<%= id %>">
@@ -383,20 +391,15 @@
 
               <div id="collapse<%= id %>" class="collapse show" aria-labelledby="heading<%= id %>" data-parent="#accordion<%= id %>">
                 <div class="card-body">
+                  <% if @use_tester_estimate %>
+                    <a>Используем для расчета оценку тестирования т.к. оценка МП в 2 раза выше</a>
+                  <% end %>
                   <div class="row justify-content-start">
                     <div class="col-md-auto">
                       <table border="2" cellspacing="2" cellpadding="3" bordercolor="" width="600" style="font-weight: normal; text-align: left;" rules="all">
                         <tbody>
                         <tr bgcolor="#99CC00">
                           <td colspan="2"><strong><span style="color: #ffffff;">Трудозатраты тестирования</span></strong></td>
-                        </tr>
-                        <tr>
-                          <td>Плановая оценка эксперта тестирования без рисков</td>
-                          <td><a href="https://jira.bssys.com/issues/?jql=key in (<%=	@show_plan.features[i].backlog%>)" target="_blank" title="Wiki"><%=@backlog_estimate%>ч</a></td>
-                        </tr>
-                        <tr>
-                          <td>Плановая оценка МП</td>
-                          <td><a href="https://jira.bssys.com/issues/?jql=key in (<%=	f.projects  %>)" target="_blank" title="Wiki"><%=@project_estimate%>ч</a></td>
                         </tr>
                         <tr>
                           <td>Списания в задачи тестирования</td>
@@ -418,23 +421,32 @@
                           <td>Все трудозатраты по тестированию</td>
                           <td><%= all_worklog/60 %>ч <%= all_worklog%60 %>м</td>
                         </tr>
+                        <tr bgcolor="#99CC00">
+                          <td><strong><span style="color: #ffffff;">Попадание в оценку</span></strong></td>
+                          <td><strong><span style="color: #ffffff;">План</span></strong></td>
+                          <td><strong><span style="color: #ffffff;">Факт</span></strong></td>
+                          <td><strong><span style="color: #ffffff;">Осталось</span></strong></td>
+                        </tr>
                         <tr>
-                          <%	 if @use_tester_estimate %>
-                            <td>Осталось часов по оценке тестирования</td>
-                            <% time = @backlog_estimate-(all_worklog.to_f/60) %>
-                            <% if time >= 0%>
-                              <td><font color="green"><%= time.round(2) %>ч</font></td>
-                            <%	 else %>
-                              <td><font color="red"><%= time.round(2) %>ч</font></td>
-                            <%	 end %>
+                          <td>Оценка тестирования</td>
+                          <td><a href="https://jira.bssys.com/issues/?jql=key in (<%=	@backlog%>)" target="_blank" title="Wiki"><%=@backlog_estimate%>ч</a></td>
+                          <td><%= all_worklog/60 %>ч <%= all_worklog%60 %>м</td>
+                          <% time = @backlog_estimate-(all_worklog.to_f/60) %>
+                          <% if time >= 0%>
+                            <td><font color="green"><%= time.round(2) %>ч</font></td>
                           <%	 else %>
-                            <td>Осталось часов по оценке МП</td>
-                            <% time = @project_estimate-(all_worklog.to_f/60) %>
-                            <% if time >= 0%>
-                              <td><font color="green"><%= time.round(2) %>ч</font></td>
-                            <%	 else %>
-                              <td><font color="red"><%= time.round(2) %>ч</font></td>
-                            <%	 end %>
+                            <td><font color="red"><%= time.round(2) %>ч</font></td>
+                          <%	 end %>
+                        </tr>
+                        <tr>
+                          <td>Оценка в проекте (менеджера)</td>
+                          <td><a href="https://jira.bssys.com/issues/?jql=key in (<%=	f.projects  %>)" target="_blank" title="Wiki"><%=@project_estimate%>ч</a></td>
+                          <td><%= all_worklog/60 %>ч <%= all_worklog%60 %>м</td>
+                          <% time = @project_estimate-(all_worklog.to_f/60) %>
+                          <% if time >= 0%>
+                            <td><font color="green"><%= time.round(2) %>ч</font></td>
+                          <%	 else %>
+                            <td><font color="red"><%= time.round(2) %>ч</font></td>
                           <%	 end %>
                         </tr>
                         </tbody>
@@ -627,6 +639,11 @@
             </div>
           </div>
         </div>
+          <%	 else %>
+          <div class="tab-pane fade" id="id<%= @show_plan.features[i].id %>" role="tabpanel" aria-labelledby="<%= id %>">
+          <div class="container-fluid"><h5>В БД JIRA не найдено данных для метрик</h5></div>
+          </div>
+        <%  end  %>
       <%	 end %>
     </div>
   </div>

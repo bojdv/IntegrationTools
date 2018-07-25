@@ -1,18 +1,31 @@
+# encoding: utf-8
 class CcFormatValidatorController < ApplicationController
   include CcFormatValidatorHelper
 
   def index
     @validator_log = CcFormatValidatorLog.all
+    uniq_date = Array.new
+    @validator_log.each do |data|
+      uniq_date << data.created_at.to_date
+    end
+    @uniq_date = uniq_date.uniq
   end
 
   def start
     $thread = Thread.new do
       while true
-        xml = receive_xml
-        if xml
-          validate_cc_xml(xml)
+        validator = Validator.new
+        if validator.xml
+          result = validator.validate_cc_xml
+          puts result
+          if result.nil?
+            answer = validator.make_answer
+          else
+            answer = validator.make_answer('DECLINED_BY_ABS', result)
+          end
+          validator.send_to_amq_openwire(answer)
         end
-        sleep 5
+        sleep 3
       end
     end
   end
@@ -23,27 +36,15 @@ class CcFormatValidatorController < ApplicationController
 
   def clear_log
     CcFormatValidatorLog.delete_all
-#     string = <<EOF
-# <StatementRequest xmlns="http://bssys.com/sbns/integration">
-# 	<branchExtId>8</branchExtId>
-# 	<docId>e8a5aff6-c054-41cd-826b-adbb1b7888b0</docId>
-# 	<fromDate>2018-02-22</fromDate>
-# 	<orgExtId>8000319</orgExtId>
-# 	<orgId>84158069-a99a-43ae-9bee-0bf9c1ea6b6b</orgId>
-# 	<orgInn>4028001072</orgInn>
-# 	<orgLegacyId>8000319</orgLegacyId>
-# 	<orgName>Организация</orgName>
-# 	<sysCreateTime>2018-02-28T12:24:12.425+03:00</sysCreateTime>
-# 	<toDate>2018-02-22</toDate>
-# 	<accounts>
-# 		<Acc>
-# 			<account>40702810800010000001</account>
-# 			<bankBIC>042908770</bankBIC>
-# 		</Acc>
-# 	</accounts>
-# </StatementRequest>
-# EOF
-#     xml = Document.new(string)
-#     puts xml.elements[1].name
+  end
+
+  def tester
+    a = '6'
+    case a
+      when 'Pay', 'p'
+        puts "1"
+      when 'Pay3'
+        puts 2
+    end
   end
 end

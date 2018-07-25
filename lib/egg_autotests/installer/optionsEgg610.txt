@@ -16,7 +16,7 @@ unattendedmodeui=minimalWithDialogs
 installdir=C:\EGG
 
 # устанавливаемые компоненты перечисляются через запятую
-enable-components=egg,DBcreate,ServiceMix,iaAmqComponent,saSpepComponent,saGmpComponent,iaFileGmpComponent,saZkhComponent,iaFileZkhComponent, saZkhPayeesComponent, iaFileMqGmpComponent, iaFileMqZkhComponent, saFnsEgripComponent, saFnsEgrulComponent
+enable-components=egg,DBcreate,ServiceMix,iaAmqComponent,saSpepComponent,saGmpComponent,iaFileGmpComponent,saZkhComponent,iaFileZkhComponent,saZkhPayeesComponent,iaFileMqGmpComponent,iaFileMqZkhComponent,saFnsEgripComponent,saFnsEgrulComponent
 # компоненты, установка которых не требуется, перечисляются через запятую
 disable-components=crypto,CryptoService,saEsiaComponent,saReestrFsspComponent,saUpridComponent
 
@@ -148,7 +148,10 @@ zkh_file_CSV_CHARSET=Cp1251
 zkh_file_bik_schedule=0 0 0 * * ? *
 zkh_file_timeout=15000
 zkh_file_http_client=http
+#zkh_file_cbr_url=http://www.cbr.ru/mcirabis/PluginInterface/GetBicCatalog.aspx?type=db
+zkh_file_cbr_psystem_url=http://www.cbr.ru/PSystem/system_p/
 zkh_file_cbr_url=http://www.cbr.ru/mcirabis/PluginInterface/GetBicCatalog.aspx?type=db
+bik_download_type=zkh_file_cbr_psystem_url
 zkh_file_automatic_download=false
 zkh_file_proxy_host=127.0.0.1
 zkh_file_proxy_port=8080
@@ -225,7 +228,7 @@ fns_egrip_attachmentMode=true
 fns_egrip_CheckingSignature=check
 fns_egrip_CheckSignatureAttachment=check
 fns_egrip_CheckEPOV=check
-fns_egrip_CheckEPSP=check
+fns_egrip_CheckEPSP=none
 fns_egrip_adapterId=amq-jms-iadp
 fns_egrip_sendingTicket1000=false
 fns_egrip_sendingTicket1012=true
@@ -233,6 +236,7 @@ fns_egrip_sendingTicket1012=true
 
 # saFnsEgrulComponent - ФНС ЕГРЮЛ
 fns_egrul_FNS_URL=http://smev3-n0.test.gosuslugi.ru:7500/smev/v1.1/ws
+fns_egrul_CryptoService=http://vm-eggcryptdev:9090/axis2/services/CryptoService
 fns_egrul_fns_sadp_consumers=10
 fns_egrul_fns_queue_request_consumers=10
 fns_egrul_isTest=true
@@ -248,5 +252,5 @@ fns_egrul_attachmentMode=true
 fns_egrul_CheckingSignature=check
 fns_egrul_CheckSignatureAttachment=check
 fns_egrul_CheckEPOV=check
-fns_egrul_CheckEPSP=check
+fns_egrul_CheckEPSP=none
 fns_egrul_isCryptoLog=true

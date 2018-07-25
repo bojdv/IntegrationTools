@@ -106,6 +106,11 @@ class TestPlansController < ApplicationController
     send_file params[:url]
   end
 
+  def safe_comment
+    feature = Feature.find(params[:featureId])
+    feature.update_attributes(:comment => params[:comment])
+  end
+
 
   def tester
     a = rand(100000)

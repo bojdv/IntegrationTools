@@ -19,6 +19,7 @@
     <%= f.input :tz, :label => 'Ссылки на требования', :input_html => { style: "height:100px"} %>
     <%= f.input :project_plan, :label => 'Ссылка на план проекта', :placeholder => 'Заполняется при наличии такого плана.' %>
     <%= f.input :testcases, :label => 'Ссылка на Test Rail', :placeholder => 'Ссылка на Milestone или тест сьют, если не создавался Milestone' %>
+    <%= f.input :test_data, :label => 'Ссылка на тестовые данных', :placeholder => 'Ссылка на тестовые данные/примеры, которые использовались при тестировании.' %>
     <%= f.input :analytic, as: :select, :label => 'Аналитики', collection: @analytic.sort, include_hidden: false, label_method: :second, value_method: :second, input_html: { multiple: true, style: "height:100px"} %>
     <%= f.input :developer, as: :select, :label => 'Разработчики', collection: @developer.sort, include_hidden: false, label_method: :second, value_method: :second, input_html: { multiple: true, style: "height:100px"} %>
     <%= f.input :qa, as: :select, :label => 'Тестировщики', collection: $qa.sort, include_hidden: false, label_method: :second, value_method: :second, input_html: { multiple: true, style: "height:100px"} %>

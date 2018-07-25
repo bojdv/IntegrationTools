@@ -126,7 +126,7 @@
         <td colspan="2"><strong><span style="color: #ffffff;">Тестовое покрытие</span></strong></td>
       </tr>
       <tr>
-        <td rowspan="<%= @plan.features.count %>">Выполненное тестирование</td>
+        <td rowspan="<%= @plan.features.count %>">Объем тестирования</td>
           <td><%= @plan.features.first.name %>:<br><%= @plan.features.first.test_scope %></td>
       </tr>
        <% if @plan.features.count > 1 %>

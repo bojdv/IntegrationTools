@@ -14,7 +14,7 @@
             <%= f.input :minus, as: :text, :label => 'Ограничения', :required => false, :placeholder => "1. \n2. ", :input_html => {style: "height:100px"} %>
             <%= f.input :plan_id, :label => false, :required => false, input_html: { value: @show_plan.id, :style=> 'display:none' } %>
             <%= f.button :submit, 'Построить отчет', class: 'btn btn-primary form-group', id: "submit_prefix", :onclick =>"$('.modal').modal('hide');"%>
-            <button type="button" class="btn btn-primary form-group" id="modal-close-button" onclick="$('#reportModal').modal('hide')">Отменить</button>
+            <button type="button" class="btn btn-primary form-group" id="modal-close-button" onclick="$('#reportModal').modal('hide')">Закрыть</button>
           <% end %>
         </div>
       </div>

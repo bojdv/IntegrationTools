@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180704082431) do
+ActiveRecord::Schema.define(version: 20180725104524) do
 
   create_table "categories", force: :cascade do |t|
     t.integer "product_id", limit: 10, precision: 10
@@ -54,6 +54,7 @@ ActiveRecord::Schema.define(version: 20180704082431) do
     t.date "start_date"
     t.date "end_date"
     t.text "tz"
+    t.text "test_data"
     t.index ["test_plan_id"], name: "index_features_on_test_plan_id"
   end
 

@@ -1,42 +1,55 @@
+<% # encoding: utf-8 %>
 <% provide(:title, "Correqts Corporate XML Validator") %>
-<div class="col">
-  <div class="row">
-    <div class="col-md placeholder">
-      <div class="form-group">
-        <!--label for="xml_to_send" id="label_for_xml"><b>Лог:</b></label-->
-        <div style="height:600px;width:1500px;border:3px solid dodgerblue;font:14px/18px Calibri, Garamond, Serif;overflow:auto;">
-          <table class="table table-dark">
-            <thead>
-            <tr>
-              <th scope="col">Дата</th>
-              <th scope="col">ID процесса</th>
-              <th scope="col">Событие</th>
-              <th scope="col">Статус</th>
-              <th scope="col">Короткое сообщение</th>
-            </tr>
-            </thead>
-            <tbody>
+<div class="row">
+  <div class="col-md placeholder">
+    <div class="form-group">
+      <!--label for="xml_to_send" id="label_for_xml"><b>Лог:</b></label-->
+      <div style="height:600px;width:1500px;border:3px solid dodgerblue;font:14px/18px Calibri, Garamond, Serif;overflow:auto;">
+        <table class="table table-dark">
+          <thead>
+          <tr style="color:yellow">
+            <th scope="col">Дата</th>
+            <th scope="col">ID процесса</th>
+            <th scope="col">Событие</th>
+            <th scope="col">Статус</th>
+            <th scope="col">Короткое сообщение</th>
+            <th scope="col">Полное сообщение</th>
+            <th scope="col">XML</th>
+          </tr>
+          </thead>
+          <% @uniq_date.each_with_index do |uniq_date, i| %>
+            <tr><td><button class="btn btn-primary" data-toggle="collapse" data-target="#collapse_<%=i%>" aria-expanded="false"><%=uniq_date%></button></td></tr>
+            <tbody id="collapse_<%=i%>" class="collapse">
+            <%	 uuid = @validator_log.first.uuid %>
             <% @validator_log.each do |data| %>
-            <tr class="<%='table-danger' if data.status == 'FAIL'%>">
-              <td><%= data.created_at %></td>
-              <td><%= data.uuid %></td>
-              <td><%= data.events %></td>
-              <td><%= data.status %></td>
-              <td><%= data.short_message %></td>
-            </tr>
+              <%	 new_uuid = data.uuid %>
+              <%	 if data.created_at.to_date == uniq_date %>
+                <% rand = Random.rand(1000) %>
+                <%	 if new_uuid != uuid %>
+                  <tr style="border-top:2px solid yellow" class="<%='table-danger' if data.status == 'FAIL'%>" aria-labelledby="heading_<%=i%>">
+                  <%	 uuid = data.uuid %>
+            <%	 else %>
+                  <tr class="<%='table-danger' if data.status == 'FAIL'%>" aria-labelledby="heading_<%=i%>">
+                <%	 end %>
+                  <td><%= data.created_at %></td>
+                  <td><%= data.uuid %></td>
+                  <td><%= data.events %></td>
+                  <td><%= data.status %></td>
+                  <td><%= data.short_message %></td>
+                  <td><%	 unless data.full_message.nil? %><a class="btn-link" style="color: red" data-toggle="collapse" data-target="#collapseXml_<%=rand+1%>" aria-expanded="true" aria-controls="collapseMain">Full</a><div id="collapseXml_<%=rand+1%>" class="collapse"><%= data.full_message %></div><%  end %></td>
+                  <td><%	 unless data.xml.nil? %><a class="btn-link" style="color: deepskyblue" data-toggle="collapse" data-target="#collapseXml_<%=rand%>" aria-expanded="true" aria-controls="collapseMain">XML</a><div id="collapseXml_<%=rand%>" class="collapse"><%=data.xml%></div><%  end %></td>
+                </tr>
+              <% end %>
             <% end %>
             </tbody>
-          </table>
-        </div>
+          <% end %>
+        </table>
       </div>
-      <a class="btn btn-primary form-group" id="tester" href="cc_format_validator/start" data-remote="true">Запустить</a>
-      <a class="btn btn-primary form-group" id="tester2" href="cc_format_validator/stop" data-remote="true">Остановить</a>
-      <a class="btn btn-primary form-group" id="tester3" href="cc_format_validator/clear_log" data-remote="true">Очистить лог</a>
     </div>
-
-    <div class="col-md-1 placeholder" id="select_product">
-      <a class="btn btn-primary form-group" id="download-link" href="" style="display: none;" onclick="this.style.display = 'none';">Скачать лог</a>
-    </div>
+    <a class="btn btn-primary form-group" id="tester" href="cc_format_validator/start" data-remote="true">Запустить</a>
+    <a class="btn btn-primary form-group" id="tester2" href="cc_format_validator/stop" data-remote="true">Остановить</a>
+    <a class="btn btn-primary form-group" id="tester3" href="cc_format_validator/clear_log" data-remote="true">Очистить лог</a>
+    <a class="btn btn-primary form-group" id="tester4" href="cc_format_validator/tester" data-remote="true">Tester</a>
   </div>
 </div>
 <%= render 'layouts/modal_xml_sender' %>

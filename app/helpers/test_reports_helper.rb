@@ -457,12 +457,12 @@ module TestReportsHelper
 
     def select_worklog_per_date
       select = <<-query
-      SELECT trunc(worklogdate) as worklogdate, sum(NVL(worklogtime,0)) as worklogtime
+      SELECT trunc(worklogstartdate) as worklogstartdate, sum(NVL(worklogtime,0)) as worklogtime
       FROM view_itools_report
       WHERE
       label in (#{@labels}) and worklogautor in (#{@worklog_autor})
-      GROUP BY trunc(worklogdate)
-      ORDER BY trunc(worklogdate) asc
+      GROUP BY trunc(worklogstartdate)
+      ORDER BY trunc(worklogstartdate) asc
       query
       begin
         puts "Select select_worklog_per_date:\n" + select
@@ -475,9 +475,9 @@ module TestReportsHelper
         hours = 0
         while (rs.next()) do
           hours = hours + rs.getString('worklogtime').to_i
-          hash_worklog_per_date = {date: rs.getString('worklogdate').to_date, value: rs.getString('worklogtime').to_i/60}
+          hash_worklog_per_date = {date: rs.getString('worklogstartdate').to_date, value: rs.getString('worklogtime').to_i/60}
           worklog_per_date << hash_worklog_per_date
-          hash_sum_worklog_per_date = {date: rs.getString('worklogdate').to_date, value: hours/60}
+          hash_sum_worklog_per_date = {date: rs.getString('worklogstartdate').to_date, value: hours/60}
           worklog_sum_per_date << hash_sum_worklog_per_date
         end
       ensure

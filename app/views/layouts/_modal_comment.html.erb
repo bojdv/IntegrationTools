@@ -1,0 +1,20 @@
+<!-- Modal -->
+<div class="modal fade" id="commentModal" tabindex="-1" role="dialog" aria-labelledby="commentModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="commentModalLabel">Комментарий по доработке</h5>
+      </div>
+      <div class="col-md-12 text-center">
+        <div class="modal-body">
+          <textarea id="commentModal-text" rows="15" cols="60"></textarea><br/>
+        </div>
+        <div class="modal-footer">
+          <textarea id="featureId" hidden></textarea>
+          <button type="button" class="btn btn-primary" id="modal-close-button" onclick="sendCommentText()">Сохранить</button>
+          <button type="button2" class="btn btn-primary" id="modal-close-button2" onclick="$('#commentModal').modal('hide')">Закрыть</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

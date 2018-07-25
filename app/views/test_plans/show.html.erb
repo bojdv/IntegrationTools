@@ -52,6 +52,12 @@
         <%  end %>
       </tr>
       <tr>
+        <th scope="col">Тестовые данные (примеры)</th>
+        <% @show_plan.features.each do |f| %>
+          <td><% if !f.test_data.nil? %><a tabindex="0" class="show-popover" data-toggle="popover" title="Тестовые данные" data-content="<%= simple_format(f.test_data)%>">Тестовые данные</a><%	 end %></td>
+        <%  end %>
+      </tr>
+      <tr>
         <th scope="col">Требования</th>
         <% @show_plan.features.each do |f| %>
           <td><% if !f.tz.nil? %><a tabindex="0" class="show-popover" data-toggle="popover" title="Требования" data-content="<%= simple_format(f.tz)%>">Требования</a><%	 end %></td>
@@ -60,7 +66,7 @@
       <tr>
         <th scope="col">План проекта</th>
         <% @show_plan.features.each do |f| %>
-          <td><% if !f.project_plan.nil? %><a tabindex="0" class="show-popover" data-toggle="popover" title="Требования" data-content="<%= simple_format(f.project_plan)%>">План проекта</a><%	 end %></td>
+          <td><% if !f.project_plan.nil? %><a tabindex="0" class="show-popover" data-toggle="popover" title="Требования" data-content='<%= simple_format(f.project_plan)%>'>План проекта</a><%	 end %></td>
         <%  end %>
       </tr>
       <tr>
@@ -90,7 +96,8 @@
       <tr>
         <th scope="col">Комментарий</th>
         <% @show_plan.features.each do |f| %>
-          <td><%	 if !f.comment.empty? %><a tabindex="0" class="show-popover" data-toggle="popover" title="Комментарий" data-content="<%= simple_format(f.comment)%>">Комментарий</a><%  end %></td>
+          <%= puts "ID #{f.id}" %>
+          <td><button tabindex="0" class="show-popover btn btn-primary" data-toggle="popover" title="Комментарий" data-content='<%= simple_format(f.comment)%>' onclick="show_comment('<%= f.comment.inspect.slice(1..-2)%>', '<%= f.id %>')">Комментарий</button></td>
         <%  end %>
       </tr>
     </table>
@@ -650,5 +657,7 @@
 <%  else %>
   <div class="container-fluid"><h5>В БД JIRA не найдено данных для метрик</h5></div>
 <%	 end %>
+
 <%= render 'layouts/modal_test_report.html.erb' %>
 <%= render 'layouts/modal_xml_sender' %>
+<%= render 'layouts/modal_comment' %>

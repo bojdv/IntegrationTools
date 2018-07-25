@@ -20,10 +20,12 @@ class EggAutoTestsController < ApplicationController
                         'ИА ZKH-Loader/СА ZkhPayees',
                         'СА ГИС ГМП',
                         'СА ГИС ЖКХ',
-                        'СА SPEP']
+                        'СА SPEP',
+                        'СА ФНС ЕГРИП',
+                        'СА ФНС ЕГРЮЛ']
     @egg68_components = Array.new(@egg67_components)
     @egg68_components.push('ЕСИА')
-    regex = /\A[6]{,1}[.](9|10|11){,2}[.][\d]{,3}[-][\w]{,8}\Z/
+    regex = /\A[6]{,1}[.](9|10|11|12|13){,2}[.][\d]{,3}[-][\w]{,8}\Z/
 
     ftp = Net::FTP.new('10.1.1.163')
     ftp.login

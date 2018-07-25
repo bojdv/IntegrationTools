@@ -53,6 +53,7 @@ Rails.application.routes.draw do
   get '/cc_format_validator/start' => 'cc_format_validator#start'
   get '/cc_format_validator/stop' => 'cc_format_validator#stop'
   get '/cc_format_validator/clear_log' => 'cc_format_validator#clear_log'
+  get '/cc_format_validator/tester' => 'cc_format_validator#tester'
 
   # Test Reports
   get '/test_reports' => 'test_reports#index'
@@ -63,6 +64,7 @@ Rails.application.routes.draw do
   # Test Plans
   get '/test_plans/tester' => 'test_plans#tester'
   post '/test_plans/make_report' => 'test_plans#make_report'
+  post '/test_plans/safe_comment' => 'test_plans#safe_comment'
   get '/test_plans/download_test_report' => 'test_plans#download_test_report'
   resources :test_plans do
     resources :features

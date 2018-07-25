@@ -76,8 +76,8 @@ module EggAutoTestsHelper
     end
   end
 
-  def send_to_amq_and_receive_egg(manager, xml, functional, ignore_ticket = false) # Отправка сообщений в Active MQ по протоколу OpenWire.
-    # manager - объект менеджера очередей, xml - объект XML сообщения или класса REXML, functional - имя теста, ignore_ticket - игнорирование промежуточного тикета
+  def send_to_amq_and_receive_egg(manager, xml, functional, ignore_ticket = false, counter = 60) # Отправка сообщений в Active MQ по протоколу OpenWire.
+    # manager - объект менеджера очередей, xml - объект XML сообщения или класса REXML, functional - имя теста, ignore_ticket - игнорирование промежуточного тикета, count - время ожидания
     # Метод возвращает текст XML сообщения, полученного от ЕГГ
     java_import 'org.apache.activemq.ActiveMQConnectionFactory'
     java_import 'javax.jms.Session'
@@ -103,7 +103,7 @@ module EggAutoTestsHelper
       $log_egg.write_to_browser("Отправили сообщение в eGG")
       $log_egg.write_to_log(functional, "Отправили сообщение в eGG", "#{textMessage.getText}")
       receiver = session.createReceiver(session.createQueue(manager.queue_in))
-      count = 60
+      count = counter
       $log_egg.write_to_browser("Ждем ответ в течении #{count} секунд")
       xml_actual = receiver.receive(1000)
       while xml_actual.nil?
@@ -119,7 +119,8 @@ module EggAutoTestsHelper
       if ignore_ticket
         $log_egg.write_to_log(functional, "Получили квиток", "Получили промежуточный квиток из очереди #{manager.queue_in}:\n #{xml_actual.getText}")
         $log_egg.write_to_browser("Получили промежуточный квиток от eGG")
-        count = 40
+        count = counter
+        $log_egg.write_to_browser("Ждем ответ в течении #{count} секунд")
         xml_actual = receiver.receive(1000)
         while xml_actual.nil?
           xml_actual = receiver.receive(1000)
@@ -127,7 +128,6 @@ module EggAutoTestsHelper
           return nil if count == 0
         end
       end
-      #$log_egg.write_to_browser("Получили ответ от eGG из очереди #{manager.queue_in}:\n #{xml_actual.getText}", "Получили ответ от eGG")
       $log_egg.write_to_browser("Получили ответ от eGG")
       $log_egg.write_to_log(functional, "Получили ответ", "Получили ответ от eGG из очереди #{manager.queue_in}:\n #{xml_actual.getText}")
       return xml_actual.getText

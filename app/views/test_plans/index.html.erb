@@ -47,7 +47,7 @@
                   <td><%= User.where(:id => plan.user_id).pluck(:email).join %></td>
                   <td><%= link_to 'Скачать отчет', {:controller => "test_plans", :action =>"download_test_report", :url => plan.report_url} unless plan.report_url.nil? %></td>
                   <td><%	 if !plan.comment.empty? %><a tabindex="0" class="show-popover" data-toggle="popover" title="Комментарий" data-content='<%= simple_format(plan.comment) %>'>Комментарий</a><%  end %></td>
-                  <%	 if logged_in? and plan.status != 'Завершен' %><td><%= link_to 'Редактировать', edit_test_plan_path(plan) %></td><% end %>
+                  <%	 if logged_in? %><td><%= link_to 'Редактировать', edit_test_plan_path(plan) %></td><% end %>
                 </tr>
               <% end %>
             <% end %>
@@ -124,7 +124,7 @@
                   <td><%= User.where(:id => plan.user_id).pluck(:email).join %></td>
                   <td><%= link_to 'Скачать отчет', {:controller => "test_plans", :action =>"download_test_report", :url => plan.report_url} unless plan.report_url.nil? %></td>
                   <td><%	 if !plan.comment.empty? %><a tabindex="0" class="show-popover" data-toggle="popover" title="Комментарий" data-content='<%= simple_format(plan.comment) %>'>Комментарий</a><%  end %></td>
-                  <%	 if logged_in? and plan.status != 'Завершен' %><td><%= link_to 'Редактировать', edit_test_plan_path(plan) %></td><% end %>
+                  <%	 if logged_in? %><td><%= link_to 'Редактировать', edit_test_plan_path(plan) %></td><% end %>
                 </tr>
               <% end %>
             <% end %>
@@ -163,7 +163,7 @@
                   <td><%= User.where(:id => plan.user_id).pluck(:email).join %></td>
                   <td><%= link_to 'Скачать отчет', {:controller => "test_plans", :action =>"download_test_report", :url => plan.report_url} unless plan.report_url.nil? %></td>
                   <td><%	 if !plan.comment.empty? %><a tabindex="0" class="show-popover" data-toggle="popover" title="Комментарий" data-content='<%= simple_format(plan.comment) %>'>Комментарий</a><%  end %></td>
-                  <%	 if logged_in? and plan.status != 'Завершен' %><td><%= link_to 'Редактировать', edit_test_plan_path(plan) %></td><% end %>
+                  <%	 if logged_in? %><td><%= link_to 'Редактировать', edit_test_plan_path(plan) %></td><% end %>
                 </tr>
               <% end %>
             <% end %>
@@ -202,7 +202,7 @@
                   <td><%= User.where(:id => plan.user_id).pluck(:email).join %></td>
                   <td><%= link_to 'Скачать отчет', {:controller => "test_plans", :action =>"download_test_report", :url => plan.report_url} unless plan.report_url.nil? %></td>
                   <td><%	 if !plan.comment.empty? %><a tabindex="0" class="show-popover" data-toggle="popover" title="Комментарий" data-content='<%= plan.comment%>'>Комментарий</a><%  end %></td>
-                  <%	 if logged_in? and plan.status != 'Завершен' %><td><%= link_to 'Редактировать', edit_test_plan_path(plan) %></td><% end %>
+                  <%	 if logged_in? %><td><%= link_to 'Редактировать', edit_test_plan_path(plan) %></td><% end %>
                 </tr>
               <% end %>
             <% end %>

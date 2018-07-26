@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+</head>
+<body>
+<style type="text/css">
+  .tabs { width: 1050px; padding: 0px; margin: 0 auto; }
+  .tabs>input { display:none; }
+  .tabs>div { display: none;
+    padding: 12px;
+    border: 1px solid #C0C0C0;
+    background: #FFFFFF;
+  }
+  .tabs>label {
+    display: inline-block;
+    padding: 7px;
+    margin: 0 -5px -1px 0;
+    text-align: center;
+    color: #666666;
+    border: 1px solid #C0C0C0;
+    background: #E0E0E0;
+    cursor: pointer;
+  }
+  .tabs>input:checked + label {
+    color: #000000;
+    border: 1px solid #C0C0C0;
+    border-bottom: 1px solid #FFFFFF;
+    background: #FFFFFF;
+  }
+  #tab_1:checked ~ #txt_1,
+  #tab_2:checked ~ #txt_2,
+  #tab_3:checked ~ #txt_3,
+  #tab_4:checked ~ #txt_4,
+  #tab_5:checked ~ #txt_5 { display: block; }
+  td {
+    white-space:pre-wrap;
+  }
+</style>
+<div class="tabs">
+  <input type="radio" name="inset" value="" id="tab_1" checked>
+  <label for="tab_1">Общая информация</label>
+
+  <input type="radio" name="inset" value="" id="tab_2">
+  <label for="tab_2">Задачи тестирования</label>
+
+  <input type="radio" name="inset" value="" id="tab_3">
+  <label for="tab_3">Дефекты/консультации</label>
+
+  <input type="radio" name="inset" value="" id="tab_4">
+  <label for="tab_4">Дефекты ДЭИС</label>
+
+  <input type="radio" name="inset" value="" id="tab_5">
+  <label for="tab_5">Не проектное списание</label>
+
+  <div id="txt_1">
+    <div style="text-align: center;"></div>
+    <div style="text-align: center; "><strong>Отчет по тестированию продукта <%=	 Product.where(:id => @plan.product_id).pluck(:product_name).join %></strong></div>
+    <% @plan.features.each do |f| %>
+      <div style="text-align: center;"><strong><%=	f.name  %></strong></div><br>
+    <%  end %>
+    <div style="font-weight: normal;"></div>
+    <table border="2" cellspacing="2" cellpadding="3" width="1000" bordercolor="" align="center" style="font-weight: normal; text-align: left;" rules="all">
+      <tbody>
+      <tr bgcolor="#99CC00">
+        <td colspan="2"><strong style="color: #ffffff;"><span style="color: #ffffff;">Общая информация о тестировании</span></strong></td>
+      </tr>
+      <tr>
+        <%	keys = @report.project_name.split(',') %>
+        <td rowspan="<%= keys.size %>">Коды проектов</td>
+        <td><%= keys.first.slice(1..-2) %></td>
+      </tr>
+      <%	 if keys.size > 1 %>
+        <%	 for i in 1...keys.size %>
+          <tr>
+            <td><%= keys[i].slice(1..-2)%></td>
+          </tr>
+        <%	 end %>
+      <%	 end %>
+      <tr>
+        <td>Даты проведения тестирования</td>
+        <td><%=	@start_test_date  %> - <%=	@end_test_date  %></td>
+      </tr>
+      <tr>
+        <td rowspan="<%= @qa.count %>">QA инженеры</td>
+          <td><%= @qa.first.join(', ')%></td>
+      </tr>
+      <% if @qa.count > 1 %>
+        <% @qa.drop(1).each do |f| %>
+          <tr>
+            <td><%=f.join(', ')%></td>
+          </tr>
+        <%	 end %>
+      <%	 end %>
+      <tr>
+        <td>Ссылка на план тестирования</td>
+        <td><a href="http://vm-itools:3000/test_plans/<%=	@plan.id  %>" target="_blank" title="iTools"><%=	@plan.name %></a></td>
+      </tr>
+      <tr>
+        <td rowspan="<%= @plan.features.count %>">Ссылка на TestRail</td>
+          <td><% unless @plan.features.first.testcases.nil? %><a href=<%= @plan.features.first.testcases %> target="_blank"><%=@plan.features.first.testcases%></a><%	 end %></td>
+      </tr>
+      <% if @plan.features.count > 1 %>
+        <% @plan.features.drop(1).each do |f| %>
+        <tr>
+          <td><% unless f.testcases.nil? %><a href=<%= f.testcases %> target="_blank"><%=f.testcases%></a><%	 end %></td>
+        </tr>
+      <%	 end %>
+       <%	 end %>
+      <tr bgcolor="#99CC00">
+        <td colspan="2"><strong><span style="color: #ffffff;"> Информация о сборке</span></strong></td>
+      </tr>
+      <tr>
+        <td>Версия продукта</td>
+        <td><%= @version %></td>
+      </tr>
+      <tr>
+          <td>Ссылки на сборки</td>
+          <td><%= @build_links %></td>
+      </tr>
+      <tr>
+        <td>Release Note</td>
+        <td><%=@rn%></td>
+      </tr>
+      <tr bgcolor="#99CC00">
+        <td colspan="2"><strong><span style="color: #ffffff;">Тестовое покрытие</span></strong></td>
+      </tr>
+      <tr>
+        <td rowspan="<%= @plan.features.count %>">Объем тестирования</td>
+          <td><%= @plan.features.first.name %>:<br><%= @plan.features.first.test_scope %></td>
+      </tr>
+       <% if @plan.features.count > 1 %>
+        <% @plan.features.drop(1).each do |f| %>
+          <tr>
+            <td><% unless f.test_scope.nil? %><%= f.name %>:<br><%= f.test_scope %><%	 end %></td>
+          </tr>
+        <%	 end %>
+      <%	 end %>
+      <tr bgcolor="#99CC00">
+        <td colspan="2"><strong><span style="color: #ffffff;">Оценка качества</span></strong></td>
+      </tr>
+      <tr>
+        <td>Ограничения</td>
+        <td><%=	@minus  %></td>
+      </tr>
+      <tr bgcolor="#99CC00">
+        <td colspan="2"><strong><span style="color: #ffffff;">Трудозатраты</span></strong></td>
+      </tr>
+      <tr>
+        <td>Плановая оценка эксперта тестирования без рисков</td>
+        <td><a href="https://jira.bssys.com/issues/?jql=key in (<%=	@backlog%>)" target="_blank" title="Wiki"><%=@backlog_estimate%>ч</a></td>
+      </tr>
+      <tr>
+        <td>Плановая оценка МП</td>
+        <td><a href="https://jira.bssys.com/issues/?jql=key in (<%=	@report.projects  %>)" target="_blank" title="Wiki"><%=@project_estimate%>ч</a></td>
+      </tr>
+      <tr>
+        <td>Списания в задачи тестирования</td>
+        <td><%= @testing_worklogtime/60 %>ч <%= @testing_worklogtime%60 %>м</td>
+      </tr>
+      <tr>
+        <td>Списания в дефекты</td>
+        <td><%= @defect_worklogtime/60 %>ч <%= @defect_worklogtime%60 %>м</td>
+      </tr>
+      <tr>
+        <td>Списания в дефекты от ДЭИС</td>
+        <td><%= @deis_defect_worklogtime/60 %>ч <%= @deis_defect_worklogtime%60 %>м</td>
+      </tr>
+      <tr>
+        <td>Списания в консультации</td>
+        <td><%= @consultation_worklogtime/60 %>ч <%= @consultation_worklogtime%60 %>м</td>
+      </tr>
+      <tr>
+        <td>Списания в согласования</td>
+        <td><%= @agreement_worklogtime/60 %>ч <%= @agreement_worklogtime%60 %>м</td>
+      </tr>
+      <tr>
+        <td>Все трудозатраты по тестированию</td>
+        <%	all_worklog = @testing_worklogtime + @defect_worklogtime + @deis_defect_worklogtime + @consultation_worklogtime + @agreement_worklogtime  %>
+        <td><%= all_worklog/60 %>ч <%= all_worklog%60 %>м</td>
+      </tr>
+      <tr>
+        <td>Осталось часов по оценке тестирования</td>
+        <% time = @backlog_estimate-(all_worklog.to_f/60) %>
+        <% if time >= 0%>
+          <td><font color="green"><%= time.round(2) %>ч</font></td>
+        <%	 else %>
+          <td><font color="red"><%= time.round(2) %>ч</font></td>
+        <%	 end %>
+      </tr>
+      <tr>
+        <td>Осталось часов по оценке МП</td>
+        <% time = @project_estimate-(all_worklog.to_f/60) %>
+        <% if time >= 0%>
+          <td><font color="green"><%= time.round(2) %>ч</font></td>
+        <%	 else %>
+          <td><font color="red"><%= time.round(2) %>ч</font></td>
+        <%	 end %>
+      </tr>
+
+      <tr bgcolor="#99CC00">
+        <td colspan="2"><strong><span style="color: #ffffff;">Информация о дефектах</span></strong></td>
+      </tr>
+      <tr>
+        <td>Всего дефектов</td>
+        <td><a href="https://jira.bssys.com/issues/?jql=key in (<%=	get_task_list(@def_tasks)%>)" target="_blank" title="Wiki"><%=	@def_tasks.length %></a></td>
+      </tr>
+      <td>Дефекты с приемки (если была)</td>
+      <td><a href="https://jira.bssys.com/issues/?jql=key in (<%=	get_task_list(@deis_def)%>)" target="_blank" title="Wiki"><%=	@deis_def.length %></td>
+      </tr>
+      <tr>
+        <td>Всего подтвержденных дефектов с приемки</td>
+        <td><%=	 @deis_defect_true_count %></td>
+      </tr>
+      <tr>
+      <tr>
+        <td>Открытых дефектов (без приемки)</td>
+        <td><a href="https://jira.bssys.com/issues/?jql=key in (<%=	get_task_list(@open_def)%>)" target="_blank" title="Wiki"><%=	@open_def.length %></a></td>
+      </tr>
+      <tr>
+        <td>Открытых БКВ</td>
+        <td><%=	 @open_def_bkv %></td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+  <div id="txt_2">
+    <div style="text-align: center;"></div>
+    <div style="text-align: center; "><strong>Все задачи тестирования</strong></div><br>
+    <div style="font-weight: normal;"></div>
+    <table border="2" cellspacing="2" cellpadding="3" width="1000" bordercolor="" align="center" style="font-weight: normal; text-align: left;" rules="all">
+      <tbody>
+      <tr bgcolor="#99CC00">
+        <td><strong style="color: #ffffff;"><span style="color: #ffffff;">Тема</span></strong></td>
+        <td><strong style="color: #ffffff;"><span style="color: #ffffff;">Задача</span></strong></td>
+        <td><strong style="color: #ffffff;"><span style="color: #ffffff;">Оценка</span></strong></td>
+        <td><strong style="color: #ffffff;"><span style="color: #ffffff;">Списано</span></strong></td>
+        <td><strong style="color: #ffffff;"><span style="color: #ffffff;">Статус</span></strong></td>
+      </tr>
+      <% sum_est, sum = 0,0 %>
+      <% @test_tasks.each_value do |value| %>
+        <tr>
+          <td><%= value[0].to_s %></td>
+          <td><a href="https://jira.bssys.com/browse/<%= value[1] %>" target="_blank" title=""><%= value[1] %></a></td>
+          <td><%= value[2].to_i/60 %>ч <%= value[2].to_i%60 %>м</td>
+          <td><%= value[3].to_i/60 %>ч <%= value[3].to_i%60 %>м</td>
+          <td><%= value[4].to_s %></td>
+        </tr>
+        <% sum += value[3].to_i%>
+        <% sum_est += value[2].to_i%>
+      <%	 end %>
+      <tr bgcolor="#99CC00">
+        <td><strong style="color: #ffffff;"><span style="color: #ffffff;">Итого:</span></strong></td>
+        <td><strong style="color: #ffffff;"><span style="color: #ffffff;"></span></strong></td>
+        <td><strong style="color: #ffffff;"><span style="color: #ffffff;"><%= sum_est/60 %>ч <%= sum_est%60 %>м</span></strong></td>
+        <td><strong style="color: #ffffff;"><span style="color: #ffffff;"><%= sum/60 %>ч <%= sum%60 %>м</span></strong></td>
+        <td><strong style="color: #ffffff;"><span style="color: #ffffff;"></span></strong></td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+  <div id="txt_3">
+    <div style="text-align: center;"></div>
+    <div style="text-align: center; "><strong>Дефекты/консультации/согласования</strong></div><br>
+    <div style="font-weight: normal;"></div>
+    <table border="2" cellspacing="2" cellpadding="3" width="1000" bordercolor="" align="center" style="font-weight: normal; text-align: left;" rules="all">
+      <tbody>
+      <tr bgcolor="#99CC00">
+        <td><strong style="color: #ffffff;"><span style="color: #ffffff;">Тема</span></strong></td>
+        <td><strong style="color: #ffffff;"><span style="color: #ffffff;">Задача</span></strong></td>
+        <td><strong style="color: #ffffff;"><span style="color: #ffffff;">Приоритет</span></strong></td>
+        <td><strong style="color: #ffffff;"><span style="color: #ffffff;">Списано</span></strong></td>
+        <td><strong style="color: #ffffff;"><span style="color: #ffffff;">Статус</span></strong></td>
+      </tr>
+      <tr>
+        <td><strong>Дефекты:</strong></td>
+        <td><strong></strong></td>
+        <td><strong></strong></td>
+        <td><strong></strong></td>
+        <td><strong></strong></td>
+      </tr>
+      <% sum = 0 %>
+      <% @def_tasks.each_value do |value| %>
+        <tr>
+          <td><%= value[0].to_s %></td>
+          <td><a href="https://jira.bssys.com/browse/<%= value[1] %>" target="_blank" title=""><%= value[1] %></a></td>
+          <td><%= value[2].to_s %></td>
+          <td><%= value[3].to_i/60 %>ч <%= value[3].to_i%60 %>м</td>
+          <td><%= value[4].to_s %></td>
+        </tr>
+        <% sum += value[3].to_i%>
+      <%	 end %>
+      <% if @cons_tasks.any? %>
+        <tr>
+          <td><strong>Консультации:</strong></td>
+          <td><strong></strong></td>
+          <td><strong></strong></td>
+          <td><strong></strong></td>
+          <td><strong></strong></td>
+        </tr>
+        <% @cons_tasks.each_value do |value| %>
+          <tr>
+            <td><%= value[0].to_s %></td>
+            <td><a href="https://jira.bssys.com/browse/<%= value[1] %>" target="_blank" title=""><%= value[1] %></a></td>
+            <td><%= value[2].to_s %></td>
+            <td><%= value[3].to_i/60 %>ч <%= value[3].to_i%60 %>м</td>
+            <td><%= value[4].to_s %></td>
+          </tr>
+          <% sum += value[3].to_i%>
+        <%	 end %>
+      <%	 end %>
+      <% if @agree_tasks.any? %>
+        <tr>
+          <td><strong>Согласования:</strong></td>
+          <td><strong></strong></td>
+          <td><strong></strong></td>
+          <td><strong></strong></td>
+          <td><strong></strong></td>
+        </tr>
+        <% @agree_tasks.each_value do |value| %>
+          <tr>
+            <td><%= value[0].to_s %></td>
+            <td><a href="https://jira.bssys.com/browse/<%= value[1] %>" target="_blank" title=""><%= value[1] %></a></td>
+            <td><%= value[2].to_s %></td>
+            <td><%= value[3].to_i/60 %>ч <%= value[3].to_i%60 %>м</td>
+            <td><%= value[4].to_s %></td>
+          </tr>
+          <% sum += value[3].to_i%>
+        <%	 end %>
+      <%	 end %>
+      <tr bgcolor="#99CC00">
+        <td><strong style="color: #ffffff;"><span style="color: #ffffff;">Итого: <%= @def_tasks.length + @cons_tasks.length + @agree_tasks.length %></span></strong></td>
+        <td><strong style="color: #ffffff;"><span style="color: #ffffff;"></span></strong></td>
+        <td><strong style="color: #ffffff;"><span style="color: #ffffff;"></span></strong></td>
+        <td><strong style="color: #ffffff;"><span style="color: #ffffff;"><%= sum/60 %>ч <%= sum%60 %>м</span></strong></td>
+        <td><strong style="color: #ffffff;"><span style="color: #ffffff;"></span></strong></td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+  <div id="txt_4">
+    <div style="text-align: center;"></div>
+    <div style="text-align: center; "><strong>Дефекты и Консультации с приемки ДЭИС (Этап = 'Приемка ДЭИС')</strong></div><br>
+    <div style="font-weight: normal;"></div>
+    <table border="2" cellspacing="2" cellpadding="3" width="1000" bordercolor="" align="center" style="font-weight: normal; text-align: left;" rules="all">
+      <tbody>
+      <tr bgcolor="#99CC00">
+        <td><strong style="color: #ffffff;"><span style="color: #ffffff;">Тема</span></strong></td>
+        <td><strong style="color: #ffffff;"><span style="color: #ffffff;">Задача</span></strong></td>
+        <td><strong style="color: #ffffff;"><span style="color: #ffffff;">Списано QA</span></strong></td>
+        <td><strong style="color: #ffffff;"><span style="color: #ffffff;">Резолюция</span></strong></td>
+        <td><strong style="color: #ffffff;"><span style="color: #ffffff;">Статус</span></strong></td>
+      </tr>
+      <% sum = 0%>
+      <% @deis_def.each_value do |value| %>
+        <tr>
+          <td><%= value[0].to_s %></td>
+          <td><a href="https://jira.bssys.com/browse/<%= value[1] %>" target="_blank" title=""><%= value[1] %></a></td>
+          <td><%= value[2].to_i/60 %>ч <%= value[2].to_i%60 %>м</td>
+          <td><%= value[3] %></td>
+          <td><%= value[4] %></td>
+        </tr>
+        <% sum += value[2].to_i%>
+      <%	 end %>
+      <tr bgcolor="#99CC00">
+        <td><strong style="color: #ffffff;"><span style="color: #ffffff;">Итого: <%= @deis_def.length %></span></strong></td>
+        <td><strong style="color: #ffffff;"><span style="color: #ffffff;"></span></strong></td>
+        <td><strong style="color: #ffffff;"><span style="color: #ffffff;"><%= sum/60 %>ч <%= sum%60 %>м</span></strong></td>
+        <td><strong style="color: #ffffff;"><span style="color: #ffffff;"></span></strong></td>
+        <td><strong style="color: #ffffff;"><span style="color: #ffffff;"></span></strong></td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+  <div id="txt_5">
+    <div style="text-align: center;"></div>
+    <div style="text-align: center; "><strong>Задачи без метки или с другой меткой, вне приемки.<br>Т.е. задачи, в которых или забыли проставить метку или которые не относятся напрямую к проекту</strong></div><br>
+    <div style="font-weight: normal;"></div>
+    <table border="2" cellspacing="2" cellpadding="3" width="1000" bordercolor="" align="center" style="font-weight: normal; text-align: left;" rules="all">
+      <tbody>
+      <tr bgcolor="#99CC00">
+        <td><strong style="color: #ffffff;"><span style="color: #ffffff;">Тема</span></strong></td>
+        <td><strong style="color: #ffffff;"><span style="color: #ffffff;">Задача</span></strong></td>
+        <td><strong style="color: #ffffff;"><span style="color: #ffffff;">Тип</span></strong></td>
+        <td><strong style="color: #ffffff;"><span style="color: #ffffff;">Списано</span></strong></td>
+        <td><strong style="color: #ffffff;"><span style="color: #ffffff;">Статус</span></strong></td>
+      </tr>
+      <% sum = 0%>
+      <% @other_tasks.each_value do |value| %>
+        <tr>
+          <td><%= value[0].to_s %></td>
+          <td><a href="https://jira.bssys.com/browse/<%= value[1] %>" target="_blank" title=""><%= value[1] %></a></td>
+          <td><%= value[2] %></td>
+          <td><%= value[3].to_i/60 %>ч <%= value[3].to_i%60 %>м</td>
+          <td><%= value[4] %></td>
+        </tr>
+        <% sum += value[3].to_i%>
+      <%	 end %>
+      <tr bgcolor="#99CC00">
+        <td><strong style="color: #ffffff;"><span style="color: #ffffff;">Итого: <%= @other_tasks.length %></span></strong></td>
+        <td><strong style="color: #ffffff;"><span style="color: #ffffff;"></span></strong></td>
+        <td><strong style="color: #ffffff;"><span style="color: #ffffff;"></span></strong></td>
+        <td><strong style="color: #ffffff;"><span style="color: #ffffff;"><%= sum/60 %>ч <%= sum%60 %>м</span></strong></td>
+        <td><strong style="color: #ffffff;"><span style="color: #ffffff;"></span></strong></td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</body>
+</html>

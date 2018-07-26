@@ -1,4 +1,5 @@
 class TestReportsController < ApplicationController
+
   def index
 
   end
@@ -6,16 +7,25 @@ class TestReportsController < ApplicationController
   def run
     response_ajax_reports("Не заполнены метки") and return if report_params[:labels].empty?
     response_ajax_reports("Не указана задача с оценкой тестирования") and return if report_params[:backlog_keys].empty?
-    worklog_autor = {'bojdv' => 'Бойко Дина', 'pekav' => 'Пехов Алексей', 'kotvv' => 'Коцупенко Владимир', 'shpae' => 'Шпинько Александр', 'tkans'=>'Ткаченко Никита'}
+    worklog_autor = {'bojdv' => 'Бойко Дина', 'pekav' => 'Пехов Алексей', 'kotvv' => 'Коцупенко Владимир', 'shpae' => 'Шпинько Александр', 'tkans'=>'Ткаченко Никита', 'pasap'=>'Пащенко Анастасия', 'e.vasilyeva'=>'Васильева Елена'}
     @report = JIRA_Report.new(report_params[:backlog_keys], report_params[:labels], worklog_autor)
-    @backlog_estimate, @project_estimate, @testing_worklogtime, @defect_worklogtime, @consultation_worklogtime, @agreement_worklogtime, @defect_count, @defect_true_count, @defect_open_count, @defect_bkv_count, @test_tasks, @def_tasks, @cons_tasks = @report.select_all
+    #@backlog_estimate, @project_estimate = @report.select_backlog_project_estimate
+    @backlog_estimate = @report.select_backlog_estimate
+    @project_estimate = @report.select_project_estimate
+    @testing_worklogtime, @test_tasks = @report.select_test_worklog
+    @defect_worklogtime, @consultation_worklogtime, @agreement_worklogtime, @def_tasks, @cons_tasks, @agree_tasks, @open_def, @open_def_bkv = @report.select_inner_tasks_worklog
+    @deis_def, @deis_defect_true_count = @report.select_deis
+    @deis_defect_worklogtime = @report.select_deis_worklog
+    @other_tasks = @report.select_other_task
+    @worklog_time, @worklog_autor = @report.select_worklog_date
+    @worklog_autor = @report.get_value_from_hash(worklog_autor, @worklog_autor)
+
+    #@defect_count, @defect_true_count, @defect_open_count, @defect_bkv_count,  = @report.select_not_worklogautor
     @build_links = @report.get_task_array(report_params[:build_link])
     @rn = report_params[:release_note]
-    @nullable_lebels, @worklog_time, @worklog_autor = @report.select_custom
-    @nullable_lebels.delete_if {|key, value| @nullable_lebels.values.count(value) > 1}
-    @worklog_autor = @report.get_value_from_hash(worklog_autor, @worklog_autor)
-    @deis_def = @report.select_deis
     make_log_reports
+
+    #@nullable_lebels.delete_if {|key, value| @nullable_lebels.values.count(value) > 1}
   end
 
   def make_log_reports # Метод формирующий файл отчета
@@ -39,9 +49,13 @@ class TestReportsController < ApplicationController
   end
 
   def tester
-    worklog_autor = {0=>["[eGG ASM 6.10.27] Error resolving artifactcom.oracle:ojdbc7:jar:12.1.0.1.0", "BSSEGGBH-42", "Р”РµС„РµРєС‚", "Р—Р°РєСЂС‹С‚"], 1=>["[eGG ASM 6.10.27] Error resolving artifactcom.oracle:ojdbc7:jar:12.1.0.1.0", "BSSEGGBH-42", "Р”РµС„РµРєС‚", "Р—Р°РєСЂС‹С‚"], 2=>["[eGG ASM 6.10.27] Error resolving artifactcom.oracle:ojdbc7:jar:12.1.0.1.0", "BSSEGGBH-43", "Р”РµС„РµРєС‚", "Р—Р°РєСЂС‹С‚"]}
-    worklog_autor.delete_if {|key, value| worklog_autor.values.count(value) > 1}
+    worklog_autor = {0=>["[hi", '0'], 1=>["hi2", '999']}
+    worklog_autor.delete_if {|key, value| value.to_s.include?('999')}
     puts worklog_autor
+
+    autor = 'pekav', 'asa'
+    autor2 = 'asa'
+    puts autor.include?(autor2)
   end
 
   private
@@ -57,7 +71,6 @@ class TestReportsController < ApplicationController
                                           :testing,
                                           :not_testing,
                                           :build_quality,
-                                          :build_intention,
                                           :limitation)
   end
 end

@@ -1,0 +1,663 @@
+<% provide(:title, @show_plan.name) %>
+<div class="container-fluid"><br/>
+  <h4>Общая информация</h4>
+  <div style="height:600px;width:auto;border:3px solid dodgerblue;font:14px/18px Calibri, Garamond, Serif;overflow:auto;">
+    <table class="table table-dark">
+      <tr>
+        <th scope="col">Название доработки</th>
+        <% @show_plan.features.each do |f| %>
+          <td style="color:yellow"><b><%= f.name %></b> <%= link_to '(edit)', "#{@show_plan.id}/features/#{f.id}/edit" %></td>
+        <%  end %>
+      </tr>
+      <tr>
+        <th scope="col">Даты тестирования (план)</th>
+        <% @show_plan.features.each do |f| %>
+          <td><%= "Старт: #{f.start_date}<br>".html_safe %><%= "Конец: #{f.end_date}" %></td>
+        <%  end %>
+      </tr>
+      <tr>
+        <th scope="col">Метки</th>
+        <% @show_plan.features.each do |f| %>
+          <td><%= f.labels %></td>
+        <%  end %>
+      </tr>
+      <tr>
+        <th scope="col">Название проекта</th>
+        <% @show_plan.features.each do |f| %>
+          <td><a href="https://jira.bssys.com/secure/BrowseProjects.jspa?selectedCategory=all&selectedProjectType=all&contains=<%= f.project_name %>" target="_blank"><%= f.project_name %></a></td>
+        <%  end %>
+      </tr>
+      <tr>
+        <th scope="col">Оценка трудозатрат</th>
+        <% @show_plan.features.each do |f| %>
+          <td><a href="https://jira.bssys.com/browse/<%= f.backlog %>" target="_blank"><%= f.backlog %></a></td>
+        <%  end %>
+      </tr>
+      <tr>
+        <th scope="col">Ссылка на доработку</th>
+        <% @show_plan.features.each do |f| %>
+          <td><a href="https://jira.bssys.com/browse/<%= f.feature_url %>" target="_blank"><%= f.feature_url %></a></td>
+        <%  end %>
+      </tr>
+      <tr>
+        <th scope="col">Объем тестирования</th>
+        <% @show_plan.features.each do |f| %>
+          <td><%= f.test_scope %></td>
+        <%  end %>
+      </tr>
+      <tr>
+        <th scope="col">Ссылка на TestRail</th>
+        <% @show_plan.features.each do |f| %>
+          <td><% if !f.testcases.nil? %><a href=<%= f.testcases %> target="_blank">TastRail</a><%	 end %></td>
+        <%  end %>
+      </tr>
+      <tr>
+        <th scope="col">Тестовые данные (примеры)</th>
+        <% @show_plan.features.each do |f| %>
+          <td><% if !f.test_data.nil? %><a tabindex="0" class="show-popover" data-toggle="popover" title="Тестовые данные" data-content="<%= simple_format(f.test_data)%>">Тестовые данные</a><%	 end %></td>
+        <%  end %>
+      </tr>
+      <tr>
+        <th scope="col">Требования</th>
+        <% @show_plan.features.each do |f| %>
+          <td><% if !f.tz.nil? %><a tabindex="0" class="show-popover" data-toggle="popover" title="Требования" data-content="<%= simple_format(f.tz)%>">Требования</a><%	 end %></td>
+        <%  end %>
+      </tr>
+      <tr>
+        <th scope="col">План проекта</th>
+        <% @show_plan.features.each do |f| %>
+          <td><% if !f.project_plan.nil? %><a tabindex="0" class="show-popover" data-toggle="popover" title="Требования" data-content='<%= simple_format(f.project_plan)%>'>План проекта</a><%	 end %></td>
+        <%  end %>
+      </tr>
+      <tr>
+        <th scope="col">Аналитики</th>
+        <% @show_plan.features.each do |f| %>
+          <td><%	 if !f.analytic.nil? %><%= f.analytic.join('<br>').html_safe %><%  end %></td>
+        <%  end %>
+      </tr>
+      <tr>
+        <th scope="col">Разработчики</th>
+        <% @show_plan.features.each do |f| %>
+          <td><%	 if !f.developer.nil? %><%= f.developer.join('<br>').html_safe %><%  end %></td>
+        <%  end %>
+      </tr>
+      <tr>
+        <th scope="col">Тестировщики</th>
+        <% @show_plan.features.each do |f| %>
+          <td><%	 if !f.qa.nil? %><%= f.qa.join('<br>').html_safe %><%  end %></td>
+        <%	 end %>
+      </tr>
+      <tr>
+        <th scope="col">Менеджер проекта</th>
+        <% @show_plan.features.each do |f| %>
+          <td><%	 if !f.manager.nil? %><%= f.manager.join('<br>').html_safe %><%  end %></td>
+        <%  end %>
+      </tr>
+      <tr>
+        <th scope="col">Комментарий</th>
+        <% @show_plan.features.each do |f| %>
+          <%= puts "ID #{f.id}" %>
+          <td><button tabindex="0" class="show-popover btn btn-primary" data-toggle="popover" title="Комментарий" data-content='<%= simple_format(f.comment)%>' onclick="show_comment('<%= f.comment.inspect.slice(1..-2)%>', '<%= f.id %>')">Комментарий</button></td>
+        <%  end %>
+      </tr>
+    </table>
+  </div><br>
+  <%= link_to 'Добавить доработку', "#{@show_plan.id}/features/new", {:class => "btn btn-primary form-group" } %>
+  <%= link_to 'Построить отчет', '#', {:class => "btn btn-primary form-group", :onclick =>"$('#reportModal').modal();"} if @show_plan.features.any? and !@report.project_name.nil?%>
+  <%= link_to 'Назад', test_plans_path(@edit_plan), {:class => "btn btn-primary form-group" }%>
+</div>
+<%	 if @show_plan.features.any? and !@report.project_name.nil? %>
+  <div class="container-fluid">
+
+    <!-- Настройки вкладок -->
+    <ul class="nav nav-tabs" id="mqTab" role="tablist">
+      <li class="nav-item">
+        <a class="nav-link active" id="777" data-toggle="tab" href="#Main" role="tab" aria-controls="output" aria-selected="true">Общая статистика</a>
+      </li>
+      <% @show_plan.features.each do |f| %>
+        <li class="nav-item">
+          <a class="nav-link" id="<%=f.id%>" data-toggle="tab" href="#id<%=f.id%>" role="tab" aria-controls="output" aria-selected="false"><%=f.name%></a>
+        </li>
+      <%	 end %>
+    </ul>
+    <div class="tab-content" id="myTabContent">
+      <!-- Первая вкладка -->
+
+      <div class="tab-pane fade show active" id="Main" role="tabpanel" aria-labelledby="777">
+        <!-- Группировка -->
+        <div id="accordion">
+          <!-- Первая группа. Трудозатраты/ информация о дефектах -->
+          <%	all_worklog = @testing_worklogtime + @defect_worklogtime + @deis_defect_worklogtime + @consultation_worklogtime + @agreement_worklogtime  %>
+          <%	 @use_tester_estimate ? estimate = @backlog_estimate : estimate = @project_estimate %>
+          <%	 progress = (all_worklog/estimate*100)/60 %>
+          <div class="card">
+            <div class="card-header" id="headingMain">
+              <h5 class="mb-0">
+                <button class="btn btn-link" data-toggle="collapse" data-target="#collapseMain" aria-expanded="true" aria-controls="collapseMain">
+                  Трудозатраты/ информация о дефектах
+                  <div class="progress">
+                    <div class="progress-bar" role="progressbar" style="width: <%=progress%>%;" aria-valuemin="0" aria-valuemax="100"><%=progress%>%</div>
+                  </div>
+                </button>
+              </h5>
+            </div>
+
+            <div id="collapseMain" class="collapse show" aria-labelledby="headingMain" data-parent="#accordion">
+              <div class="card-body">
+                <% if @use_tester_estimate %>
+                  <a>Используем для расчета оценку тестирования т.к. оценка МП в 2 раза выше</a>
+                <% end %>
+                <div class="row justify-content-start">
+                  <div class="col-md-auto">
+                    <table border="2" cellspacing="2" cellpadding="3" bordercolor="" width="600" style="font-weight: normal; text-align: left;" rules="all">
+                      <tbody>
+                      <tr bgcolor="#99CC00">
+                        <td colspan="2"><strong><span style="color: #ffffff;">Трудозатраты тестирования</span></strong></td>
+                      </tr>
+                      <tr>
+                        <td>Списания в задачи тестирования</td>
+                        <td><%= @testing_worklogtime/60 %>ч <%= @testing_worklogtime%60 %>м</td>
+                      </tr>
+                      <tr>
+                        <td>Списания в дефекты</td>
+                        <td><%= @defect_worklogtime/60 %>ч <%= @defect_worklogtime%60 %>м</td>
+                      </tr>
+                      <tr>
+                        <td>Списания в дефекты от ДЭИС</td>
+                        <td><%= @deis_defect_worklogtime/60 %>ч <%= @deis_defect_worklogtime%60 %>м</td>
+                      </tr>
+                      <tr>
+                        <td>Списания в консультации</td>
+                        <td><%= @consultation_worklogtime/60 %>ч <%= @consultation_worklogtime%60 %>м</td>
+                      </tr>
+                      <tr>
+                        <td>Списания в согласования</td>
+                        <td><%= @agreement_worklogtime/60 %>ч <%= @agreement_worklogtime%60 %>м</td>
+                      </tr>
+                      <tr>
+                        <td>Все трудозатраты по тестированию</td>
+                        <td><%= all_worklog/60 %>ч <%= all_worklog%60 %>м</td>
+                      </tr>
+                      <tr bgcolor="#99CC00">
+                        <td><strong><span style="color: #ffffff;">Попадание в оценку</span></strong></td>
+                        <td><strong><span style="color: #ffffff;">План</span></strong></td>
+                        <td><strong><span style="color: #ffffff;">Факт</span></strong></td>
+                        <td><strong><span style="color: #ffffff;">Осталось</span></strong></td>
+                      </tr>
+                      <tr>
+                        <td>Оценка тестирования</td>
+                        <td><a href="https://jira.bssys.com/issues/?jql=key in (<%=	@backlog%>)" target="_blank" title="Wiki"><%=@backlog_estimate%>ч</a></td>
+                        <td><%= all_worklog/60 %>ч <%= all_worklog%60 %>м</td>
+                          <% time = @backlog_estimate-(all_worklog.to_f/60) %>
+                          <% if time >= 0%>
+                            <td><font color="green"><%= time.round(2) %>ч</font></td>
+                          <%	 else %>
+                            <td><font color="red"><%= time.round(2) %>ч</font></td>
+                          <%	 end %>
+                      </tr>
+                      <tr>
+                        <td>Оценка в проекте (менеджера)</td>
+                        <td><a href="https://jira.bssys.com/issues/?jql=key in (<%=	@report.projects  %>)" target="_blank" title="Wiki"><%=@project_estimate%>ч</a></td>
+                        <td><%= all_worklog/60 %>ч <%= all_worklog%60 %>м</td>
+                        <% time = @project_estimate-(all_worklog.to_f/60) %>
+                        <% if time >= 0%>
+                          <td><font color="green"><%= time.round(2) %>ч</font></td>
+                        <%	 else %>
+                          <td><font color="red"><%= time.round(2) %>ч</font></td>
+                        <%	 end %>
+                      </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div class="col-md-auto">
+                    <table border="2" cellspacing="2" cellpadding="3" bordercolor="" width="600" style="font-weight: normal; text-align: left;" rules="all">
+                      <tbody>
+                      <tr bgcolor="#99CC00">
+                        <td colspan="2"><strong><span style="color: #ffffff;">Информация о дефектах</span></strong></td>
+                      </tr>
+                      <tr>
+                        <td>Всего дефектов</td>
+                        <td><a href="https://jira.bssys.com/issues/?jql=key in (<%=	get_task_list(@def_tasks)%>)" target="_blank" title="Wiki"><%=	@def_tasks.length %></a></td>
+                      </tr>
+                      <td>Дефекты с приемки (если была)</td>
+                      <td><a href="https://jira.bssys.com/issues/?jql=key in (<%=	get_task_list(@deis_def)%>)" target="_blank" title="Wiki"><%=	@deis_def.length %></td>
+                      </tr>
+                      <tr>
+                        <td>Всего подтвержденных дефектов с приемки</td>
+                        <td><%=	 @deis_defect_true_count %></td>
+                      </tr>
+                      <tr>
+                      <tr>
+                        <td>Открытых дефектов (без приемки)</td>
+                        <td><a href="https://jira.bssys.com/issues/?jql=key in (<%=	get_task_list(@open_def)%>)" target="_blank" title="Wiki"><%=	@open_def.length %></a></td>
+                      </tr>
+                      <tr>
+                        <td>Открытых БКВ</td>
+                        <td><%=	 @open_def_bkv %></td>
+                      </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <%	 unless @worklog_per_date.empty? %>
+                  <div class="row justify-content-start">
+                    <div class="col-md-auto">
+                      <div id="chart"></div>
+                      <%= metrics_graphic_for @worklog_per_date, title: "График списаний", description: "Списания по задаче в разрезе дней/часов", width: 600, height: 250, target: '#chart', x_accessor: 'date', y_accessor: 'value', time_format: '%Y-%m-%d' %>
+                    </div>
+                    <div class="col-md-auto">
+                      <div id="chart2"></div>
+                      <%= metrics_graphic_for @worklog_sum_per_date, title: "Фактические списания к плановым", description: "Зеленая линия - оценка МП", width: 600, height: 250, target: '#chart2', x_accessor: 'date', y_accessor: 'value', time_format: '%Y-%m-%d' %>
+                    </div>
+                  </div>
+                <%	 end %>
+              </div>
+            </div>
+          </div>
+
+          <!-- Вторая группа. Дефекты ДЭИС -->
+          <div class="card">
+            <div class="card-header" id="headingDeis">
+              <h5 class="mb-0">
+                <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseDeis" aria-expanded="false" aria-controls="collapseDeis">
+                  Дефекты ДЭИС
+                </button>
+              </h5>
+            </div>
+
+            <div id="collapseDeis" class="collapse" aria-labelledby="headingDeis" data-parent="#accordion">
+              <div class="card-body">
+                <div class="row justify-content-start">
+                  <div class="col-md-auto">
+                    <div style="text-align: center; "><strong>Дефекты и Консультации с приемки ДЭИС (Этап = 'Приемка ДЭИС')</strong></div><br>
+                    <div style="font-weight: normal;"></div>
+                    <table border="2" cellspacing="2" cellpadding="3" width="1000" bordercolor="" align="center" style="font-weight: normal; text-align: left;" rules="all">
+                      <tbody>
+                      <tr bgcolor="#99CC00">
+                        <td><strong style="color: #ffffff;"><span style="color: #ffffff;">Тема</span></strong></td>
+                        <td><strong style="color: #ffffff;"><span style="color: #ffffff;">Задача</span></strong></td>
+                        <td><strong style="color: #ffffff;"><span style="color: #ffffff;">Списано QA</span></strong></td>
+                        <td><strong style="color: #ffffff;"><span style="color: #ffffff;">Резолюция</span></strong></td>
+                        <td><strong style="color: #ffffff;"><span style="color: #ffffff;">Статус</span></strong></td>
+                      </tr>
+                      <% sum = 0%>
+                      <% @deis_def.each_value do |value| %>
+                        <tr>
+                          <td><%= value[0].to_s %></td>
+                          <td><a href="https://jira.bssys.com/browse/<%= value[1] %>" target="_blank" title=""><%= value[1] %></a></td>
+                          <td><%= value[2].to_i/60 %>ч <%= value[2].to_i%60 %>м</td>
+                          <td><%= value[3] %></td>
+                          <td><%= value[4] %></td>
+                        </tr>
+                        <% sum += value[2].to_i%>
+                      <%	 end %>
+                      <tr bgcolor="#99CC00">
+                        <td><strong style="color: #ffffff;"><span style="color: #ffffff;">Итого: <%= @deis_def.length %></span></strong></td>
+                        <td><strong style="color: #ffffff;"><span style="color: #ffffff;"></span></strong></td>
+                        <td><strong style="color: #ffffff;"><span style="color: #ffffff;"><%= sum/60 %>ч <%= sum%60 %>м</span></strong></td>
+                        <td><strong style="color: #ffffff;"><span style="color: #ffffff;"></span></strong></td>
+                        <td><strong style="color: #ffffff;"><span style="color: #ffffff;"></span></strong></td>
+                      </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Третья группа. Непроектные списания -->
+          <div class="card">
+            <div class="card-header" id="headingNoProject">
+              <h5 class="mb-0">
+                <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseNoProject" aria-expanded="false" aria-controls="collapseNoProject">
+                  Непроектные списания
+                </button>
+              </h5>
+            </div>
+
+            <div id="collapseNoProject" class="collapse" aria-labelledby="headingNoProject" data-parent="#accordion">
+              <div class="card-body">
+                <div class="row justify-content-start">
+                  <div class="col-md-auto">
+                    <div style="text-align: center; "><strong>Задачи без метки или с другой меткой, вне приемки.<br>Т.е. задачи, в которых или забыли проставить метку или которые не относятся напрямую к проекту</strong></div><br>
+                    <div style="font-weight: normal;"></div>
+                    <table border="2" cellspacing="2" cellpadding="3" width="1000" bordercolor="" align="center" style="font-weight: normal; text-align: left;" rules="all">
+                      <tbody>
+                      <tr bgcolor="#99CC00">
+                        <td><strong style="color: #ffffff;"><span style="color: #ffffff;">Тема</span></strong></td>
+                        <td><strong style="color: #ffffff;"><span style="color: #ffffff;">Задача</span></strong></td>
+                        <td><strong style="color: #ffffff;"><span style="color: #ffffff;">Тип</span></strong></td>
+                        <td><strong style="color: #ffffff;"><span style="color: #ffffff;">Списано</span></strong></td>
+                        <td><strong style="color: #ffffff;"><span style="color: #ffffff;">Статус</span></strong></td>
+                      </tr>
+                      <% sum = 0%>
+                      <% @other_tasks.each_value do |value| %>
+                        <tr>
+                          <td><%= value[0].to_s %></td>
+                          <td><a href="https://jira.bssys.com/browse/<%= value[1] %>" target="_blank" title=""><%= value[1] %></a></td>
+                          <td><%= value[2] %></td>
+                          <td><%= value[3].to_i/60 %>ч <%= value[3].to_i%60 %>м</td>
+                          <td><%= value[4] %></td>
+                        </tr>
+                        <% sum += value[3].to_i%>
+                      <%	 end %>
+                      <tr bgcolor="#99CC00">
+                        <td><strong style="color: #ffffff;"><span style="color: #ffffff;">Итого: <%= @other_tasks.length %></span></strong></td>
+                        <td><strong style="color: #ffffff;"><span style="color: #ffffff;"></span></strong></td>
+                        <td><strong style="color: #ffffff;"><span style="color: #ffffff;"></span></strong></td>
+                        <td><strong style="color: #ffffff;"><span style="color: #ffffff;"><%= sum/60 %>ч <%= sum%60 %>м</span></strong></td>
+                        <td><strong style="color: #ffffff;"><span style="color: #ffffff;"></span></strong></td>
+                      </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Следующие вкладки -->
+
+      <% @report_feature.each_with_index do |f, i| %>
+        <% unless f.project_name.nil? %>
+        <%	 id = rand(100000) %>
+        <%  @backlog = @show_plan.features[i].backlog %>
+        <%	 @backlog_estimate = f.select_backlog_estimate %>
+        <%	 @project_estimate = f.select_project_estimate %>
+        <%	 @testing_worklogtime, @test_tasks = f.select_test_worklog %>
+        <%	 @defect_worklogtime, @consultation_worklogtime, @agreement_worklogtime, @def_tasks, @cons_tasks, @agree_tasks, @open_def, @open_def_bkv = f.select_inner_tasks_worklog %>
+        <%	 @worklog_per_date, worklog_sum_per_date = f.select_worklog_per_date
+             @worklog_sum_per_date = [worklog_sum_per_date,[{date: @show_plan.features[i].start_date, value: 0}, {date: @show_plan.features[i].end_date, value: @project_estimate}],[{date: @show_plan.features[i].start_date, value: 0}, {date: @show_plan.features[i].end_date, value: @backlog_estimate}]] %>
+        <div class="tab-pane fade" id="id<%= @show_plan.features[i].id %>" role="tabpanel" aria-labelledby="<%= id %>">
+          <!-- Группировка -->
+          <div id="accordion<%=id %>">
+            <!-- Первая группа. Трудозатраты -->
+            <%	all_worklog = @testing_worklogtime + @defect_worklogtime + @consultation_worklogtime + @agreement_worklogtime  %>
+            <%
+            if @backlog_estimate == 0
+            @use_tester_estimate = false
+            else
+            @project_estimate/@backlog_estimate >= 2.5 ? @use_tester_estimate = true : @use_tester_estimate = false
+            end %>
+            <%	@use_tester_estimate ? estimate = @backlog_estimate : estimate = @project_estimate %>
+            <%	 progress = (all_worklog/estimate*100)/60 %>
+            <div class="card">
+              <div class="card-header" id="heading<%= id %>">
+                <h5 class="mb-0">
+                  <button class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= id %>" aria-expanded="true" aria-controls="collapse<%= id %>">
+                    Трудозатраты тестирования
+                    <div class="progress">
+                      <div class="progress-bar" role="progressbar" style="width: <%=progress%>%;" aria-valuemin="0" aria-valuemax="100"><%=progress%>%</div>
+                    </div>
+                  </button>
+                </h5>
+              </div>
+
+              <div id="collapse<%= id %>" class="collapse show" aria-labelledby="heading<%= id %>" data-parent="#accordion<%= id %>">
+                <div class="card-body">
+                  <% if @use_tester_estimate %>
+                    <a>Используем для расчета оценку тестирования т.к. оценка МП в 2 раза выше</a>
+                  <% end %>
+                  <div class="row justify-content-start">
+                    <div class="col-md-auto">
+                      <table border="2" cellspacing="2" cellpadding="3" bordercolor="" width="600" style="font-weight: normal; text-align: left;" rules="all">
+                        <tbody>
+                        <tr bgcolor="#99CC00">
+                          <td colspan="2"><strong><span style="color: #ffffff;">Трудозатраты тестирования</span></strong></td>
+                        </tr>
+                        <tr>
+                          <td>Списания в задачи тестирования</td>
+                          <td><%= @testing_worklogtime/60 %>ч <%= @testing_worklogtime%60 %>м</td>
+                        </tr>
+                        <tr>
+                          <td>Списания в дефекты</td>
+                          <td><%= @defect_worklogtime/60 %>ч <%= @defect_worklogtime%60 %>м</td>
+                        </tr>
+                        <tr>
+                          <td>Списания в консультации</td>
+                          <td><%= @consultation_worklogtime/60 %>ч <%= @consultation_worklogtime%60 %>м</td>
+                        </tr>
+                        <tr>
+                          <td>Списания в согласования</td>
+                          <td><%= @agreement_worklogtime/60 %>ч <%= @agreement_worklogtime%60 %>м</td>
+                        </tr>
+                        <tr>
+                          <td>Все трудозатраты по тестированию</td>
+                          <td><%= all_worklog/60 %>ч <%= all_worklog%60 %>м</td>
+                        </tr>
+                        <tr bgcolor="#99CC00">
+                          <td><strong><span style="color: #ffffff;">Попадание в оценку</span></strong></td>
+                          <td><strong><span style="color: #ffffff;">План</span></strong></td>
+                          <td><strong><span style="color: #ffffff;">Факт</span></strong></td>
+                          <td><strong><span style="color: #ffffff;">Осталось</span></strong></td>
+                        </tr>
+                        <tr>
+                          <td>Оценка тестирования</td>
+                          <td><a href="https://jira.bssys.com/issues/?jql=key in (<%=	@backlog%>)" target="_blank" title="Wiki"><%=@backlog_estimate%>ч</a></td>
+                          <td><%= all_worklog/60 %>ч <%= all_worklog%60 %>м</td>
+                          <% time = @backlog_estimate-(all_worklog.to_f/60) %>
+                          <% if time >= 0%>
+                            <td><font color="green"><%= time.round(2) %>ч</font></td>
+                          <%	 else %>
+                            <td><font color="red"><%= time.round(2) %>ч</font></td>
+                          <%	 end %>
+                        </tr>
+                        <tr>
+                          <td>Оценка в проекте (менеджера)</td>
+                          <td><a href="https://jira.bssys.com/issues/?jql=key in (<%=	f.projects  %>)" target="_blank" title="Wiki"><%=@project_estimate%>ч</a></td>
+                          <td><%= all_worklog/60 %>ч <%= all_worklog%60 %>м</td>
+                          <% time = @project_estimate-(all_worklog.to_f/60) %>
+                          <% if time >= 0%>
+                            <td><font color="green"><%= time.round(2) %>ч</font></td>
+                          <%	 else %>
+                            <td><font color="red"><%= time.round(2) %>ч</font></td>
+                          <%	 end %>
+                        </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <div class="col-md-auto">
+                      <table border="2" cellspacing="2" cellpadding="3" bordercolor="" width="600" style="font-weight: normal; text-align: left;" rules="all">
+                        <tbody>
+                        <tr bgcolor="#99CC00">
+                          <td colspan="2"><strong><span style="color: #ffffff;">Информация о дефектах</span></strong></td>
+                        </tr>
+                        <tr>
+                          <td>Всего дефектов</td>
+                          <td><a href="https://jira.bssys.com/issues/?jql=key in (<%=	get_task_list(@def_tasks)%>)" target="_blank" title="Wiki"><%=	@def_tasks.length %></td>
+                        </tr>
+                        <tr>
+                          <td>Открытых дефектов (без приемки)</td>
+                          <td><a href="https://jira.bssys.com/issues/?jql=key in (<%=	get_task_list(@open_def)%>)" target="_blank" title="Wiki"><%=	@open_def.length %></td>
+                        </tr>
+                        <tr>
+                          <td>Открытых БКВ</td>
+                          <td><%=	 @open_def_bkv %></td>
+                        </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                  <%	 unless @worklog_per_date.empty? %>
+                    <div class="row justify-content-start">
+                      <div class="col-md-auto">
+                        <div id="chart_<%=id %>"></div>
+                        <%= metrics_graphic_for @worklog_per_date, title: "График списаний", description: "Списания по задаче в разрезе дней/часов", width: 600, height: 250, target: "#chart_#{id}", x_accessor: 'date', y_accessor: 'value', time_format: '%Y-%m-%d' %>
+                      </div>
+                      <div class="col-md-auto">
+                        <div id="chart2_<%=id %>"></div>
+                        <%= metrics_graphic_for @worklog_sum_per_date, title: "Фактические списания к плановым", description: "Зеленая линия - оценка МП, Красная - Оценка тестирования", width: 600, height: 250, target: "#chart2_#{id}", x_accessor: 'date', y_accessor: 'value', time_format: '%Y-%m-%d' %>
+                      </div>
+                    </div>
+                  <%	 end %>
+                </div>
+              </div>
+            </div>
+
+            <!-- Вторая группа. Задачи тестирования -->
+            <div class="card">
+              <div class="card-header" id="heading<%= id+1 %>">
+                <h5 class="mb-0">
+                  <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapse<%= id+1 %>" aria-expanded="false" aria-controls="collapse<%= id+1 %>">
+                    Задачи тестирования
+                  </button>
+                </h5>
+              </div>
+
+              <div id="collapse<%= id+1 %>" class="collapse" aria-labelledby="heading<%= id+1 %>" data-parent="#accordion<%= id %>">
+                <div class="card-body">
+                  <div class="row justify-content-start">
+                    <div class="col-md-auto">
+                      <div style="text-align: center; "><strong>Задачи тестирования доработки <%=@show_plan.features[i].name%></strong></div><br>
+                      <div style="font-weight: normal;"></div>
+                      <table border="2" cellspacing="2" cellpadding="3" width="1000" bordercolor="" align="center" style="font-weight: normal; text-align: left;" rules="all">
+                        <tbody>
+                        <tr bgcolor="#99CC00">
+                          <td><strong style="color: #ffffff;"><span style="color: #ffffff;">Тема</span></strong></td>
+                          <td><strong style="color: #ffffff;"><span style="color: #ffffff;">Задача</span></strong></td>
+                          <td><strong style="color: #ffffff;"><span style="color: #ffffff;">Оценка</span></strong></td>
+                          <td><strong style="color: #ffffff;"><span style="color: #ffffff;">Списано</span></strong></td>
+                          <td><strong style="color: #ffffff;"><span style="color: #ffffff;">Статус</span></strong></td>
+                        </tr>
+                        <% sum_est, sum = 0,0 %>
+                        <% @test_tasks.each_value do |value| %>
+                          <tr>
+                            <td><%= value[0].to_s %></td>
+                            <td><a href="https://jira.bssys.com/browse/<%= value[1] %>" target="_blank" title=""><%= value[1] %></a></td>
+                            <td><%= value[2].to_i/60 %>ч <%= value[2].to_i%60 %>м</td>
+                            <td><%= value[3].to_i/60 %>ч <%= value[3].to_i%60 %>м</td>
+                            <td><%= value[4].to_s %></td>
+                          </tr>
+                          <% sum += value[3].to_i%>
+                          <% sum_est += value[2].to_i%>
+                        <%	 end %>
+                        <tr bgcolor="#99CC00">
+                          <td><strong style="color: #ffffff;"><span style="color: #ffffff;">Итого:</span></strong></td>
+                          <td><strong style="color: #ffffff;"><span style="color: #ffffff;"></span></strong></td>
+                          <td><strong style="color: #ffffff;"><span style="color: #ffffff;"><%= sum_est/60 %>ч <%= sum_est%60 %>м</span></strong></td>
+                          <td><strong style="color: #ffffff;"><span style="color: #ffffff;"><%= sum/60 %>ч <%= sum%60 %>м</span></strong></td>
+                          <td><strong style="color: #ffffff;"><span style="color: #ffffff;"></span></strong></td>
+                        </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Третья группа. Дефекты/Консультации/Согласования -->
+            <div class="card">
+              <div class="card-header" id="heading<%=id+2 %>">
+                <h5 class="mb-0">
+                  <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapse<%= id+2 %>" aria-expanded="false" aria-controls="collapse<%= id+2 %>">
+                    Дефекты/Консультации/Согласования
+                  </button>
+                </h5>
+              </div>
+
+              <div id="collapse<%= id+2 %>" class="collapse" aria-labelledby="heading<%= id+2 %>" data-parent="#accordion<%= id %>">
+                <div class="card-body">
+                  <div class="row justify-content-start">
+                    <div class="col-md-auto">
+                      <div style="text-align: center; "><strong>Дефекты/консультации/согласования по доработке <%= @show_plan.features[i].name %></strong></div><br>
+                      <div style="font-weight: normal;"></div>
+                      <table border="2" cellspacing="2" cellpadding="3" width="1000" bordercolor="" align="center" style="font-weight: normal; text-align: left;" rules="all">
+                        <tbody>
+                        <tr bgcolor="#99CC00">
+                          <td><strong style="color: #ffffff;"><span style="color: #ffffff;">Тема</span></strong></td>
+                          <td><strong style="color: #ffffff;"><span style="color: #ffffff;">Задача</span></strong></td>
+                          <td><strong style="color: #ffffff;"><span style="color: #ffffff;">Приоритет</span></strong></td>
+                          <td><strong style="color: #ffffff;"><span style="color: #ffffff;">Списано</span></strong></td>
+                          <td><strong style="color: #ffffff;"><span style="color: #ffffff;">Статус</span></strong></td>
+                        </tr>
+                        <tr>
+                          <td><strong>Дефекты:</strong></td>
+                          <td><strong></strong></td>
+                          <td><strong></strong></td>
+                          <td><strong></strong></td>
+                          <td><strong></strong></td>
+                        </tr>
+                        <% sum = 0 %>
+                        <% @def_tasks.each_value do |value| %>
+                          <tr>
+                            <td><%= value[0].to_s %></td>
+                            <td><a href="https://jira.bssys.com/browse/<%= value[1] %>" target="_blank" title=""><%= value[1] %></a></td>
+                            <td><%= value[2].to_s %></td>
+                            <td><%= value[3].to_i/60 %>ч <%= value[3].to_i%60 %>м</td>
+                            <td><%= value[4].to_s %></td>
+                          </tr>
+                          <% sum += value[3].to_i%>
+                        <%	 end %>
+                        <% if @cons_tasks.any? %>
+                          <tr>
+                            <td><strong>Консультации:</strong></td>
+                            <td><strong></strong></td>
+                            <td><strong></strong></td>
+                            <td><strong></strong></td>
+                            <td><strong></strong></td>
+                          </tr>
+                          <% @cons_tasks.each_value do |value| %>
+                            <tr>
+                              <td><%= value[0].to_s %></td>
+                              <td><a href="https://jira.bssys.com/browse/<%= value[1] %>" target="_blank" title=""><%= value[1] %></a></td>
+                              <td><%= value[2].to_s %></td>
+                              <td><%= value[3].to_i/60 %>ч <%= value[3].to_i%60 %>м</td>
+                              <td><%= value[4].to_s %></td>
+                            </tr>
+                            <% sum += value[3].to_i%>
+                          <%	 end %>
+                        <%	 end %>
+                        <% if @agree_tasks.any? %>
+                          <tr>
+                            <td><strong>Согласования:</strong></td>
+                            <td><strong></strong></td>
+                            <td><strong></strong></td>
+                            <td><strong></strong></td>
+                            <td><strong></strong></td>
+                          </tr>
+                          <% @agree_tasks.each_value do |value| %>
+                            <tr>
+                              <td><%= value[0].to_s %></td>
+                              <td><a href="https://jira.bssys.com/browse/<%= value[1] %>" target="_blank" title=""><%= value[1] %></a></td>
+                              <td><%= value[2].to_s %></td>
+                              <td><%= value[3].to_i/60 %>ч <%= value[3].to_i%60 %>м</td>
+                              <td><%= value[4].to_s %></td>
+                            </tr>
+                            <% sum += value[3].to_i%>
+                          <%	 end %>
+                        <%	 end %>
+                        <tr bgcolor="#99CC00">
+                          <td><strong style="color: #ffffff;"><span style="color: #ffffff;">Итого: <%= @def_tasks.length + @cons_tasks.length + @agree_tasks.length %></span></strong></td>
+                          <td><strong style="color: #ffffff;"><span style="color: #ffffff;"></span></strong></td>
+                          <td><strong style="color: #ffffff;"><span style="color: #ffffff;"></span></strong></td>
+                          <td><strong style="color: #ffffff;"><span style="color: #ffffff;"><%= sum/60 %>ч <%= sum%60 %>м</span></strong></td>
+                          <td><strong style="color: #ffffff;"><span style="color: #ffffff;"></span></strong></td>
+                        </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+          <%	 else %>
+          <div class="tab-pane fade" id="id<%= @show_plan.features[i].id %>" role="tabpanel" aria-labelledby="<%= id %>">
+          <div class="container-fluid"><h5>В БД JIRA не найдено данных для метрик</h5></div>
+          </div>
+        <%  end  %>
+      <%	 end %>
+    </div>
+  </div>
+<%  else %>
+  <div class="container-fluid"><h5>В БД JIRA не найдено данных для метрик</h5></div>
+<%	 end %>
+
+<%= render 'layouts/modal_test_report.html.erb' %>
+<%= render 'layouts/modal_xml_sender' %>
+<%= render 'layouts/modal_comment' %>

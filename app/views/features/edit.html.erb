@@ -1,0 +1,37 @@
+<% provide(:title, 'Редактировать доработку') %>
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Редактировать доработку</title>
+</head>
+<body>
+<div class="container">
+  <%= simple_form_for [@plan, @feature], remote: true, html: {class: 'form-group' } do |f| %>
+    <%= f.input :name, :label => 'Название доработки' %>
+    <%= f.input :start_date, :label => 'Дата начала тестирования (план)', :required => false , :order => [:day, :month, :year]%>
+    <%= f.input :end_date, :label => 'Дата окончания тестирования (план)', :required => false , :order => [:day, :month, :year], include_blank: true%>
+    <%= f.input :labels, :label => 'Метка для задач', :placeholder => 'Например: eGG_java8' %>
+    <%= f.input :project_name, :label => 'Название проекта', :placeholder => 'Например: 25898_BSS_13_Law6.11' %>
+    <%= f.input :backlog, :label => 'Задача с оценкой тестирования', :placeholder => 'Например: BACKLOG-24724' %>
+    <%= f.input :feature_url, :label => 'Ссылка на доработку', :placeholder => 'Например: SVZMTAG-44' %>
+    <%= f.input :test_scope, as: :text, :label => 'Что будет проверено', :placeholder => "1. \n2." %>
+    <%= f.input :tz, :label => 'Ссылки на требования', :input_html => { style: "height:100px"} %>
+    <%= f.input :project_plan, :label => 'Ссылка на план проекта', :placeholder => 'Заполняется при наличии такого плана.' %>
+    <%= f.input :testcases, :label => 'Ссылка на Test Rail', :placeholder => 'Ссылка на Milestone или тест сьют, если не создавался Milestone' %>
+    <%= f.input :test_data, :label => 'Ссылка на тестовые данных', :placeholder => 'Ссылка на тестовые данные/примеры, которые использовались при тестировании.' %>
+    <%= f.input :analytic, as: :select, :label => 'Аналитики', collection: @analytic.sort, include_hidden: false, label_method: :second, value_method: :second, input_html: { multiple: true, style: "height:100px"} %>
+    <%= f.input :developer, as: :select, :label => 'Разработчики', collection: @developer.sort, include_hidden: false, label_method: :second, value_method: :second, input_html: { multiple: true, style: "height:100px"} %>
+    <%= f.input :qa, as: :select, :label => 'Тестировщики', collection: $qa.sort, include_hidden: false, label_method: :second, value_method: :second, input_html: { multiple: true, style: "height:100px"} %>
+    <%= f.input :manager, as: :select, :label => 'Менеджер проекта', collection: @manager.sort, include_hidden: false, label_method: :second, value_method: :second, input_html: { multiple: true, style: "height:100px"}%>
+    <%= f.input :comment, as: :text, :label => 'Комментарий тестировщика. <u>Обязательно к заполнению после окончания тестирования</u>'.html_safe, :placeholder=> "Какие были сложности?\nВ чем причина превышений?", :input_html => {style: "height:200px"} %>
+    <%= f.submit 'Сохранить изменения', class: 'btn btn-primary' %>
+  <%	 end %>
+  <%= link_to 'Назад', @plan, {:class => "btn btn-primary form-group" } %>
+  <%	 if logged_in? and @current_user.email == 'a.pekhov@bssys.com' %>
+    <%= link_to 'Удалить', test_plan_feature_path(:test_plan_id => @plan.id, :feature_id=>@feature.id), {:class => "btn btn-danger form-group", method: :delete, data: { confirm: 'Вы уверены, что хотите удалить доработку?' }} %>
+  <%	 end %>
+</div>
+<%= render 'layouts/modal_xml_sender' %>
+</body>
+</html>

@@ -1,15 +1,4 @@
 Rails.application.routes.draw do
-  get 'test_reports/index'
-
-  get 'cc_format_validator/index'
-
-  get 'egg_auto_tests/index'
-
-  get 'egg_autotests/index'
-
-  get 'tir_auto_tests/index'
-
-  get 'simple_tests/index'
 
   get 'sessions/new'
   get 'users/new'
@@ -64,12 +53,22 @@ Rails.application.routes.draw do
   get '/cc_format_validator/start' => 'cc_format_validator#start'
   get '/cc_format_validator/stop' => 'cc_format_validator#stop'
   get '/cc_format_validator/clear_log' => 'cc_format_validator#clear_log'
+  get '/cc_format_validator/tester' => 'cc_format_validator#tester'
 
   # Test Reports
   get '/test_reports' => 'test_reports#index'
   get '/test_reports/tester' => 'test_reports#tester'
   post '/test_reports/run' => 'test_reports#run'
   get '/test_reports/download_log_reports' => 'test_reports#download_log_reports'
+
+  # Test Plans
+  get '/test_plans/tester' => 'test_plans#tester'
+  post '/test_plans/make_report' => 'test_plans#make_report'
+  post '/test_plans/safe_comment' => 'test_plans#safe_comment'
+  get '/test_plans/download_test_report' => 'test_plans#download_test_report'
+  resources :test_plans do
+    resources :features
+  end
 
   root 'main_page#index'
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html

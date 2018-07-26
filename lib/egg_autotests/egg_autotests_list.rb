@@ -12,6 +12,7 @@ require_dependency "#{Rails.root}/lib/egg_autotests/ia_ZKH_Loader"
 require_dependency "#{Rails.root}/lib/egg_autotests/ia_JPMorgan_GIS_GMP"
 require_dependency "#{Rails.root}/lib/egg_autotests/ia_JPMorgan_GIS_ZKH"
 require_dependency "#{Rails.root}/lib/egg_autotests/sa_SPEP"
+require_dependency "#{Rails.root}/lib/egg_autotests/sa_FNS_EGRIP"
 
 class EggAutotestsList
 
@@ -30,7 +31,7 @@ class EggAutotestsList
       when build_version.include?('6.9')
         @ufebs_version = '2018.2.2' #\app\smx\resourceapp.war\wsdl\XSD\CBR\х\ed\cbr_ed101_vх.xsd
       else
-        @ufebs_version = '2018.3.1'
+        @ufebs_version = '2018.3.2'
     end
 
   end
@@ -97,6 +98,16 @@ class EggAutotestsList
       sa_spep.verifycertificatewithreport
       sa_spep.verifycertificate_crl
       sa_spep.verifycertificate_nocert
+    end
+
+    if components.include?('СА ФНС ЕГРИП')
+      sa_gis_gmp = SA_FNS_EGRIP.new(@pass_menu_color, @fail_menu_color, @not_find_xml, @not_receive_answer, @egg_version, @try_count)
+      sa_gis_gmp.request_EGRIP_v405
+    end
+
+    if components.include?('СА ФНС ЕГРЮЛ')
+      sa_gis_gmp = SA_FNS_EGRUL.new(@pass_menu_color, @fail_menu_color, @not_find_xml, @not_receive_answer, @egg_version, @try_count)
+      sa_gis_gmp.request_EGRUL_v405
     end
 
   end

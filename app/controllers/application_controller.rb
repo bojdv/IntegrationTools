@@ -4,6 +4,8 @@ class ApplicationController < ActionController::Base
   include XmlSenderHelper
   include ActionController::Live
   include TestReportsHelper
+  include TestPlansHelper
+  include FeaturesHelper
   require 'rubygems'
   require 'java'
   # Библиотеки AMQ
@@ -17,4 +19,6 @@ class ApplicationController < ActionController::Base
   $CLASSPATH << "lib/javax.resource.jar"
   $CLASSPATH << "lib/javax.transaction.jar"
   $CLASSPATH << "com.ibm.msg.client.osgi.wmq_7.0.1.3.jar"
+
+
 end

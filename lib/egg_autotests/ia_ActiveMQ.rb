@@ -33,7 +33,9 @@ class IA_ActiveMQ # Класс для тестирования адаптера
         $log_egg.write_to_browser("Валидируем XML для запроса...")
         $log_egg.write_to_log(functional, "Валидация исходящей XML", "Валидируем XML для запроса:\n#{xml.xml_name}\nПо XSD:\n #{xsd}")
         validate_egg_xml(xsd, xml.xml_text, functional) # Вызываем метод валидации
-        answer = send_to_amq_and_receive_egg(manager, xml, functional, true) # Вызываем метод отправки в MQ и записываем полученный ответ в answer
+        if send_to_amq_egg(manager, xml.xml_text, functional)
+          answer = receive_from_amq_egg(manager, functional, true)
+        end
         if answer.nil? # Если ответ от ЕГГ пустой, начинаем цикл заново
           @result["run_RequestMessage"] = "false"
           count +=1

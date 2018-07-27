@@ -101,12 +101,12 @@ class EggAutotestsList
     end
 
     if components.include?('СА ФНС ЕГРИП')
-      sa_gis_gmp = SA_FNS_EGRIP.new(@pass_menu_color, @fail_menu_color, @not_find_xml, @not_receive_answer, @egg_version, @try_count)
+      sa_gis_gmp = SA_FNS_EGRIP.new(@pass_menu_color, @fail_menu_color, @not_find_xml, @not_receive_answer, @egg_version, @try_count, @db_username)
       sa_gis_gmp.request_EGRIP_v405
     end
 
     if components.include?('СА ФНС ЕГРЮЛ')
-      sa_gis_gmp = SA_FNS_EGRUL.new(@pass_menu_color, @fail_menu_color, @not_find_xml, @not_receive_answer, @egg_version, @try_count)
+      sa_gis_gmp = SA_FNS_EGRUL.new(@pass_menu_color, @fail_menu_color, @not_find_xml, @not_receive_answer, @egg_version, @try_count, @db_username)
       sa_gis_gmp.request_EGRUL_v405
     end
 

@@ -213,7 +213,7 @@ file_mq_zkh_adapterCode=egg-zkhfileMq-adapter
 file_mq_zkh_brokerURL=failover:tcp://127.0.0.1:61616
 
 # saFnsEgripComponent - ФНС ЕГРИП
-fns_egrip_SMEV=http://smev3-n0.test.gosuslugi.ru:7500/smev/v1.1/ws
+fns_egrip_SMEV=http://vm-itools:4455/mockSMEV3?WSDL
 fns_egrip_CryptoService=http://vm-eggcryptdev:9090/axis2/services/CryptoService
 fns_egrip_isCryptoLog=false
 fns_egrip_fns_egrip_sadp_consumers=5
@@ -224,10 +224,10 @@ fns_egrip_deadLine=10
 fns_egrip_EgripFormatVersion=4.0.5
 fns_egrip_NodeID=node1
 fns_egrip_isResponseLock=true
-fns_egrip_attachmentMode=true
-fns_egrip_CheckingSignature=check
+fns_egrip_attachmentMode=none
+fns_egrip_CheckingSignature=none
 fns_egrip_CheckSignatureAttachment=check
-fns_egrip_CheckEPOV=check
+fns_egrip_CheckEPOV=none
 fns_egrip_CheckEPSP=none
 fns_egrip_adapterId=amq-jms-iadp
 fns_egrip_sendingTicket1000=false

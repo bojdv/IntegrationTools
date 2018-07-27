@@ -76,7 +76,7 @@ module EggAutoTestsHelper
     end
   end
 
-  def send_to_amq_and_receive_egg(manager, xml, functional, ignore_ticket = false, counter = 60) # Отправка сообщений в Active MQ по протоколу OpenWire.
+  def send_to_amq_egg(manager, xml, functional) # Отправка сообщений в Active MQ по протоколу OpenWire.
     # manager - объект менеджера очередей, xml - объект XML сообщения или класса REXML, functional - имя теста, ignore_ticket - игнорирование промежуточного тикета, count - время ожидания
     # Метод возвращает текст XML сообщения, полученного от ЕГГ
     java_import 'org.apache.activemq.ActiveMQConnectionFactory'
@@ -102,6 +102,31 @@ module EggAutoTestsHelper
       #$log_egg.write_to_browser("Отправили сообщение в eGG:\n #{textMessage.getText}", "Отправили сообщение в eGG")
       $log_egg.write_to_browser("Отправили сообщение в eGG")
       $log_egg.write_to_log(functional, "Отправили сообщение в eGG", "#{textMessage.getText}")
+    rescue Exception => msg
+      $log_egg.write_to_browser("Ошибка! #{msg.message}")
+      $log_egg.write_to_log(functional, "Случилось непредвиденное", "Ошибка! #{msg.message}\n#{msg.backtrace.join("\n")}")
+      return nil
+    ensure
+      sender.close if sender
+      session.close if session
+      connection.close if connection
+    end
+  end
+
+  def receive_from_amq_egg(manager, functional, ignore_ticket = false, counter = 60) # Получение сообщений из Active MQ по протоколу OpenWire
+    java_import 'org.apache.activemq.ActiveMQConnectionFactory'
+    java_import 'javax.jms.Session'
+    java_import 'javax.jms.TextMessage'
+    puts 'Receive message from AMQ (OpenWire)'
+    begin
+      factory = ActiveMQConnectionFactory.new
+      $log_egg.write_to_browser("Получаем XML из менеджера: Хост:#{manager.host}, Порт:#{manager.port}, Логин:#{manager.user}, Пароль:#{manager.password}")
+      factory.setBrokerURL("tcp://#{manager.host}:#{manager.port}")
+      manager.user.nil? ? user ='' : user=manager.user
+      manager.password.nil? ? password ='' : password=manager.user
+      connection = factory.createQueueConnection(user, password)
+      session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+      connection.start
       receiver = session.createReceiver(session.createQueue(manager.queue_in))
       count = counter
       $log_egg.write_to_browser("Ждем ответ в течении #{count} секунд")
@@ -134,89 +159,6 @@ module EggAutoTestsHelper
     rescue Exception => msg
       $log_egg.write_to_browser("Ошибка! #{msg.message}")
       $log_egg.write_to_log(functional, "Случилось непредвиденное", "Ошибка! #{msg.message}\n#{msg.backtrace.join("\n")}")
-      return nil
-    ensure
-      sender.close if sender
-      receiver.close if receiver
-      session.close if session
-      connection.close if connection
-    end
-  end
-
-  def send_to_amq_egg(manager, xml, queue = manager.queue_out) # Отправка сообщений в Active MQ по протоколу OpenWire
-    # Метод ничего не возвращает
-    java_import 'org.apache.activemq.ActiveMQConnectionFactory'
-    java_import 'javax.jms.Session'
-    java_import 'javax.jms.TextMessage'
-    puts 'Sending message to AMQ (OpenWire)'
-    begin
-      factory = ActiveMQConnectionFactory.new
-      $log_egg.write_to_browser("Отправляем XML по адресу: Хост:#{manager.host}, Порт:#{manager.port}, Логин:#{manager.user}, Пароль:#{manager.password}, Очередь:#{queue}")
-      factory.setBrokerURL("tcp://#{manager.host}:#{manager.port}")
-      manager.user.nil? ? user ='' : user=manager.user
-      manager.password.nil? ? password ='' : password=manager.user
-      connection = factory.createQueueConnection(user, password)
-      session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-      if xml.is_a? String
-        textMessage = session.createTextMessage(xml)
-      else
-        textMessage = session.createTextMessage(xml.xml_text)
-      end
-      textMessage.setJMSCorrelationID(SecureRandom.uuid)
-      sender = session.createSender(session.createQueue(queue))
-      connection.start
-      connection.destroyDestination(session.createQueue(manager.queue_in)) # Удаляем очередь.
-      sender.send(textMessage)
-      #$log_egg.write_to_browser("Отправили сообщение в eGG:\n #{textMessage.getText}", "Отправили сообщение в eGG")
-      $log_egg.write_to_browser("Отправили сообщение в eGG")
-    rescue Exception => msg
-      $log_egg.write_to_browser("Ошибка! #{msg}")
-      return nil
-    ensure
-      sender.close if sender
-      session.close if session
-      connection.close if connection
-    end
-  end
-
-  def receive_from_amq_egg(manager, ignore_ticket = false) # Получение сообщений из Active MQ по протоколу OpenWire
-    java_import 'org.apache.activemq.ActiveMQConnectionFactory'
-    java_import 'javax.jms.Session'
-    java_import 'javax.jms.TextMessage'
-    puts 'Sending message to AMQ (OpenWire)'
-    begin
-      factory = ActiveMQConnectionFactory.new
-      $log_egg.write_to_browser("Получаем XML из менеджера: Хост:#{manager.host}, Порт:#{manager.port}, Логин:#{manager.user}, Пароль:#{manager.password}")
-      factory.setBrokerURL("tcp://#{manager.host}:#{manager.port}")
-      manager.user.nil? ? user ='' : user=manager.user
-      manager.password.nil? ? password ='' : password=manager.user
-      connection = factory.createQueueConnection(user, password)
-      session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-      connection.start
-      receiver = session.createReceiver(session.createQueue(manager.queue_in))
-      count = 40
-      xml_actual = receiver.receive(1000)
-      while xml_actual.nil?
-        xml_actual = receiver.receive(1000)
-        puts count -=1
-        return nil if count == 0
-      end
-      if ignore_ticket
-        #$log_egg.write_to_browser("Получили промежуточный квиток из очереди #{manager.queue_in}:\n #{xml_actual.getText}", "Получили промежуточный квиток от eGG")
-        $log_egg.write_to_browser("Получили промежуточный квиток от eGG")
-        count = 40
-        xml_actual = receiver.receive(1000)
-        while xml_actual.nil?
-          xml_actual = receiver.receive(1000)
-          puts count -=1
-          response_ajax("Ответ не был получен!") and return if count == 0
-        end
-      end
-      #$log_egg.write_to_browser("Получили ответ от eGG из очереди #{manager.queue_in}:\n #{xml_actual.getText}", "Получили ответ от eGG")
-      $log_egg.write_to_browser("Получили ответ от eGG")
-      return xml_actual.getText
-    rescue Exception => msg
-      $log_egg.write_to_browser("Ошибка! #{msg}")
       return nil
     ensure
       receiver.close if receiver
@@ -550,8 +492,7 @@ END;})
   def insert_inn(db_user) # Метод вставляет в таблицу zkh_inn запись с поставщиком для тестов. Ничего не возвращает.
     begin
       url = "jdbc:oracle:thin:@vm-corint:1521:corint"
-      puts "USER=#{@db_username.to_s}"
-      connection = java.sql.DriverManager.getConnection(url, @db_username, @db_username);
+      connection = java.sql.DriverManager.getConnection(url, db_user, db_user);
       stmt = connection.create_statement
       # stmt.executeUpdate("TRUNCATE TABLE zkh_inn")
       # $log_egg.write_to_browser("Очистили таблицу ZKH_INN")
@@ -562,6 +503,20 @@ END;})
       stmt.close if stmt
       connection.close if connection
     end
+  end
+
+  def change_smevmessageid(xml_rexml, smev_id, db_user, functional)
+    process_id = xml_rexml.elements["//mq:RequestMessage"].attributes["processID"]
+    begin
+      url = "jdbc:oracle:thin:@vm-corint:1521:corint"
+      connection = java.sql.DriverManager.getConnection(url, db_user, db_user);
+      stmt = connection.create_statement
+      stmt.executeUpdate("UPDATE EGG_SMEV3_CONTEXT SET SMEVMESSAGEID = '#{smev_id}' WHERE PROCESSID = '#{process_id}'")
+    ensure
+      stmt.close if stmt
+      connection.close if connection
+    end
+    $log_egg.write_to_log(functional, "Заменили id в SMEVMESSAGEID", "UPDATE EGG_SMEV3_CONTEXT SET SMEVMESSAGEID = '#{smev_id}' WHERE PROCESSID = '#{process_id}'")
   end
 
   def get_installer_config

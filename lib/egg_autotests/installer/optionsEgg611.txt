@@ -16,7 +16,7 @@ unattendedmodeui=minimalWithDialogs
 installdir=C:\EGG
 
 # устанавливаемые компоненты перечисляются через запятую
-enable-components=egg,DBcreate,ServiceMix,iaAmqComponent,saSpepComponent,saGmpComponent,iaFileGmpComponent,saZkhComponent,iaFileZkhComponent, saZkhPayeesComponent, iaFileMqGmpComponent,iaFileMqZkhComponent,saGmp20Component
+enable-components=egg,DBcreate,ServiceMix,iaAmqComponent,saSpepComponent,saGmpComponent,iaFileGmpComponent,saZkhComponent,iaFileZkhComponent, saZkhPayeesComponent, iaFileMqGmpComponent,iaFileMqZkhComponent,saGmp20Component,saFnsEgripComponent,saFnsEgrulComponent
 # компоненты, установка которых не требуется, перечисляются через запятую
 disable-components=crypto,CryptoService,saEsiaComponent,saReestrFsspComponent,saUpridComponent
 
@@ -148,6 +148,8 @@ zkh_file_bik_schedule=0 0 0 * * ? *
 zkh_file_timeout=15000
 zkh_file_http_client=http
 zkh_file_cbr_url=http://www.cbr.ru/mcirabis/PluginInterface/GetBicCatalog.aspx?type=db
+zkh_file_cbr_psystem_url=http://www.cbr.ru/mcirabis/PluginInterface/GetBicCatalog.aspx?type=db
+bik_download_type=zkh_file_cbr_url
 zkh_file_automatic_download=false
 zkh_file_proxy_host=127.0.0.1
 zkh_file_proxy_port=8080
@@ -208,6 +210,49 @@ file_mq_zkh_ValidateInputEgg=true
 file_mq_zkh_adapterCode=egg-zkhfileMq-adapter
 file_mq_zkh_brokerURL=failover:tcp://127.0.0.1:61616
 
+# saFnsEgripComponent - ФНС ЕГРИП
+fns_egrip_SMEV=http://vm-itools:5000/egrip_smev3
+fns_egrip_CryptoService=http://vm-eggcryptdev:9090/axis2/services/CryptoService
+fns_egrip_isCryptoLog=false
+fns_egrip_fns_egrip_sadp_consumers=5
+fns_egrip_TestMessage=true
+fns_egrip_timer_period=10000
+fns_egrip_http_client=http4
+fns_egrip_deadLine=10
+fns_egrip_EgripFormatVersion=4.0.5
+fns_egrip_NodeID=node1
+fns_egrip_isResponseLock=true
+fns_egrip_attachmentMode=none
+fns_egrip_CheckingSignature=none
+fns_egrip_CheckSignatureAttachment=check
+fns_egrip_CheckEPOV=none
+fns_egrip_CheckEPSP=none
+fns_egrip_adapterId=amq-jms-iadp
+fns_egrip_sendingTicket1000=false
+fns_egrip_sendingTicket1012=true
+
+
+# saFnsEgrulComponent - ФНС ЕГРЮЛ
+fns_egrul_FNS_URL=http://vm-itools:5000/egrul_smev3
+fns_egrul_CryptoService=http://vm-eggcryptdev:9090/axis2/services/CryptoService
+fns_egrul_fns_sadp_consumers=10
+fns_egrul_fns_queue_request_consumers=10
+fns_egrul_isTest=true
+fns_egrul_deadLine=1000
+fns_egrul_timeout=10000
+fns_egrul_DeliverySchedule=1
+fns_egrul_NumberOfAttempts=5
+fns_egrul_http_client=http4
+fns_egrul_EGRULVersion=4.0.5
+fns_egrul_timer_period=10000
+fns_egrul_isResponseLock=true
+fns_egrul_attachmentMode=true
+fns_egrul_CheckingSignature=check
+fns_egrul_CheckSignatureAttachment=check
+fns_egrul_CheckEPOV=check
+fns_egrul_CheckEPSP=none
+fns_egrul_isCryptoLog=true
+
 
 # saGmp20Component - СА ГИС ГМП 2 (СМЭВ3)
 egg_gmp20_PaymentVersion=2.0.1
@@ -244,6 +289,9 @@ egg_gmp20_payment_serviceId=GIS_GMP_2.0_Payment
 egg_gmp20_payment_systemId=egg
 egg_gmp20_payment_departmentId=egg
 egg_gmp20_payment_processName=GIS_GMP_2.0_Payment
+egg_gmp20_sendingTicket1000=false
+egg_gmp20_sendingTicket1012=true
+
 
 
 

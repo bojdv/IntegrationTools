@@ -1,11 +1,12 @@
 class SA_FNS_EGRUL
-  def initialize(pass_menu_color, fail_menu_color, not_find_xml, not_receive_answer, egg_version, try_count)
+  def initialize(pass_menu_color, fail_menu_color, not_find_xml, not_receive_answer, egg_version, try_count, db_username)
     @pass_menu_color = pass_menu_color
     @fail_menu_color = fail_menu_color
     @not_find_xml = not_find_xml
     @not_receive_answer = not_receive_answer
     @egg_version = egg_version
     @try_count = try_count
+    @db_username = db_username
 
     @menu_name = 'СА ФНС ЕГРЮЛ'
     @category = Category.find_by_category_name('СА ФНС ЕГРЮЛ')
@@ -30,14 +31,22 @@ class SA_FNS_EGRUL
         raise @not_find_xml if xml.nil?
         $log_egg.write_to_log(functional, "Получили xml", "#{xml.xml_name}\n#{xml.xml_text}")
         xml_rexml = Document.new(xml.xml_text)
-        xml_rexml.elements["//tns:RequestMessage"].attributes['processID'] = SecureRandom.uuid
-        $log_egg.write_to_log(functional, "Отредактировали запрос", "Добавили в запрос случайный processID: #{xml_rexml.elements["//tns:RequestMessage"].attributes['processID']}")
+        xml_rexml.elements["//mq:RequestMessage"].attributes['processID'] = SecureRandom.uuid
+        $log_egg.write_to_log(functional, "Отредактировали запрос", "Добавили в запрос случайный processID: #{xml_rexml.elements["//mq:RequestMessage"].attributes['processID']}")
         xsd = "#{Rails.root}/lib/egg_autotests/xsd/amq_adapter/MQMessages.xsd"
         $log_egg.write_to_browser("Валидируем XML для запроса...")
         $log_egg.write_to_log(functional, "Валидация исходящей XML", "Валидируем XML для запроса:\n#{xml.xml_name}\nПо XSD:\n #{xsd}")
         validate_egg_xml(xsd, xml_rexml.to_s, functional)
-        answer = send_to_amq_and_receive_egg(@manager, xml_rexml.to_s, functional, true, 80)
-        next count +=1  if answer.nil?
+        if send_to_amq_egg(@manager, xml_rexml.to_s, functional)
+          sleep 2
+          change_smevmessageid(xml_rexml, 'b396b307-8ff4-11e8-a3af-005056b644cd', @db_username)
+          answer = receive_from_amq_egg(@manager, functional, true, 80)
+        end
+        if answer.nil? # Если ответ от ЕГГ пустой, начинаем цикл заново
+          @result["request_EGRUL_v405"] = "false"
+          count +=1
+          next
+        end
         $log_egg.write_to_browser("Валидируем ответную XML...")
         $log_egg.write_to_log(functional, "Валидируем ответную XML", "Валидируем ответную XML:\n#{answer}\nПо XSD:\n #{xsd}")
         validate_egg_xml(xsd, answer, functional)

@@ -39,11 +39,20 @@ class SA_FNS_EGRUL
         validate_egg_xml(xsd, xml_rexml.to_s, functional)
         if send_to_amq_egg(@manager, xml_rexml.to_s, functional)
           sleep 2
-          change_smevmessageid(xml_rexml, 'b396b307-8ff4-11e8-a3af-005056b644cd', @db_username)
+          #change_smevmessageid(xml_rexml, 'b396b307-8ff4-11e8-a3af-005056b644cd', @db_username)
           answer = receive_from_amq_egg(@manager, functional, true, 80)
         end
         if answer.nil? # Если ответ от ЕГГ пустой, начинаем цикл заново
-          @result["request_EGRUL_v405"] = "false"
+          colorize_egg(@egg_version, @menu_name, @fail_menu_color)
+          $log_egg.write_to_browser("Не получили ответ от ЕГГ")
+          $log_egg.write_to_log(functional, "Проверка не пройдена!", "Не получили ответ от ЕГГ")
+          count +=1
+          next
+        end
+        if answer.include?('<ErrorCode>1022</ErrorCode>') # Если ответ от ЕГГ пустой, начинаем цикл заново
+          colorize_egg(@egg_version, @menu_name, @fail_menu_color)
+          $log_egg.write_to_browser("Ошибка СМЭВ. Электронный сервис СМЭВ вернул SOAP Fault")
+          $log_egg.write_to_log(functional, "Проверка не пройдена!", "Электронный сервис СМЭВ вернул SOAP Fault")
           count +=1
           next
         end
@@ -53,7 +62,7 @@ class SA_FNS_EGRUL
         answer_decode = get_decode_answer(answer)
         $log_egg.write_to_browser("Раскодировали ответ!")
         $log_egg.write_to_log(functional, "Раскодированный тег Answer", "#{answer_decode}")
-        expected_result = 'СвАдресЮЛ'
+        expected_result = 'Отчество'
         if answer_decode.include?(expected_result)
           @result["request_EGRUL_v405"] = "true"
           $log_egg.write_to_browser("Проверка пройдена!")

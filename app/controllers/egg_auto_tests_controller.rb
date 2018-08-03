@@ -137,8 +137,22 @@ class EggAutoTestsController < ApplicationController
   end
 
   def tester
-    @a = "waa"
-    p @a
+    a = <<-EOF
+    <ED101 xmlns="urn:cbr-ru:ed:v2.0" ChargeOffDate="2018-04-09" EDAuthor="4525361000" SystemCode="02" EDDate="2018-04-09" EDNo="2000" Priority="5" ReceiptDate="2018-04-09" Sum="555500" TransKind="01">
+	<AccDoc AccDocDate="2018-04-09" AccDocNo="00082"/>
+		<Payer INN="6454005120" KPP="645501001" PersonalAcc="40911810300002108861">
+			<Name>ПАО "НВКбанк"</Name>
+			<Bank BIC="046311751" CorrespAcc="30101810100000000751"/>
+		</Payer>
+<Payee INN="9909400765" KPP="774763002" PersonalAcc="30301810000006000001">
+            <Name>ПАО СБЕРБАНК</Name>
+            <Bank BIC="044525225" CorrespAcc="30101810400000000225"/>
+        </Payee>
+	<Purpose>Оплата по сч. мк4993 от 29.06.2016  В том числе НДС  18% - 1098.00</Purpose>
+</ED101>
+    EOF
+    b = Document.new(a)
+    puts b.root.attributes['EDAuthor']
   end
 end
 

@@ -505,7 +505,7 @@ END;})
     end
   end
 
-  def change_smevmessageid(xml_rexml, smev_id, db_user, functional)
+  def change_smevmessageid(xml_rexml, smev_id, db_user, functional) # метод меняет id для запросов в СМЭВ3
     process_id = xml_rexml.elements["//mq:RequestMessage"].attributes["processID"]
     begin
       url = "jdbc:oracle:thin:@vm-corint:1521:corint"
@@ -517,6 +517,20 @@ END;})
       connection.close if connection
     end
     $log_egg.write_to_log(functional, "Заменили id в SMEVMESSAGEID", "UPDATE EGG_SMEV3_CONTEXT SET SMEVMESSAGEID = '#{smev_id}' WHERE PROCESSID = '#{process_id}'")
+  end
+
+  def change_correlationid(xml_rexml, correlation_id, db_user, functional) # метод меняет id для запросов в УФЭБС
+    request_EDAuthor = xml_rexml.root.attributes['EDAuthor']
+    begin
+      url = "jdbc:oracle:thin:@vm-corint:1521:corint"
+      connection = java.sql.DriverManager.getConnection(url, db_user, db_user);
+      stmt = connection.create_statement
+      stmt.executeUpdate("UPDATE EGG_FILE_ADAPTER_MCICB SET CORRELATION_ID = '#{correlation_id}' WHERE EDAUTHOR = '#{request_EDAuthor}'")
+    ensure
+      stmt.close if stmt
+      connection.close if connection
+    end
+    $log_egg.write_to_log(functional, "Заменили id в EGG_FILE_ADAPTER_MCICB", "UPDATE EGG_FILE_ADAPTER_MCICB SET CORRELATION_ID = '#{correlation_id}' WHERE EDAUTHOR = '#{request_EDAuthor}'")
   end
 
   def get_installer_config

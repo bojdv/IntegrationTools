@@ -41,11 +41,20 @@ class SA_FNS_EGRIP
         validate_egg_xml(xsd, xml_rexml.to_s, functional)
         if send_to_amq_egg(@manager, xml_rexml.to_s, functional)
           sleep 2
-          change_smevmessageid(xml_rexml, 'e8fff274-8ff4-11e8-b72c-005056b644cd', @db_username, functional)
+          #change_smevmessageid(xml_rexml, 'e8fff274-8ff4-11e8-b72c-005056b644cd', @db_username, functional)
           answer = receive_from_amq_egg(@manager, functional, true, 80)
         end
         if answer.nil? # Если ответ от ЕГГ пустой, начинаем цикл заново
-          @result["request_EGRIP_v405"] = "false"
+          colorize_egg(@egg_version, @menu_name, @fail_menu_color)
+          $log_egg.write_to_browser("Не получили ответ от ЕГГ")
+          $log_egg.write_to_log(functional, "Проверка не пройдена!", "Не получили ответ от ЕГГ")
+          count +=1
+          next
+        end
+        if answer.include?('<ErrorCode>1022</ErrorCode>') # Если ответ от ЕГГ пустой, начинаем цикл заново
+          colorize_egg(@egg_version, @menu_name, @fail_menu_color)
+          $log_egg.write_to_browser("Ошибка СМЭВ. Электронный сервис СМЭВ вернул SOAP Fault")
+          $log_egg.write_to_log(functional, "Проверка не пройдена!", "Электронный сервис СМЭВ вернул SOAP Fault")
           count +=1
           next
         end

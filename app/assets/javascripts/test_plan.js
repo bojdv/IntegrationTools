@@ -14,7 +14,7 @@ $(function () {
 })
 function show_comment(text, id) {
     if (text) {
-        space = '\n\n'
+        space = '\n'
     } else {
         space = ''
     }

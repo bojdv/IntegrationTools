@@ -50,6 +50,8 @@ class IA_UFEBS_GIS_ZKH
         File.open("#{@dir_outbound}/#{xml_name}.xml", 'w'){ |file| file.write xml_rexml.to_s } # Создаем файл в исходящем каталоге и пишем в него текст XML из БД
         $log_egg.write_to_browser("Положили запрос в каталог #{@dir_outbound}")
         $log_egg.write_to_log(functional, "Подкладываем запрос #{xml_name}.xml", "Положили запрос в каталог #{@dir_outbound}:\n#{xml_rexml.to_s}")
+        sleep 4
+        #change_correlationid(xml_rexml, '00000000-0000-0000-0000-000000000000', @db_username, functional)
         answer = ufebs_file_count(functional, false, 'gis_zkh') # Читай описание в методе. Возвращает число найденных в каталоге файлов с нужными статусами
         if answer.first == 1 and answer.last == 1 # Если нашли в каталоге 1 файл со статусом ADPS000 (Принят адаптером) и 1 файл со статусом ADPS001 (Принят СМЭВ), считаем, что все ок.
           @result["ed101_test"] = "true" # Добавляем в хэш ключ ed101_test со значенеим true

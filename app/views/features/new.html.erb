@@ -8,6 +8,7 @@
 <div class="container">
   <%= simple_form_for [@plan, @new_feature], remote: true, html: {class: 'form-group' } do |f| %>
     <%= f.input :name, :label => 'Название доработки' %>
+    <%= f.input :status, :label => 'Статус доработки', :required => false, :collection => ['Новая', 'В работе', 'Приемка ДЭИС', 'Готово'], selected: 1 %>
     <%= f.input :start_date, :label => 'Дата начала тестирования (план)', :required => false , :order => [:day, :month, :year]%>
     <%= f.input :end_date, :label => 'Дата окончания тестирования (план)', :required => false , :order => [:day, :month, :year], include_blank: true%>
     <%= f.input :labels, :label => 'Метка для задач', :placeholder => 'Например: eGG_java8' %>
@@ -18,7 +19,7 @@
     <%= f.input :tz, :label => 'Ссылки на требования', :input_html => { :value=> "ТЗ: \nСпецификация: \nПрочее: ", style: "height:100px"} %>
     <%= f.input :project_plan, :label => 'Ссылка на план проекта', :placeholder => 'Заполняется при наличии такого плана.' %>
     <%= f.input :testcases, :label => 'Ссылка на Test Rail', :placeholder => 'Ссылка на Milestone или тест сьют, если не создавался Milestone' %>
-    <%= f.input :test_data, :label => 'Ссылка на тестовые данных', :placeholder => 'Ссылка на тестовые данные/примеры, которые использовались при тестировании.' %>
+    <%= f.input :test_data, :label => 'Ссылка на тестовые данные', :placeholder => 'Ссылка на тестовые данные/примеры, которые использовались при тестировании.' %>
     <%= f.input :analytic, as: :select, :label => 'Аналитики', collection: @analytic.sort, include_hidden: false, label_method: :second, value_method: :second, input_html: { multiple: true, style: "height:100px"} %>
     <%= f.input :developer, as: :select, :label => 'Разработчики', collection: @developer.sort, include_hidden: false, label_method: :second, value_method: :second, input_html: { multiple: true, style: "height:100px"} %>
     <%= f.input :qa, as: :select, :label => 'Тестировщики', collection: $qa.sort, include_hidden: false, label_method: :second, value_method: :second, input_html: { multiple: true, style: "height:100px"} %>

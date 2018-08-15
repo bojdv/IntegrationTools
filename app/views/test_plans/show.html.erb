@@ -10,6 +10,19 @@
         <%  end %>
       </tr>
       <tr>
+        <th scope="col">Статус</th>
+        <% @show_plan.features.each do |f| %>
+          <% case f.status%>
+          <% when 'Новая' %>
+            <td style="color:red"><%= f.status %></td>
+          <% when 'В работе', 'Приемка ДЭИС' %>
+            <td style="color:yellow"><%= f.status %></td>
+          <% when 'Готово' %>
+            <td style="color:greenyellow"><%= f.status %></td>
+          <%	 end %>
+        <%  end %>
+      </tr>
+      <tr>
         <th scope="col">Даты тестирования (план)</th>
         <% @show_plan.features.each do |f| %>
           <td><%= "Старт: #{f.start_date}<br>".html_safe %><%= "Конец: #{f.end_date}" %></td>
@@ -96,7 +109,6 @@
       <tr>
         <th scope="col">Комментарий</th>
         <% @show_plan.features.each do |f| %>
-          <%= puts "ID #{f.id}" %>
           <td><button tabindex="0" class="show-popover btn btn-primary" data-toggle="popover" title="Комментарий" data-content='<%= simple_format(f.comment)%>' onclick="show_comment('<%= f.comment.inspect.slice(1..-2)%>', '<%= f.id %>')">Комментарий</button></td>
         <%  end %>
       </tr>

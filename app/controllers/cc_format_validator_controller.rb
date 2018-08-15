@@ -1,4 +1,6 @@
 # encoding: utf-8
+require 'rexml/document'
+include REXML
 class CcFormatValidatorController < ApplicationController
   include CcFormatValidatorHelper
 
@@ -16,16 +18,26 @@ class CcFormatValidatorController < ApplicationController
       while true
         validator = Validator.new
         if validator.xml
-          result = validator.validate_cc_xml
-          puts result
-          if result.nil?
-            answer = validator.make_answer
-          else
-            answer = validator.make_answer('DECLINED_BY_ABS', result)
+          begin
+            validate_result = validator.validate_cc_xml
+            check_etalon_result = validator.check_etalon_elems
+            answer = if validate_result.nil?
+              validator.make_answer('DECLINED_BY_ABS', "\nРезультат валидации: \nНе найдена XSD")
+            elsif validate_result.empty? and check_etalon_result.empty?
+              validator.make_answer
+            elsif validate_result.empty? and check_etalon_result.any?
+              validator.make_answer('DECLINED_BY_ABS', "\nРезультат валидации: \nвалидация пройдена\nРезультат проверки наличия эталонных элементов:\nЭти элементы отсутствуют в xml: #{check_etalon_result.join(',')}\n")
+            elsif !validate_result.empty? and check_etalon_result.empty?
+              validator.make_answer('DECLINED_BY_ABS', "\nРезультат валидации: \n#{validate_result}\nРезультат проверки наличия эталонных элементов:\nэлементы присутствуют\n")
+            elsif !validate_result.empty? and check_etalon_result.any?
+              validator.make_answer('DECLINED_BY_ABS', "\nРезультат валидации: \n#{validate_result}\nРезультат проверки наличия эталонных элементов:\nЭти элементы отсутствуют в xml: #{check_etalon_result.join(',')}\n")
+            end
+            validator.send_to_amq_openwire(answer)
+          rescue Exception => msg
+            puts "Error! #{msg.message}\n#{msg.backtrace.join("\n")}"
           end
-          validator.send_to_amq_openwire(answer)
         end
-        sleep 3
+        sleep 1
       end
     end
   end
@@ -39,12 +51,6 @@ class CcFormatValidatorController < ApplicationController
   end
 
   def tester
-    a = '6'
-    case a
-      when 'Pay', 'p'
-        puts "1"
-      when 'Pay3'
-        puts 2
-    end
+    puts $thread.alive?
   end
 end

@@ -50,6 +50,17 @@
     <a class="btn btn-primary form-group" id="tester2" href="cc_format_validator/stop" data-remote="true">Остановить</a>
     <a class="btn btn-primary form-group" id="tester3" href="cc_format_validator/clear_log" data-remote="true">Очистить лог</a>
     <a class="btn btn-primary form-group" id="tester4" href="cc_format_validator/tester" data-remote="true">Tester</a>
+    </br>
+    <a>Статус:</a>
+    <% if $thread %>
+      <% if $thread.alive? %>
+        <a class="text-success">Запущено</a>
+      <%	 else %>
+        <a class="text-danger">Остановлено</a>
+      <%	 end %>
+    <%	 else %>
+      <a class="text-danger">Остановлено</a>
+    <%	 end %>
   </div>
 </div>
 <%= render 'layouts/modal_xml_sender' %>

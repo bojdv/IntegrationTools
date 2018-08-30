@@ -13,6 +13,7 @@ require_dependency "#{Rails.root}/lib/egg_autotests/ia_JPMorgan_GIS_GMP"
 require_dependency "#{Rails.root}/lib/egg_autotests/ia_JPMorgan_GIS_ZKH"
 require_dependency "#{Rails.root}/lib/egg_autotests/sa_SPEP"
 require_dependency "#{Rails.root}/lib/egg_autotests/sa_FNS_EGRIP"
+require_dependency "#{Rails.root}/lib/egg_autotests/SA_FNS_EGRUL"
 
 class EggAutotestsList
 

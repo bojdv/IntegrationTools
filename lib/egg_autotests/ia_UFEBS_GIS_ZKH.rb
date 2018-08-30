@@ -19,6 +19,30 @@ class IA_UFEBS_GIS_ZKH
     @ufebs_version = ufebs_version #\app\smx\resourceapp.war\wsdl\XSD\CBR\х\ed\cbr_ed101_vх.xsd
   end
 
+  def change_transportguid(functional, transport_guid)
+    30.times do
+      $egg_integrator.core_in_ufebs_zkh.any? ? (break) : (sleep 1)
+    end
+    if $egg_integrator.core_in_ufebs_zkh.any?
+      xml_from_ia = $egg_integrator.core_in_ufebs_zkh.first[:body]
+      $log_egg.write_to_browser("Перехватили сообщение от ИА к ядру. CorrelationID: #{$egg_integrator.core_in_ufebs_zkh.first[:correlation_id]}")
+      $log_egg.write_to_log(functional, "Перехватили сообщение от ИА к ядру. CorrelationID: #{$egg_integrator.core_in_ufebs_zkh.first[:correlation_id]}", xml_from_ia)
+    else
+      $log_egg.write_to_browser("Сообщение не дошло до ядра")
+      $log_egg.write_to_log(functional, "Проверка сообщения в очереди core_sa", "Сообщение не дошло до ядра")
+      return
+      # count +=1
+      # next
+    end
+    decode_rexml_request = get_decode_core_request(xml_from_ia)
+    decode_rexml_request.root.add_element('gis:TransportGUID').text = transport_guid
+    xml_to_sa = get_encode_core_request(functional, xml_from_ia, decode_rexml_request.to_s)
+    $egg_integrator.send_to_core(xml_to_sa, $egg_integrator.core_in_ufebs_zkh.first[:correlation_id])
+    $log_egg.write_to_browser("Изменили в XML TransportGUID и отправили в ядро")
+    $log_egg.write_to_log(functional, "Изменили в XML TransportGUID и отправили в ядро", xml_to_sa)
+    $egg_integrator.core_in_ufebs_zkh.clear
+  end
+
   def ed101_test
     sleep 1.5
     begin # begin означает начало блока, в котором мы хотим отловить исключение, если оно случится, что будет выполнен блок rescue
@@ -50,6 +74,7 @@ class IA_UFEBS_GIS_ZKH
         File.open("#{@dir_outbound}/#{xml_name}.xml", 'w'){ |file| file.write xml_rexml.to_s } # Создаем файл в исходящем каталоге и пишем в него текст XML из БД
         $log_egg.write_to_browser("Положили запрос в каталог #{@dir_outbound}")
         $log_egg.write_to_log(functional, "Подкладываем запрос #{xml_name}.xml", "Положили запрос в каталог #{@dir_outbound}:\n#{xml_rexml.to_s}")
+        change_transportguid(functional, '00000000-0000-0000-0000-000000000000') # Перехватываем сообщение до ядра и меняем TransportGUID на значение из заглушки
         answer = ufebs_file_count(functional, false, 'gis_zkh') # Читай описание в методе. Возвращает число найденных в каталоге файлов с нужными статусами
         if answer.first == 1 and answer.last == 1 # Если нашли в каталоге 1 файл со статусом ADPS000 (Принят адаптером) и 1 файл со статусом ADPS001 (Принят СМЭВ), считаем, что все ок.
           @result["ed101_test"] = "true" # Добавляем в хэш ключ ed101_test со значенеим true
@@ -113,6 +138,7 @@ class IA_UFEBS_GIS_ZKH
         File.open("#{@dir_outbound}/#{xml_name}.xml", 'w'){ |file| file.write xml_rexml.to_s }
         $log_egg.write_to_browser("Положили запрос в каталог #{@dir_outbound}")
         $log_egg.write_to_log(functional, "Подкладываем запрос #{xml_name}.xml", "Положили запрос в каталог #{@dir_outbound}:\n#{xml_rexml.to_s}")
+        change_transportguid(functional, '00000000-0000-0000-0000-000000000000') # Перехватываем сообщение до ядра и меняем TransportGUID на значение из заглушки
         answer = ufebs_file_count(functional, false, 'gis_zkh')
         if answer.first == 1 and answer.last == 1
           @result["ed108_test"] = "true"
@@ -178,6 +204,36 @@ class IA_UFEBS_GIS_ZKH
         File.open("#{@dir_outbound}/#{xml_name}.xml", 'w'){ |file| file.write xml_rexml.to_s }
         $log_egg.write_to_browser("Положили запрос в каталог #{@dir_outbound}")
         $log_egg.write_to_log(functional, "Подкладываем запрос #{xml_name}.xml", "Положили запрос в каталог #{@dir_outbound}:\n#{xml_rexml.to_s}")
+
+        # Перехватываем сообщение до ядра и меняем Id на entityId ответа из заглушки
+        30.times do
+          $egg_integrator.core_in_ufebs_zkh.any? ? (break) : (sleep 1)
+        end
+
+        if $egg_integrator.core_in_ufebs_zkh.any?
+          sleep 3
+          $egg_integrator.core_in_ufebs_zkh.each do |request|
+            xml_from_ia = request[:body]
+            $log_egg.write_to_browser("Перехватили сообщение от ИА к ядру. CorrelationID: #{request[:correlation_id]}")
+            $log_egg.write_to_log(functional, "Перехватили сообщение от ИА к ядру. CorrelationID: #{request[:correlation_id]}", xml_from_ia)
+            decode_rexml_request = get_decode_core_request(xml_from_ia)
+            decode_rexml_request.root.add_element('gis:TransportGUID').text = '00000000-0000-0000-0000-000000000000'
+            xml_to_sa = get_encode_core_request(functional, xml_from_ia, decode_rexml_request.to_s)
+            $egg_integrator.send_to_core(xml_to_sa, request[:correlation_id])
+            $log_egg.write_to_browser("Изменили в XML TransportGUID и отправили в ядро")
+            $log_egg.write_to_log(functional, "Изменили в XML TransportGUID и отправили в ядро", xml_to_sa)
+            sleep 2
+          end
+          $egg_integrator.core_in_ufebs_zkh.clear
+        else
+          $log_egg.write_to_browser("Сообщение не дошло до ядра")
+          $log_egg.write_to_log(functional, "Проверка сообщения в очереди core_sa", "Сообщение не дошло до ядра")
+          return
+          # count +=1
+          # next
+        end
+        #########################################################
+
         answer = ufebs_file_count(functional, true, 'gis_zkh')
         if answer.first == 2 and answer.last == 2
           @result["packetepd_test"] = "true"

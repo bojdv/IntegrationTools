@@ -8,7 +8,7 @@ class IA_ActiveMQ # Класс для тестирования адаптера
     @egg_version = egg_version
     @try_count = try_count
     @result = Hash.new # хэш, в который пишутся результаты выполнения теста
-    @functional = "Проверка адаптера СА ГИС ГМП" # Имя корневого раздела теста в логе html
+    @functional = "Проверка ИА ActiveMQ" # Имя корневого раздела теста в логе html
   end
 
   def run_RequestMessage # Запуск теста платежки ГИС ГМП
@@ -29,11 +29,20 @@ class IA_ActiveMQ # Класс для тестирования адаптера
         xml = Xml.where(xml_name: xml_name, category_id: category.id).first # Получаем xml по имени XML и имени категории
         raise @not_find_xml if xml.nil? # исключение, если xml не найдена
         $log_egg.write_to_log(functional, "Получили xml", "#{xml.xml_name}\n#{xml.xml_text}")
+        decode_request = get_decode_request(xml.xml_text)
+        decode_request = Document.new(decode_request)
+        decode_request.elements['//pi:SystemIdentifier'].text = "1042202001000215060220170080#{Random.rand(1000...9000)}"
+        xml_rexml = Document.new(xml.xml_text)
+        xml_rexml.elements["//mq:Request"].text = Base64.encode64(decode_request.to_s)
+        xml_rexml.elements["//mq:RequestMessage"].attributes['processID'] = SecureRandom.uuid
+        $log_egg.write_to_log(functional, "Отредактировали запрос", "1. Добавили в запрос случайный processID: #{xml_rexml.elements["//mq:RequestMessage"].attributes['processID']}\n2. Добавили в запрос случайный SystemIdentifier: #{decode_request.elements['//pi:SystemIdentifier'].text}")
         xsd = "#{Rails.root}/lib/egg_autotests/xsd/amq_adapter/MQMessages.xsd" # Получаем путь к XSD
         $log_egg.write_to_browser("Валидируем XML для запроса...")
         $log_egg.write_to_log(functional, "Валидация исходящей XML", "Валидируем XML для запроса:\n#{xml.xml_name}\nПо XSD:\n #{xsd}")
-        validate_egg_xml(xsd, xml.xml_text, functional) # Вызываем метод валидации
-        answer = send_to_amq_and_receive_egg(manager, xml, functional, true) # Вызываем метод отправки в MQ и записываем полученный ответ в answer
+        validate_egg_xml(xsd, xml_rexml.to_s, functional) # Вызываем метод валидации
+        if send_to_amq_egg(manager, xml_rexml.to_s, functional)
+          answer = receive_from_amq_egg(manager, functional, true)
+        end
         if answer.nil? # Если ответ от ЕГГ пустой, начинаем цикл заново
           @result["run_RequestMessage"] = "false"
           count +=1
@@ -45,7 +54,7 @@ class IA_ActiveMQ # Класс для тестирования адаптера
         answer_decode = get_decode_answer(answer) # Вызываем метод декодирования ответа из Base64
         $log_egg.write_to_browser("Раскодировали ответ!")
         $log_egg.write_to_log(functional, "Раскодированный тег Answer", "#{answer_decode}")
-        expected_result = 'Импортируемые данные уже присутствуют в Системе' # Текст, который должен быть в XML, если она успешна
+        expected_result = 'успешно' # Текст, который должен быть в XML, если она успешна
         if answer_decode.include?(expected_result) # Проверяем, присутствует ли нужный текст в декодированном ответе
           @result["run_RequestMessage"] = "true" # Записываем в хэш @result ключ run_RequestMessage со значением true
           $log_egg.write_to_browser("Проверка пройдена!")

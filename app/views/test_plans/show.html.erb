@@ -5,98 +5,110 @@
     <table class="table table-dark">
       <tr>
         <th scope="col">Название доработки</th>
-        <% @show_plan.features.each do |f| %>
+        <% @show_plan.features.sort_by(&:created_at).each do |f| %>
           <td style="color:yellow"><b><%= f.name %></b> <%= link_to '(edit)', "#{@show_plan.id}/features/#{f.id}/edit" %></td>
         <%  end %>
       </tr>
       <tr>
+        <th scope="col">Статус</th>
+        <% @show_plan.features.sort_by(&:created_at).each do |f| %>
+          <% case f.status%>
+          <% when 'Новая', 'Отменена' %>
+            <td style="color:red"><%= f.status %></td>
+          <% when 'В работе', 'Приемка ДЭИС' %>
+            <td style="color:yellow"><%= f.status %></td>
+          <% when 'Готово' %>
+            <td style="color:greenyellow"><%= f.status %></td>
+          <%	 end %>
+        <%  end %>
+      </tr>
+      <tr>
         <th scope="col">Даты тестирования (план)</th>
-        <% @show_plan.features.each do |f| %>
+        <% @show_plan.features.sort_by(&:created_at).each do |f| %>
           <td><%= "Старт: #{f.start_date}<br>".html_safe %><%= "Конец: #{f.end_date}" %></td>
         <%  end %>
       </tr>
       <tr>
         <th scope="col">Метки</th>
-        <% @show_plan.features.each do |f| %>
+        <% @show_plan.features.sort_by(&:created_at).each do |f| %>
           <td><%= f.labels %></td>
         <%  end %>
       </tr>
       <tr>
         <th scope="col">Название проекта</th>
-        <% @show_plan.features.each do |f| %>
+        <% @show_plan.features.sort_by(&:created_at).each do |f| %>
           <td><a href="https://jira.bssys.com/secure/BrowseProjects.jspa?selectedCategory=all&selectedProjectType=all&contains=<%= f.project_name %>" target="_blank"><%= f.project_name %></a></td>
         <%  end %>
       </tr>
       <tr>
         <th scope="col">Оценка трудозатрат</th>
-        <% @show_plan.features.each do |f| %>
+        <% @show_plan.features.sort_by(&:created_at).each do |f| %>
           <td><a href="https://jira.bssys.com/browse/<%= f.backlog %>" target="_blank"><%= f.backlog %></a></td>
         <%  end %>
       </tr>
       <tr>
         <th scope="col">Ссылка на доработку</th>
-        <% @show_plan.features.each do |f| %>
+        <% @show_plan.features.sort_by(&:created_at).each do |f| %>
           <td><a href="https://jira.bssys.com/browse/<%= f.feature_url %>" target="_blank"><%= f.feature_url %></a></td>
         <%  end %>
       </tr>
       <tr>
         <th scope="col">Объем тестирования</th>
-        <% @show_plan.features.each do |f| %>
+        <% @show_plan.features.sort_by(&:created_at).each do |f| %>
           <td><%= f.test_scope %></td>
         <%  end %>
       </tr>
       <tr>
         <th scope="col">Ссылка на TestRail</th>
-        <% @show_plan.features.each do |f| %>
+        <% @show_plan.features.sort_by(&:created_at).each do |f| %>
           <td><% if !f.testcases.nil? %><a href=<%= f.testcases %> target="_blank">TastRail</a><%	 end %></td>
         <%  end %>
       </tr>
       <tr>
         <th scope="col">Тестовые данные (примеры)</th>
-        <% @show_plan.features.each do |f| %>
+        <% @show_plan.features.sort_by(&:created_at).each do |f| %>
           <td><% if !f.test_data.nil? %><a tabindex="0" class="show-popover" data-toggle="popover" title="Тестовые данные" data-content="<%= simple_format(f.test_data)%>">Тестовые данные</a><%	 end %></td>
         <%  end %>
       </tr>
       <tr>
         <th scope="col">Требования</th>
-        <% @show_plan.features.each do |f| %>
+        <% @show_plan.features.sort_by(&:created_at).each do |f| %>
           <td><% if !f.tz.nil? %><a tabindex="0" class="show-popover" data-toggle="popover" title="Требования" data-content="<%= simple_format(f.tz)%>">Требования</a><%	 end %></td>
         <%  end %>
       </tr>
       <tr>
         <th scope="col">План проекта</th>
-        <% @show_plan.features.each do |f| %>
+        <% @show_plan.features.sort_by(&:created_at).each do |f| %>
           <td><% if !f.project_plan.nil? %><a tabindex="0" class="show-popover" data-toggle="popover" title="Требования" data-content='<%= simple_format(f.project_plan)%>'>План проекта</a><%	 end %></td>
         <%  end %>
       </tr>
       <tr>
         <th scope="col">Аналитики</th>
-        <% @show_plan.features.each do |f| %>
+        <% @show_plan.features.sort_by(&:created_at).each do |f| %>
           <td><%	 if !f.analytic.nil? %><%= f.analytic.join('<br>').html_safe %><%  end %></td>
         <%  end %>
       </tr>
       <tr>
         <th scope="col">Разработчики</th>
-        <% @show_plan.features.each do |f| %>
+        <% @show_plan.features.sort_by(&:created_at).each do |f| %>
           <td><%	 if !f.developer.nil? %><%= f.developer.join('<br>').html_safe %><%  end %></td>
         <%  end %>
       </tr>
       <tr>
         <th scope="col">Тестировщики</th>
-        <% @show_plan.features.each do |f| %>
+        <% @show_plan.features.sort_by(&:created_at).each do |f| %>
           <td><%	 if !f.qa.nil? %><%= f.qa.join('<br>').html_safe %><%  end %></td>
         <%	 end %>
       </tr>
       <tr>
         <th scope="col">Менеджер проекта</th>
-        <% @show_plan.features.each do |f| %>
+        <% @show_plan.features.sort_by(&:created_at).each do |f| %>
           <td><%	 if !f.manager.nil? %><%= f.manager.join('<br>').html_safe %><%  end %></td>
         <%  end %>
       </tr>
       <tr>
         <th scope="col">Комментарий</th>
-        <% @show_plan.features.each do |f| %>
-          <%= puts "ID #{f.id}" %>
+        <% @show_plan.features.sort_by(&:created_at).each do |f| %>
           <td><button tabindex="0" class="show-popover btn btn-primary" data-toggle="popover" title="Комментарий" data-content='<%= simple_format(f.comment)%>' onclick="show_comment('<%= f.comment.inspect.slice(1..-2)%>', '<%= f.id %>')">Комментарий</button></td>
         <%  end %>
       </tr>

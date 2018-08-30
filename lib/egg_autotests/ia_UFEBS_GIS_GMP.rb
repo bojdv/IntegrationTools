@@ -19,6 +19,30 @@ class IA_UFEBS_GIS_GMP
     @ufebs_version = ufebs_version #\app\smx\resourceapp.war\wsdl\XSD\CBR\х\ed\cbr_ed101_vх.xsd
   end
 
+  def change_id(functional, correlation_id)
+    30.times do
+      $egg_integrator.core_in_ufebs_gmp.any? ? (break) : (sleep 1)
+    end
+    if $egg_integrator.core_in_ufebs_gmp.any?
+      xml_from_ia = $egg_integrator.core_in_ufebs_gmp.first[:body]
+      $log_egg.write_to_browser("Перехватили сообщение от ИА к ядру. CorrelationID: #{$egg_integrator.core_in_ufebs_gmp.first[:correlation_id]}")
+      $log_egg.write_to_log(functional, "Перехватили сообщение от ИА к ядру. CorrelationID: #{$egg_integrator.core_in_ufebs_gmp.first[:correlation_id]}", xml_from_ia)
+    else
+      $log_egg.write_to_browser("Сообщение не дошло до ядра")
+      $log_egg.write_to_log(functional, "Проверка сообщения в очереди core_sa", "Сообщение не дошло до ядра")
+      return
+      # count +=1
+      # next
+    end
+    decode_rexml_request = get_decode_core_request(xml_from_ia)
+    decode_rexml_request.elements['//pi:FinalPayment'].attributes['Id'] = correlation_id
+    xml_to_sa = get_encode_core_request(functional, xml_from_ia, decode_rexml_request.to_s)
+    $egg_integrator.send_to_core(xml_to_sa, $egg_integrator.core_in_ufebs_gmp.first[:correlation_id])
+    $log_egg.write_to_browser("Изменили в XML Id и отправили в ядро")
+    $log_egg.write_to_log(functional, "Изменили в XML Id и отправили в ядро", xml_to_sa)
+    $egg_integrator.core_in_ufebs_gmp.clear
+  end
+
   def ed101_test
     sleep 1.5
     begin
@@ -51,6 +75,7 @@ class IA_UFEBS_GIS_GMP
         File.open("#{@dir_outbound}/#{xml_name}.xml", 'w'){ |file| file.write xml_rexml.to_s }
         $log_egg.write_to_browser("Положили запрос в каталог #{@dir_outbound}")
         $log_egg.write_to_log(functional, "Подкладываем запрос #{xml_name}.xml", "Положили запрос в каталог #{@dir_outbound}:\n#{xml_rexml.to_s}")
+        change_id(functional, 'G_4924759a-e3b7-472e-bb27-01b4276ea740') # Перехватываем сообщение до ядра и меняем Id на entityId ответа из заглушки
         answer = ufebs_file_count(functional)
         if answer.first == 1 and answer.last == 1
           @result["ed101_test"] = "true"
@@ -106,6 +131,8 @@ class IA_UFEBS_GIS_GMP
         File.open("#{@dir_outbound}/#{xml_name}.xml", 'w'){ |file| file.write xml_rexml.to_s }
         $log_egg.write_to_browser("Положили запрос в каталог #{@dir_outbound}")
         $log_egg.write_to_log(functional, "Подкладываем запрос #{xml_name}.xml", "Положили запрос в каталог #{@dir_outbound}:\n#{xml_rexml.to_s}")
+        # Перехватываем сообщение до ядра и меняем Id на entityId ответа из заглушки
+        change_id(functional, 'G_4924759a-e3b7-472e-bb27-01b4276ea740') # Перехватываем сообщение до ядра и меняем Id на entityId ответа из заглушки
         answer = ufebs_file_count(functional)
         if answer.first == 1 and answer.last == 1
           @result["ed104_test"] = "true"
@@ -161,6 +188,7 @@ class IA_UFEBS_GIS_GMP
         File.open("#{@dir_outbound}/#{xml_name}.xml", 'w'){ |file| file.write xml_rexml.to_s }
         $log_egg.write_to_browser("Положили запрос в каталог #{@dir_outbound}")
         $log_egg.write_to_log(functional, "Подкладываем запрос #{xml_name}.xml", "Положили запрос в каталог #{@dir_outbound}:\n#{xml_rexml.to_s}")
+        change_id(functional, 'G_4924759a-e3b7-472e-bb27-01b4276ea740') # Перехватываем сообщение до ядра и меняем Id на entityId ответа из заглушки
         answer = ufebs_file_count(functional)
         if answer.first == 1 and answer.last == 1
           @result["ed105_test"] = "true"
@@ -224,6 +252,7 @@ class IA_UFEBS_GIS_GMP
         File.open("#{@dir_outbound}/#{xml_name}.xml", 'w'){ |file| file.write xml_rexml.to_s }
         $log_egg.write_to_browser("Положили запрос в каталог #{@dir_outbound}")
         $log_egg.write_to_log(functional, "Подкладываем запрос #{xml_name}.xml", "Положили запрос в каталог #{@dir_outbound}:\n#{xml_rexml.to_s}")
+        change_id(functional, 'G_4924759a-e3b7-472e-bb27-01b4276ea740') # Перехватываем сообщение до ядра и меняем Id на entityId ответа из заглушки
         answer = ufebs_file_count(functional)
         if answer.first == 1 and answer.last == 1
           @result["ed108_test"] = "true"
@@ -282,6 +311,34 @@ class IA_UFEBS_GIS_GMP
         File.open("#{@dir_outbound}/#{xml_name}.xml", 'w'){ |file| file.write xml_rexml.to_s }
         $log_egg.write_to_browser("Положили запрос в каталог #{@dir_outbound}")
         $log_egg.write_to_log(functional, "Подкладываем запрос #{xml_name}.xml", "Положили запрос в каталог #{@dir_outbound}:\n#{xml_rexml.to_s}")
+        # Перехватываем сообщение до ядра и меняем Id на entityId ответа из заглушки
+        30.times do
+          $egg_integrator.core_in_ufebs_gmp.any? ? (break) : (sleep 1)
+        end
+
+        if $egg_integrator.core_in_ufebs_gmp.any?
+          sleep 3
+          $egg_integrator.core_in_ufebs_gmp.each do |request|
+            xml_from_ia = request[:body]
+            $log_egg.write_to_browser("Перехватили сообщение от ИА к ядру. CorrelationID: #{request[:correlation_id]}")
+            $log_egg.write_to_log(functional, "Перехватили сообщение от ИА к ядру. CorrelationID: #{request[:correlation_id]}", xml_from_ia)
+            decode_rexml_request = get_decode_core_request(xml_from_ia)
+            decode_rexml_request.elements['//pi:FinalPayment'].attributes['Id'] = 'G_4924759a-e3b7-472e-bb27-01b4276ea740'
+            xml_to_sa = get_encode_core_request(functional, xml_from_ia, decode_rexml_request.to_s)
+            $egg_integrator.send_to_core(xml_to_sa, request[:correlation_id])
+            $log_egg.write_to_browser("Изменили в XML Id и отправили в ядро")
+            $log_egg.write_to_log(functional, "Изменили в XML Id и отправили в ядро", xml_to_sa)
+            sleep 2
+          end
+          $egg_integrator.core_in_ufebs_gmp.clear
+        else
+          $log_egg.write_to_browser("Сообщение не дошло до ядра")
+          $log_egg.write_to_log(functional, "Проверка сообщения в очереди core_sa", "Сообщение не дошло до ядра")
+          return
+          # count +=1
+          # next
+        end
+        #########################################################
         answer = ufebs_file_count(functional, true)
         if answer.first == 3 and answer.last == 3
           @result["packetepd_test"] = "true"

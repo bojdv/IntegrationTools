@@ -16,7 +16,7 @@ unattendedmodeui=minimalWithDialogs
 installdir=C:\EGG
 
 # устанавливаемые компоненты перечисляются через запятую
-enable-components=egg,DBcreate,ServiceMix,iaAmqComponent,saSpepComponent,saGmpComponent,iaFileGmpComponent,saZkhComponent,iaFileZkhComponent, saZkhPayeesComponent, iaFileMqGmpComponent,iaFileMqZkhComponent,saGmp20Component
+enable-components=egg,DBcreate,ServiceMix,iaAmqComponent,saSpepComponent,saGmpComponent,iaFileGmpComponent,saZkhComponent,iaFileZkhComponent, saZkhPayeesComponent, iaFileMqGmpComponent,iaFileMqZkhComponent,saGmp20Component,saFnsEgripComponent,saFnsEgrulComponent
 # компоненты, установка которых не требуется, перечисляются через запятую
 disable-components=crypto,CryptoService,saEsiaComponent,saReestrFsspComponent,saUpridComponent
 
@@ -84,10 +84,10 @@ fk_PaymentVersion=1.16.5
 fk_NumberOfAttempts=5
 fk_DeliverySchedule=3
 
-# fk_SID0003663=http://vm-itools:8090/GIS-GMP - заглушка
-fk_SID0003663=http://smev-mvf.test.gosuslugi.ru:7777/gateway/services/SID0003663/1.00
+fk_SID0003663=http://vm-itools:5000/GIS-GMP
+#fk_SID0003663=http://smev-mvf.test.gosuslugi.ru:7777/gateway/services/SID0003663/1.00
 
-sadp_CryptoService=http://vm-eggcryptdev:9090/axis2/services/CryptoService
+sadp_CryptoService=http://vm-eggcrypttest:9090/axis2/services/CryptoService
 fk_isCryptoLog=true
 fk_sendingTicket1012=true
 fk_proxy_host=127.0.0.1
@@ -107,17 +107,17 @@ ufebs_file_FillReceiptDateED104=CurrentDate
 ufebs_file_FillReceiptDateED105=CurrentDate
 ufebs_file_FillReceiptDateED108=Default
 
-# настройки СА ГИС ГМП saZkhComponent
-# zkh_GIS_ZHKH_Payment_1=http://vm-itools:8480/SA_GIS_ZHKH_Payment - заглушка
-zkh_GIS_ZHKH_Payment_1=http://smev-mvf.test.gosuslugi.ru:7777/gateway/services/SID0004154
+# настройки СА ГИС ЖКХ saZkhComponent
+zkh_GIS_ZHKH_Payment_1=http://vm-itools:5000/SA_GIS_ZHKH_Payment
+#zkh_GIS_ZHKH_Payment_1=http://smev-mvf.test.gosuslugi.ru:7777/gateway/services/SID0004154
 
-# zkh_SA_GIS_ZHKH_Payment_details_1=http://vm-itools:8380/SA_GIS_ZHKH_Payment_details - заглушка
-zkh_SA_GIS_ZHKH_Payment_details_1=http://smev-mvf.test.gosuslugi.ru:7777/gateway/services/SID0004153
+zkh_SA_GIS_ZHKH_Payment_details_1=http://vm-itools:5000/SA_GIS_ZHKH_Payment_details
+#zkh_SA_GIS_ZHKH_Payment_details_1=http://smev-mvf.test.gosuslugi.ru:7777/gateway/services/SID0004153
 
 zkh_GIS_ZHKH_Payment_2=http://smev-mvf.test.gosuslugi.ru:7777/gateway/services/SID0004766
 zkh_SA_GIS_ZHKH_Payment_details_2=http://smev-mvf.test.gosuslugi.ru:7777/gateway/services/SID0004157
 zkh_GisZkhVersion=zkh_GisZkhVersion_8
-zkh_CryptoService=http://vm-eggcryptdev:9090/axis2/services/CryptoService
+zkh_CryptoService=http://vm-eggcrypttest:9090/axis2/services/CryptoService
 zkh_NumberOfAttempts=2
 zkh_NumberOfPackages=10
 zkh_DeliverySchedule=1
@@ -148,6 +148,8 @@ zkh_file_bik_schedule=0 0 0 * * ? *
 zkh_file_timeout=15000
 zkh_file_http_client=http
 zkh_file_cbr_url=http://www.cbr.ru/mcirabis/PluginInterface/GetBicCatalog.aspx?type=db
+zkh_file_cbr_psystem_url=http://www.cbr.ru/mcirabis/PluginInterface/GetBicCatalog.aspx?type=db
+bik_download_type=zkh_file_cbr_url
 zkh_file_automatic_download=false
 zkh_file_proxy_host=127.0.0.1
 zkh_file_proxy_port=8080
@@ -159,7 +161,7 @@ zkh_file_is_payees_request=true
 
 # saZkhPayeesComponent - Импорт справочника поставщиков
 zkhPayees_zkhPayeesService=http://smev-mvf.test.gosuslugi.ru:7777/gateway/services/SID0004768/1.00
-zkhPayees_CryptoService=http://vm-eggcryptdev:9090/axis2/services/CryptoService
+zkhPayees_CryptoService=http://vm-eggcrypttest:9090/axis2/services/CryptoService
 zkhPayees_zkh_payees_sadp_consumers=5
 zkhPayees_zkh_payees_sgd_consumers=5
 zkhPayees_zkh_payees_result_sgd_consumers=5
@@ -181,6 +183,7 @@ zkhPayees_use_proxy=false
 zkhPayees_timeout=60000
 zkhPayees_NumberOfAttempts=3
 zkhPayees_DeliverySchedule=1
+zkhPayees_CodesForRepeat=INT002018;EXP001000
 
 # iaFileMqGmpComponent - JPMorgan ГИС ГМП
 file_mq_gmp_testMode=true
@@ -208,13 +211,61 @@ file_mq_zkh_ValidateInputEgg=true
 file_mq_zkh_adapterCode=egg-zkhfileMq-adapter
 file_mq_zkh_brokerURL=failover:tcp://127.0.0.1:61616
 
+# saFnsEgripComponent - ФНС ЕГРИП
+fns_egrip_SMEV=http://vm-itools:5000/egrip_smev3
+#fns_egrip_SMEV=http://smev3-n0.test.gosuslugi.ru:7500/smev/v1.1/ws
+fns_egrip_CryptoService=http://vm-eggcrypttest:9090/axis2/services/CryptoService
+fns_egrip_isCryptoLog=false
+fns_egrip_fns_egrip_sadp_consumers=5
+fns_egrip_TestMessage=true
+fns_egrip_timer_period=10000
+fns_egrip_http_client=http4
+fns_egrip_deadLine=10
+fns_egrip_EgripFormatVersion=4.0.5
+fns_egrip_NodeID=node1
+fns_egrip_isResponseLock=true
+fns_egrip_attachmentMode=true
+fns_egrip_CheckingSignature=none
+fns_egrip_CheckSignatureAttachment=check
+fns_egrip_CheckEPOV=none
+fns_egrip_CheckEPSP=none
+fns_egrip_adapterId=amq-jms-iadp
+fns_egrip_sendingTicket1000=false
+fns_egrip_sendingTicket1012=true
+
+
+# saFnsEgrulComponent - ФНС ЕГРЮЛ
+fns_egrul_FNS_URL=http://vm-itools:5000/egrul_smev3
+#fns_egrul_FNS_URL=http://smev3-n0.test.gosuslugi.ru:7500/smev/v1.1/ws
+fns_egrul_CryptoService=http://vm-eggcrypttest:9090/axis2/services/CryptoService
+fns_egrul_fns_sadp_consumers=10
+fns_egrul_fns_queue_request_consumers=10
+fns_egrul_TestMessage=true
+fns_egrul_deadLine=1000
+fns_egrul_timeout=10000
+fns_egrul_DeliverySchedule=1
+fns_egrul_NumberOfAttempts=5
+fns_egrul_http_client=http4
+fns_egrul_EGRULVersion=4.0.5
+fns_egrul_timer_period=10000
+fns_egrul_isResponseLock=true
+fns_egrul_attachmentMode=true
+fns_egrul_CheckingSignature=check
+fns_egrul_CheckSignatureAttachment=check
+fns_egrul_CheckEPOV=none
+fns_egrul_CheckEPSP=none
+fns_egrul_isCryptoLog=true
+fns_egrul_sendingTicket1000=false
+fns_egrul_sendingTicket1012=true
+
 
 # saGmp20Component - СА ГИС ГМП 2 (СМЭВ3)
 egg_gmp20_PaymentVersion=2.0.1
 egg_gmp20_senderRole=9
 egg_gmp20_NumberOfPayments=10
 egg_gmp20_senderIdentifier=30670e
-egg_gmp20_SID0003663=http://smev3-n0.test.gosuslugi.ru:7500/smev/v1.1/ws
+egg_gmp20_SID0003663=http://vm-itools:8783/SA_GIS_GMP_SMEV3
+#egg_gmp20_SID0003663=http://smev3-n0.test.gosuslugi.ru:7500/smev/v1.1/ws
 egg_gmp20_fkQueue_consumers=10
 egg_gmp20_paymentQueue_consumers=10
 egg_gmp20_chargesQueue_consumers=10
@@ -223,11 +274,10 @@ egg_gmp20_queue_export_consumers=10
 egg_gmp20_commandQueue_consumers=10
 egg_gmp20_PositiveCodes=0
 egg_gmp20_NegativeCodes=5;11
-egg_gmp20_isResponseLock=true
 egg_gmp20_attachmentMode=true
 egg_gmp20_timer_period=10000
 egg_gmp20_isCryptoLog=true
-egg_gmp20_CryptoService=http://vm-eggcryptdev:9090/axis2/services/CryptoService
+egg_gmp20_CryptoService=http://vm-eggcrypttest:9090/axis2/services/CryptoService
 egg_gmp20_CheckSignatureAttachment=check
 egg_gmp20_CheckEPOV=check
 egg_gmp20_CheckEPSP=none
@@ -240,11 +290,14 @@ egg_gmp20_charges_systemId=egg
 
 egg_gmp20_charges_departmentId=egg
 egg_gmp20_charges_processName=GIS_GMP_2.0_Charges
+egg_gmp20_charges_isResponseLock=false
+egg_gmp20_payment_isResponseLock=false
 egg_gmp20_payment_serviceId=GIS_GMP_2.0_Payment
 egg_gmp20_payment_systemId=egg
 egg_gmp20_payment_departmentId=egg
 egg_gmp20_payment_processName=GIS_GMP_2.0_Payment
-
+egg_gmp20_sendingTicket1000=false
+egg_gmp20_sendingTicket1012=true
 
 
 # iaFileUfebsGmpComponent - ИА УФЭБС (СМЭВ3)

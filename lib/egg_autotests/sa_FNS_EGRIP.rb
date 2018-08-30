@@ -1,12 +1,13 @@
 class SA_FNS_EGRIP
 
-  def initialize(pass_menu_color, fail_menu_color, not_find_xml, not_receive_answer, egg_version, try_count)
+  def initialize(pass_menu_color, fail_menu_color, not_find_xml, not_receive_answer, egg_version, try_count, db_username)
     @pass_menu_color = pass_menu_color
     @fail_menu_color = fail_menu_color
     @not_find_xml = not_find_xml
     @not_receive_answer = not_receive_answer
     @egg_version = egg_version
     @try_count = try_count
+    @db_username = db_username
 
     @menu_name = 'СА ФНС ЕГРИП'
     @category = Category.find_by_category_name('СА ФНС ЕГРИП')
@@ -32,14 +33,30 @@ class SA_FNS_EGRIP
         raise @not_find_xml if xml.nil?
         $log_egg.write_to_log(functional, "Получили xml", "#{xml.xml_name}\n#{xml.xml_text}")
         xml_rexml = Document.new(xml.xml_text)
-        xml_rexml.elements["//tns:RequestMessage"].attributes['processID'] = SecureRandom.uuid
-        $log_egg.write_to_log(functional, "Отредактировали запрос", "Добавили в запрос случайный processID: #{xml_rexml.elements["//tns:RequestMessage"].attributes['processID']}")
+        xml_rexml.elements["//mq:RequestMessage"].attributes['processID'] = SecureRandom.uuid
+        $log_egg.write_to_log(functional, "Отредактировали запрос", "Добавили в запрос случайный processID: #{xml_rexml.elements["//mq:RequestMessage"].attributes['processID']}")
         xsd = "#{Rails.root}/lib/egg_autotests/xsd/amq_adapter/MQMessages.xsd"
         $log_egg.write_to_browser("Валидируем XML для запроса...")
         $log_egg.write_to_log(functional, "Валидация исходящей XML", "Валидируем XML для запроса:\n#{xml.xml_name}\nПо XSD:\n #{xsd}")
         validate_egg_xml(xsd, xml_rexml.to_s, functional)
-        answer = send_to_amq_and_receive_egg(@manager, xml_rexml.to_s, functional, true, 80)
-        next count +=1  if answer.nil?
+        if send_to_amq_egg(@manager, xml_rexml.to_s, functional)
+          change_smevmessageid(xml_rexml, '654c74e5-90c0-11e8-b72c-005056b644cd', @db_username, functional)
+          answer = receive_from_amq_egg(@manager, functional, true, 80)
+        end
+        if answer.nil? # Если ответ от ЕГГ пустой, начинаем цикл заново
+          colorize_egg(@egg_version, @menu_name, @fail_menu_color)
+          $log_egg.write_to_browser("Не получили ответ от ЕГГ")
+          $log_egg.write_to_log(functional, "Проверка не пройдена!", "Не получили ответ от ЕГГ")
+          count +=1
+          next
+        end
+        if answer.include?('<ErrorCode>1022</ErrorCode>') # Если ответ от ЕГГ пустой, начинаем цикл заново
+          colorize_egg(@egg_version, @menu_name, @fail_menu_color)
+          $log_egg.write_to_browser("Ошибка СМЭВ. Электронный сервис СМЭВ вернул SOAP Fault")
+          $log_egg.write_to_log(functional, "Проверка не пройдена!", "Электронный сервис СМЭВ вернул SOAP Fault")
+          count +=1
+          next
+        end
         $log_egg.write_to_browser("Валидируем ответную XML...")
         $log_egg.write_to_log(functional, "Валидируем ответную XML", "Валидируем ответную XML:\n#{answer}\nПо XSD:\n #{xsd}")
         validate_egg_xml(xsd, answer, functional)

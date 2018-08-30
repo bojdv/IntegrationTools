@@ -1,5 +1,7 @@
 Rails.application.routes.draw do
 
+  get 'soap/tester'
+
   get 'sessions/new'
   get 'users/new'
   get 'product' => 'product#index'
@@ -69,6 +71,8 @@ Rails.application.routes.draw do
   resources :test_plans do
     resources :features
   end
+
+  wash_out :soap
 
   root 'main_page#index'
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html

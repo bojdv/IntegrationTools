@@ -42,7 +42,9 @@ class SA_GIS_GMP
         $log_egg.write_to_browser("Валидируем XML для запроса...")
         $log_egg.write_to_log(functional, "Валидация исходящей XML", "Валидируем XML для запроса:\n#{xml.xml_name}\nПо XSD:\n #{xsd}")
         validate_egg_xml(xsd, xml_rexml.to_s, functional)
-        answer = send_to_amq_and_receive_egg(@manager, xml_rexml.to_s, functional, true)
+        if send_to_amq_egg(@manager, xml_rexml.to_s, functional)
+          answer = receive_from_amq_egg(@manager, functional, true)
+        end
         next count +=1  if answer.nil?
         $log_egg.write_to_browser("Валидируем ответную XML...")
         $log_egg.write_to_log(functional, "Валидируем ответную XML", "Валидируем ответную XML:\n#{answer}\nПо XSD:\n #{xsd}")
@@ -98,7 +100,9 @@ class SA_GIS_GMP
         $log_egg.write_to_browser("Валидируем XML для запроса...")
         $log_egg.write_to_log(functional, "Валидация исходящей XML", "Валидируем XML для запроса:\n#{xml.xml_name}\nПо XSD:\n #{xsd}")
         validate_egg_xml(xsd, xml_rexml.to_s, functional)
-        answer = send_to_amq_and_receive_egg(@manager, xml_rexml.to_s, functional, true)
+        if send_to_amq_egg(@manager, xml_rexml.to_s, functional)
+          answer = receive_from_amq_egg(@manager, functional, true)
+        end
         next count +=1  if answer.nil?
         $log_egg.write_to_browser("Валидируем ответную XML...")
         $log_egg.write_to_log(functional, "Валидируем ответную XML", "Валидируем ответную XML:\n#{answer}\nПо XSD:\n #{xsd}")
@@ -154,7 +158,9 @@ class SA_GIS_GMP
         $log_egg.write_to_browser("Валидируем XML для запроса...")
         $log_egg.write_to_log(functional, "Валидация исходящей XML", "Валидируем XML для запроса:\n#{xml.xml_name}\nПо XSD:\n #{xsd}")
         validate_egg_xml(xsd, xml_rexml.to_s, functional)
-        answer = send_to_amq_and_receive_egg(@manager, xml_rexml.to_s, functional, true)
+        if send_to_amq_egg(@manager, xml_rexml.to_s, functional)
+          answer = receive_from_amq_egg(@manager, functional, true)
+        end
         next count +=1  if answer.nil?
         $log_egg.write_to_browser("Валидируем ответную XML...")
         $log_egg.write_to_log(functional, "Валидируем ответную XML", "Валидируем ответную XML:\n#{answer}\nПо XSD:\n #{xsd}")
@@ -203,7 +209,9 @@ class SA_GIS_GMP
         $log_egg.write_to_browser("Валидируем XML для запроса...")
         $log_egg.write_to_log(functional, "Валидация исходящей XML", "Валидируем XML для запроса:\n#{xml.xml_name}\nПо XSD:\n #{xsd}")
         validate_egg_xml(xsd, xml.xml_text, functional)
-        answer = send_to_amq_and_receive_egg(@manager, xml, functional)
+        if send_to_amq_egg(@manager, xml.xml_text, functional)
+          answer = receive_from_amq_egg(@manager, functional)
+        end
         next count +=1  if answer.nil?
         $log_egg.write_to_browser("Валидируем ответную XML...")
         $log_egg.write_to_log(functional, "Валидируем ответную XML", "Валидируем ответную XML:\nПо XSD:\n #{xsd}")

@@ -22,7 +22,7 @@
 
           <%= simple_form_for :mq_attributes, remote: true, url: xml_sender_send_to_queue_path, html: {class: 'form-group' } do |f| %>
             <div class="<%= 'context-menu-manager-settings' if logged_in? %>">
-            <%= f.input :settings_name, :label => 'Название настройки', :required => false, input_html: {style: "background-color: #b3ffcc"}, placeholder: 'Заполнить при сохранении' %>
+              <%= f.input :settings_name, :label => 'Название настройки', :required => false, input_html: {style: "background-color: #b3ffcc"}, placeholder: 'Заполнить при сохранении' %>
             </div>
             <%= f.input :manager_type, label: 'Выберите менеджер очередей', required: false, collection: ['Active MQ', 'WebSphere MQ'], selected: :collection[0] %>
             <div id="protocol_select">
@@ -81,12 +81,12 @@
     </div>
     <div class="xml_select">
       <% if logged_in? %>
-        <%= f.input :select_xml_name, :required => false, :label => false, input_html: {onclick: "get_choice_xml()"},:collection => @category, as: :grouped_select, group_method: :xmls, group_label_method: :category_name, :label_method => lambda { |xml| "#{xml.xml_name if xml.user_id==current_user.id || xml.private == false}"}, :value_method => lambda { |xml| "#{xml.id if xml.user_id==current_user.id || xml.private == false}"} %>
+        <%= f.input :select_xml_name, :required => false, :label => false, input_html: {onclick: "get_choice_xml()"},:collection => @category, as: :grouped_select, group_method: :xmls, group_label_method: :category_name, :label_method => lambda   { |xml| "#{xml.xml_name if xml.user_id==current_user.id || xml.private == false}"}, :value_method => lambda { |xml| "#{xml.id if xml.user_id==current_user.id || xml.private == false}"} %>
       <% else %>
-        <%= f.input :select_xml_name, :required => false, :label => false, input_html: {onchange: "get_choice_xml()", onclick: "get_choice_xml()"}, :collection => @category, as: :grouped_select, group_method: :xmls, group_label_method: :category_name, :label_method => lambda { |xml| "#{xml.xml_name if xml.private == false}"}, :value_method => lambda { |xml| "#{xml.id if xml.private == false}"} %>
+        <%= f.input :select_xml_name, :required => false, :label => false, input_html: {onchange: "get_choice_xml()", onclick: "get_choice_xml()"}, :collection => @category.sort_by(&:created_at), as: :grouped_select, group_method: :xmls, group_label_method: :category_name, :label_method => lambda { |xml| "#{xml.xml_name if xml.private == false}"}, :value_method => lambda { |xml| "#{xml.id if xml.private == false}"} %>
       <% end %>
     </div>
-<!--    <%= f.button :submit, 'Загрузить XML', class: 'btn btn-primary'%><br>-->
+    <!--    <%= f.button :submit, 'Загрузить XML', class: 'btn btn-primary'%><br>-->
     <!-- Данные XML -->
     <div id="xml_description">
       <div class="<%= 'context-menu-one' if logged_in? %>">

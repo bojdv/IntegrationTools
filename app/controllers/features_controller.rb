@@ -58,7 +58,7 @@ class FeaturesController < ApplicationController
 
   private
   def feature_params
-    params.require(:feature).permit(:name, :labels, :project_name, :backlog, :feature_url, :test_scope, :tz, :testcases, :test_data, :start_date, :end_date, :project_plan, :comment, :analytic => [], :developer => [], :manager => [], :qa => [])
+    params.require(:feature).permit(:name, :status, :labels, :project_name, :backlog, :feature_url, :test_scope, :tz, :testcases, :test_data, :start_date, :end_date, :project_plan, :comment, :analytic => [], :developer => [], :manager => [], :qa => [])
   end
 
   def share_var

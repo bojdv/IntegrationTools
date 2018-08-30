@@ -108,6 +108,7 @@
     <orderEntry type="library" scope="PROVIDED" name="tzinfo-data (v1.2017.3, jruby-9.1.15.0-p0) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="uglifier (v4.1.3, jruby-9.1.15.0-p0) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="wasabi (v3.5.0, jruby-9.1.15.0-p0) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="wash_out (v0.12.0, jruby-9.1.15.0-p0) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="websocket-driver (v0.6.5, jruby-9.1.15.0-p0) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="websocket-extensions (v0.1.3, jruby-9.1.15.0-p0) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="xpath (v3.0.0, jruby-9.1.15.0-p0) [gem]" level="application" />

@@ -229,6 +229,8 @@ GEM
     wasabi (3.5.0)
       httpi (~> 2.0)
       nokogiri (>= 1.4.2)
+    wash_out (0.12.0)
+      nori (>= 2.0.0)
     websocket-driver (0.6.5)
       websocket-extensions (>= 0.1.0)
     websocket-driver (0.6.5-java)
@@ -267,6 +269,7 @@ DEPENDENCIES
   stomp
   tzinfo-data
   uglifier (>= 1.3.0)
+  wash_out
 
 BUNDLED WITH
    1.16.1

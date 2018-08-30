@@ -168,14 +168,17 @@ module CcFormatValidatorHelper
       begin
         factory = ActiveMQConnectionFactory.new
         factory.setBrokerURL("tcp://vm-itools:61611")
-        connection = factory.createQueueConnection('smx', 'smx')
+        connection = factory.createConnection('smx', 'smx')
         session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         textMessage = session.createTextMessage(message)
         textMessage.setJMSCorrelationID(SecureRandom.uuid)
         sender = session.createSender(session.createQueue('correqts_out'))
+        sender2 = session.createSender(session.createQueue('correqts_out2'))
         connection.start
         sender.send(textMessage)
+        sender2.send(textMessage)
         sender.close
+        sender2.close
         session.close
         connection.close
         CcFormatValidatorLog.create(uuid: @uuid, events: 'Отправка ответа', status: 'OK', short_message: 'Отправили ответ в очередь correqts_out', xml: textMessage.text )

@@ -40,8 +40,7 @@ class SA_FNS_EGRIP
         $log_egg.write_to_log(functional, "Валидация исходящей XML", "Валидируем XML для запроса:\n#{xml.xml_name}\nПо XSD:\n #{xsd}")
         validate_egg_xml(xsd, xml_rexml.to_s, functional)
         if send_to_amq_egg(@manager, xml_rexml.to_s, functional)
-          sleep 2
-          #change_smevmessageid(xml_rexml, 'e8fff274-8ff4-11e8-b72c-005056b644cd', @db_username, functional)
+          change_smevmessageid(xml_rexml, '654c74e5-90c0-11e8-b72c-005056b644cd', @db_username, functional)
           answer = receive_from_amq_egg(@manager, functional, true, 80)
         end
         if answer.nil? # Если ответ от ЕГГ пустой, начинаем цикл заново

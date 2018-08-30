@@ -130,9 +130,10 @@ module EggAutoTestsHelper
       receiver = session.createReceiver(session.createQueue(manager.queue_in))
       count = counter
       $log_egg.write_to_browser("Ждем ответ в течении #{count} секунд")
-      xml_actual = receiver.receive(1000)
+      xml_actual = receiver.receiveNoWait
       while xml_actual.nil?
-        xml_actual = receiver.receive(1000)
+        xml_actual = receiver.receiveNoWait
+        sleep 1
         puts count -=1
         return nil if count == 0
       end
@@ -146,9 +147,10 @@ module EggAutoTestsHelper
         $log_egg.write_to_browser("Получили промежуточный квиток от eGG")
         count = counter
         $log_egg.write_to_browser("Ждем ответ в течении #{count} секунд")
-        xml_actual = receiver.receive(1000)
+        xml_actual = receiver.receiveNoWait
         while xml_actual.nil?
-          xml_actual = receiver.receive(1000)
+          xml_actual = receiver.receiveNoWait
+          sleep 1
           puts count -=1
           return nil if count == 0
         end
@@ -327,13 +329,31 @@ END;})
     return answer_decode
   end
 
-  def get_encode_request(xml) # Метод, который получает XML для запроса и возвращает раскодированный тег '//mq:Answer'
+  def get_decode_core_request(xml) # Тоже, что и get_decode_answer
+    request = Document.new(xml)
+    answer = request.elements['//tns:request'].text
+    answer_decode = Base64.decode64(answer)
+    answer_decode = answer_decode.force_encoding("utf-8")
+    return Document.new(answer_decode)
+  end
+
+  def get_encode_core_request(functional, xml, request)
+    # Метод, который получает XML и запрос (tns:request) и вставляет в него закодированный запрос
+    # xml - конверт с типом строка
+    # request - тело тега tns:request с типом строка
+    # Возвращает готовую xml с типом строка
+    xml_from_ia_rexml = Document.new(xml)
+    xml_from_ia_rexml.elements['//tns:request'].text = Base64.encode64(request)
+    return xml_from_ia_rexml.to_s
+  end
+
+  def get_encode_request(xml) # Метод, который получает XML для запроса и возвращает закодированный тег '//mq:Answer'
     request = Document.new(xml)
     answer = request.elements['//mq:Answer'].text
     answer_decode = Base64.encode64(answer)
     answer_decode = answer_decode.force_encoding("utf-8")
     #$log_egg.write_to_browser("Раскодировали тег Request:\n#{answer_decode}", "Раскодировали запрос!")
-    $log_egg.write_to_browser("Раскодировали запрос!")
+    $log_egg.write_to_browser("Закодировали запрос!")
     return answer_decode
   end
 
@@ -396,9 +416,19 @@ END;})
     adps001_count = 0 # Счетчик финальных успешных квитков
     count = 60 # Ожидание ответа в секундах
     $log_egg.write_to_browser("Ждем ответ в течении #{count} секунд")
-    packetepd ? positive_code = 3 : positive_code = 1 # Если мы проверяем запрос packetepd, то будем ждать от адаптера 3 файла с успешным кодом ADPS001, если другие запросы, то один файл.
+    if packetepd
+      case gis_type
+        when 'gis_gmp'
+          positive_code = 3 # Ждем три файла со статусом ADPS001
+        when 'gis_zkh'
+          positive_code = 2
+      end
+    else
+      positive_code = 1
+    end
     until adps001_count == positive_code or count < 0 # Просматриваем каталог, пока не обнаружим нужное кол-во файлов с кодом ADPS001 или пока не пройдет время count
       if File.directory?(dir) # Проверяем существует ли директория
+        adps001_count = 0
         Dir.entries(dir).each_entry do |entry| # Просматриваем каждый файл в каталоге, имя файла пишется в переменную entry
           adps001_count += 1 if entry.include?(code_adps001) # Если файл содержит в своем имени нужный код, то добавляем +1 к счетчику adps001_count
           count = 0 if entry.include?(fail_code) # Если обнаружили файл с кодом ошибки, то выходим из цикла, больше ждать нет смысла.
@@ -511,27 +541,35 @@ END;})
       url = "jdbc:oracle:thin:@vm-corint:1521:corint"
       connection = java.sql.DriverManager.getConnection(url, db_user, db_user);
       stmt = connection.create_statement
-      stmt.executeUpdate("UPDATE EGG_SMEV3_CONTEXT SET SMEVMESSAGEID = '#{smev_id}' WHERE PROCESSID = '#{process_id}'")
+      result = 0
+      while result == 0 # 0, if no rows are affected by the operation.
+        result = stmt.executeUpdate("UPDATE EGG_SMEV3_CONTEXT SET SMEVMESSAGEID = '#{smev_id}' WHERE PROCESSID = '#{process_id}'")
+        sleep 1
+      end
+    rescue Exception => msg
+      $log_egg.write_to_browser("Ошибка! #{msg}")
+      $log_egg.write_to_log(@end_test_message, "Ошибка при копировании логов", "Ошибка! #{msg}\n#{msg.backtrace.join("\n")}")
     ensure
       stmt.close if stmt
       connection.close if connection
     end
+    $log_egg.write_to_browser("Заменили id в SMEVMESSAGEID на #{smev_id}")
     $log_egg.write_to_log(functional, "Заменили id в SMEVMESSAGEID", "UPDATE EGG_SMEV3_CONTEXT SET SMEVMESSAGEID = '#{smev_id}' WHERE PROCESSID = '#{process_id}'")
   end
 
-  def change_correlationid(xml_rexml, correlation_id, db_user, functional) # метод меняет id для запросов в УФЭБС
-    request_EDAuthor = xml_rexml.root.attributes['EDAuthor']
-    begin
-      url = "jdbc:oracle:thin:@vm-corint:1521:corint"
-      connection = java.sql.DriverManager.getConnection(url, db_user, db_user);
-      stmt = connection.create_statement
-      stmt.executeUpdate("UPDATE EGG_FILE_ADAPTER_MCICB SET CORRELATION_ID = '#{correlation_id}' WHERE EDAUTHOR = '#{request_EDAuthor}'")
-    ensure
-      stmt.close if stmt
-      connection.close if connection
-    end
-    $log_egg.write_to_log(functional, "Заменили id в EGG_FILE_ADAPTER_MCICB", "UPDATE EGG_FILE_ADAPTER_MCICB SET CORRELATION_ID = '#{correlation_id}' WHERE EDAUTHOR = '#{request_EDAuthor}'")
-  end
+  # def change_correlationid(xml_rexml, correlation_id, db_user, functional) # метод меняет id для запросов в УФЭБС
+  #   request_EDAuthor = xml_rexml.root.attributes['EDAuthor']
+  #   begin
+  #     url = "jdbc:oracle:thin:@vm-corint:1521:corint"
+  #     connection = java.sql.DriverManager.getConnection(url, db_user, db_user);
+  #     stmt = connection.create_statement
+  #     stmt.executeUpdate("UPDATE EGG_FILE_ADAPTER_MCICB SET CORRELATION_ID = '#{correlation_id}' WHERE EDAUTHOR = '#{request_EDAuthor}'")
+  #   ensure
+  #     stmt.close if stmt
+  #     connection.close if connection
+  #   end
+  #   $log_egg.write_to_log(functional, "Заменили id в EGG_FILE_ADAPTER_MCICB", "UPDATE EGG_FILE_ADAPTER_MCICB SET CORRELATION_ID = '#{correlation_id}' WHERE EDAUTHOR = '#{request_EDAuthor}'")
+  # end
 
   def get_installer_config
     case # Определяем название файла с конфигом инсталлятора
@@ -546,8 +584,178 @@ END;})
     end
   end
 
-  def test_m
-    puts "Hi"
+  def copy_core_config
+    begin
+      config = <<-EOF
+#Настройки валидации
+ValidateInputEgg=true
+ValidateOutputEgg=true
+
+#Настройка логирования
+isLog=false
+
+#Входная очередь ядра 
+core_sa=core_sa_real
+#Ответная очередь ядра 
+core_ia=core_ia
+#Количество потоков чтения входной очереди ядра
+queue_core_sa_consumers=5
+#Количество потоков чтения выходной очереди ядра
+queue_core_ia_consumers=5
+      EOF
+      File.open("C:/EGG/apache-servicemix-6.1.2/etc/egg.core.config.cfg", 'w'){ |file| file.write config }
+      $log_egg.write_to_browser("Изменили в конфиге очередь ядра на core_sa_real...")
+      return true
+    rescue Exception => msg
+      puts msg
+      return false
+    end
+  end
+
+  class EggCoreIntegrator
+    def initialize
+      java_import 'org.apache.activemq.ActiveMQConnectionFactory'
+      java_import 'javax.jms.Session'
+      java_import 'javax.jms.TextMessage'
+      @core_in_ufebs_gmp = Array.new
+      @core_in_ufebs_zkh = Array.new
+      @core_in_ufebs_jpm = Array.new
+      @manager = QueueManager.find_by_manager_name('iTools[EGG]')
+      start_core_in_listener # Запускаем прослушку входной очереди ядра
+    end
+
+    attr_accessor :core_in_ufebs_gmp, :core_in_ufebs_zkh, :core_in_ufebs_jpm
+
+    def start_core_in_listener
+      @thread_get_core_message = Thread.new do
+        begin
+            factory = ActiveMQConnectionFactory.new
+            factory.setBrokerURL("tcp://#{@manager.host}:#{@manager.port}")
+            @manager.user.nil? ? user ='' : user=@manager.user
+            @manager.password.nil? ? password ='' : password=@manager.user
+            connection = factory.createQueueConnection(user, password)
+            session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            connection.start
+            receiver = session.createReceiver(session.createQueue('core_sa'))
+            sender = session.createSender(session.createQueue('core_sa_real'))
+            while true do
+            message = receiver.receiveNoWait()
+            if message
+              message_rexml = Document.new(message.getText)
+              case message_rexml.elements['//tns:Request'].attributes['adapterId']
+                when 'egg-file-adapter-mcicb'
+                  puts "Receive UFEBS GIS GMP message"
+                  @core_in_ufebs_gmp << {correlation_id: message.getJMSCorrelationID, body: message.getText }
+                when 'egg-file-adapter-zkh-mcicb'
+                  puts "Receive UFEBS GIS ZKH message"
+                  @core_in_ufebs_zkh << {correlation_id: message.getJMSCorrelationID, body: message.getText }
+                when 'egg-zkhfileMq-adapter'
+                  puts "Receive UFEBS GIS ZKH JPMorgan message"
+                  @core_in_ufebs_jpm << {correlation_id: message.getJMSCorrelationID, body: message.getText }
+                else
+                  puts "Receive not UFEBS message"
+                  sender.send(message)
+              end
+            end
+            sleep 1
+          end
+        rescue Exception => msg
+          puts "Ошибка! #{msg.message} #{msg.backtrace.join('\n')}"
+        ensure
+          receiver.close if receiver
+          sender.close if sender
+          session.close if session
+          connection.close if connection
+          Thread.current.kill
+        end
+      end
+    end
+
+    # def start_core_out_listener # не используется
+    #   @thread_get_core_message = Thread.new do
+    #     begin
+    #       factory = ActiveMQConnectionFactory.new
+    #       factory.setBrokerURL("tcp://#{@manager.host}:#{@manager.port}")
+    #       @manager.user.nil? ? user ='' : user=@manager.user
+    #       @manager.password.nil? ? password ='' : password=@manager.user
+    #       connection = factory.createQueueConnection(user, password)
+    #       session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+    #       connection.start
+    #       receiver = session.createReceiver(session.createQueue('core_ia'))
+    #       sender = session.createSender(session.createQueue('core_ia_real'))
+    #       while true do
+    #         message = receiver.receiveNoWait()
+    #         if message
+    #           message_rexml = Document.new(message.getText)
+    #           if message_rexml.elements['//tns:Request'].attributes['adapterId'] == 'egg-file-adapter-mcicb'
+    #             puts "Receive UFEBS message"
+    #             @core_in_ufebs_gmp << {correlation_id: message.getJMSCorrelationID, body: message.getText }
+    #           else
+    #             puts "Receive not UFEBS message"
+    #             sender.send(message)
+    #           end
+    #         end
+    #         sleep 1
+    #       end
+    #     rescue Exception => msg
+    #       puts "Ошибка! #{msg.message} #{msg.backtrace.join('\n')}"
+    #     ensure
+    #       receiver.close if receiver
+    #       sender.close if sender
+    #       session.close if session
+    #       connection.close if connection
+    #       Thread.current.kill
+    #     end
+    #   end
+    # end
+
+    def stop_core_in_listener
+      @thread_get_core_message.kill
+    end
+
+    def core_in_listener_live?
+      @thread_get_core_message.alive?
+    end
+
+    def send_to_core(xml, correlation_id)
+      begin
+        factory = ActiveMQConnectionFactory.new
+        factory.setBrokerURL("tcp://#{@manager.host}:#{@manager.port}")
+        @manager.user.nil? ? user ='' : user=@manager.user
+        @manager.password.nil? ? password ='' : password=@manager.user
+        connection = factory.createQueueConnection(user, password)
+        session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+        connection.start
+        sender = session.createSender(session.createQueue('core_sa_real'))
+        textMessage = session.createTextMessage(xml)
+        textMessage.setJMSCorrelationID(correlation_id)
+        sender.send(textMessage)
+      rescue Exception => msg
+        puts "Ошибка! #{msg.message} #{msg.backtrace.join('\n')}"
+      ensure
+        sender.close if sender
+        session.close if session
+        connection.close if connection
+      end
+    end
+
+    def get_ufebs_xml_from_ia
+      20.times do
+        $egg_integrator.core_in_ufebs_gmp.any? ? (break) : (sleep 1)
+      end
+      if $egg_integrator.core_in_ufebs_gmp.any?
+        xml_from_ia = $egg_integrator.core_in_ufebs_gmp[:body]
+        $log_egg.write_to_browser("Перехватили сообщение от ИА к ядру")
+        $log_egg.write_to_log(functional, "Перехватили сообщение от ИА к ядру", xml_from_ia)
+        return $egg_integrator.core_in_ufebs_gmp[:body]
+      else
+        $log_egg.write_to_browser("Сообщение не дошло до ядра")
+        $log_egg.write_to_log(functional, "Проверка сообщения в очереди core_sa", "Сообщение не дошло до ядра")
+        return
+        # count +=1
+        # next
+      end
+    end
   end
 
 end

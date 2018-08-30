@@ -62,6 +62,7 @@ class EggAutoTestsController < ApplicationController
       end
       return if dir_empty_egg?(tests_params_egg[:egg_dir])
       $log_egg.write_to_browser("#{puts_line_egg}")
+      copy_core_config
       sleep 1
       start_servicemix_egg(tests_params_egg[:egg_dir])
       count = 400
@@ -74,6 +75,8 @@ class EggAutoTestsController < ApplicationController
       $log_egg.write_to_browser("Done! Запустили eGG")
       $log_egg.write_to_log(@run_test_message, "Запускаем Servicemix...", "Done! Запустили eGG")
       sleep 2
+      $egg_integrator = EggCoreIntegrator.new
+      $egg_integrator.start_core_in_listener
       $log_egg.write_to_browser("#{puts_line_egg}")
       if tests_params_egg[:egg_version] == 'eGG 6.7'
         $log_egg.write_to_browser("Запустили тесты eGG #{tests_params_egg[:build_version]}")
@@ -93,6 +96,7 @@ class EggAutoTestsController < ApplicationController
     ensure
       begin
         begin
+          $egg_integrator.stop_core_in_listener if $egg_integrator.core_in_listener_live?
           stop_servicemix_egg(tests_params_egg[:egg_dir]) if tests_params_egg[:dont_stop_egg] == 'false'
           delete_db_egg(@end_test_message) if tests_params_egg[:dont_drop_db] == 'false'
         ensure
@@ -137,22 +141,81 @@ class EggAutoTestsController < ApplicationController
   end
 
   def tester
-    a = <<-EOF
-    <ED101 xmlns="urn:cbr-ru:ed:v2.0" ChargeOffDate="2018-04-09" EDAuthor="4525361000" SystemCode="02" EDDate="2018-04-09" EDNo="2000" Priority="5" ReceiptDate="2018-04-09" Sum="555500" TransKind="01">
-	<AccDoc AccDocDate="2018-04-09" AccDocNo="00082"/>
-		<Payer INN="6454005120" KPP="645501001" PersonalAcc="40911810300002108861">
-			<Name>ПАО "НВКбанк"</Name>
-			<Bank BIC="046311751" CorrespAcc="30101810100000000751"/>
-		</Payer>
-<Payee INN="9909400765" KPP="774763002" PersonalAcc="30301810000006000001">
-            <Name>ПАО СБЕРБАНК</Name>
-            <Bank BIC="044525225" CorrespAcc="30101810400000000225"/>
-        </Payee>
-	<Purpose>Оплата по сч. мк4993 от 29.06.2016  В том числе НДС  18% - 1098.00</Purpose>
-</ED101>
-    EOF
-    b = Document.new(a)
-    puts b.root.attributes['EDAuthor']
+    java_import 'org.apache.activemq.ActiveMQConnectionFactory'
+    java_import 'javax.jms.Session'
+    java_import 'javax.jms.TextMessage'
+    3.times do
+      begin
+        file = File.open('C:/jruby-9.1.15.0.zip')
+        puts (file.size.to_f)/1000000
+        text = ''
+        file.each_line {|x| text << x}
+        puts text.bytesize
+        factory = ActiveMQConnectionFactory.new
+        factory.setBrokerURL("tcp://vm-tircustom:61617")
+        connection = factory.createQueueConnection('admin', 'admin')
+        session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+        connection.start
+        sender = session.createSender(session.createQueue('test_in'))
+        textMessage = session.createTextMessage(text)
+        sender.send(textMessage)
+      ensure
+        sender.close if sender
+        session.close if session
+        connection.close if connection
+        text = nil
+        factory = nil
+        next
+      end
+    end
+=begin
+    manager = QueueManager.find_by_manager_name('iTools[Test]')
+    @core_in_message = []
+    java_import 'org.apache.activemq.ActiveMQConnectionFactory'
+    java_import 'javax.jms.Session'
+    java_import 'javax.jms.TextMessage'
+    thread_get_core_message = Thread.new do
+      begin
+        factory = ActiveMQConnectionFactory.new
+        factory.setBrokerURL("tcp://#{manager.host}:#{manager.port}")
+        manager.user.nil? ? user ='' : user=manager.user
+        manager.password.nil? ? password ='' : password=manager.user
+        connection = factory.createQueueConnection(user, password)
+        session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+        connection.start
+        receiver = session.createReceiver(session.createQueue('core_sa'))
+        sender = session.createSender(session.createQueue('core_sa_real'))
+        while true do
+          message = receiver.receive(1000)
+          if message
+              message_rexml = Document.new(message.getText)
+              if message_rexml.elements['//tns:Request'].attributes['adapterId'] == 'egg-file-adapter-mcicb'
+                puts "Receive UFEBS message"
+                @core_in_message << {correlation_id: message.getJMSCorrelationID, body: message.getText}
+              else
+                puts "Receive not UFEBS message"
+                sender.send(message)
+              end
+          end
+          sleep 1
+        end
+      rescue Exception => msg
+        puts "Ошибка! #{msg.message} #{msg.backtrace.join('\n')}"
+      ensure
+        receiver.close if receiver
+        sender.close if sender
+        session.close if session
+        connection.close if connection
+        Thread.current.kill
+      end
+    end
+    sleep 3
+    thread_get_core_message.kill
+    puts @core_in_message.first
+    @core_in_message.clear
+    puts @core_in_message.any?
+    puts @core_in_message.first
+=end
   end
 end
 

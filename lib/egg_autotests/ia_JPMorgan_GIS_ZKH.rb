@@ -20,6 +20,36 @@ class IA_JPMorgan_GIS_ZKH
     @expected_result = 'UpdateDate' # Текст, который должен быть в XML, если она успешна
   end
 
+  def change_transportguid(functional, transport_guid)
+    30.times do
+      $egg_integrator.core_in_ufebs_jpm.any? ? (break) : (sleep 1)
+    end
+    if $egg_integrator.core_in_ufebs_jpm.any?
+      xml_from_ia = $egg_integrator.core_in_ufebs_jpm.first[:body]
+      $log_egg.write_to_browser("Перехватили сообщение от ИА к ядру. CorrelationID: #{$egg_integrator.core_in_ufebs_jpm.first[:correlation_id]}")
+      $log_egg.write_to_log(functional, "Перехватили сообщение от ИА к ядру. CorrelationID: #{$egg_integrator.core_in_ufebs_jpm.first[:correlation_id]}", xml_from_ia)
+    else
+      $log_egg.write_to_browser("Сообщение не дошло до ядра")
+      $log_egg.write_to_log(functional, "Проверка сообщения в очереди core_sa", "Сообщение не дошло до ядра")
+      return
+      # count +=1
+      # next
+    end
+    if functional.include?('GIS_ZKH_Payment_Cancellation')
+      $egg_integrator.send_to_core($egg_integrator.core_in_ufebs_jpm.first[:body], $egg_integrator.core_in_ufebs_jpm.first[:correlation_id])
+      $log_egg.write_to_browser("Отправили сообщение в ядро без изменений")
+      $log_egg.write_to_log(functional, "Отправили сообщение в ядро без изменений", $egg_integrator.core_in_ufebs_jpm.first[:body])
+    else
+      decode_rexml_request = get_decode_core_request(xml_from_ia)
+      decode_rexml_request.root.add_element('gis:TransportGUID').text = transport_guid
+      xml_to_sa = get_encode_core_request(functional, xml_from_ia, decode_rexml_request.to_s)
+      $egg_integrator.send_to_core(xml_to_sa, $egg_integrator.core_in_ufebs_jpm.first[:correlation_id])
+      $log_egg.write_to_browser("Изменили в XML TransportGUID и отправили в ядро")
+      $log_egg.write_to_log(functional, "Изменили в XML TransportGUID и отправили в ядро", xml_to_sa)
+    end
+    $egg_integrator.core_in_ufebs_jpm.clear
+  end
+
   def payment
     sleep 1.5
     begin
@@ -43,6 +73,7 @@ class IA_JPMorgan_GIS_ZKH
         File.open("#{@dir_outbound}/#{xml_name}.xml", 'w'){ |file| file.write xml_rexml.to_s }
         $log_egg.write_to_browser("Положили запрос в каталог #{@dir_outbound}")
         $log_egg.write_to_log(functional, "Подкладываем запрос #{xml_name}.xml", "Положили запрос в каталог #{@dir_outbound}:\n#{xml_rexml.to_s}")
+        change_transportguid(functional, '00000000-0000-0000-0000-000000000000') # Перехватываем сообщение до ядра и меняем TransportGUID на значение из заглушки
         answer = get_file_body(@dir_inbound)
         if answer.size == 0
           @result["payment"] = "false"
@@ -97,6 +128,7 @@ class IA_JPMorgan_GIS_ZKH
         File.open("#{@dir_outbound}/#{xml_name}.xml", 'w'){ |file| file.write xml_rexml.to_s }
         $log_egg.write_to_browser("Положили запрос в каталог #{@dir_outbound}")
         $log_egg.write_to_log(functional, "Подкладываем запрос #{xml_name}.xml", "Положили запрос в каталог #{@dir_outbound}:\n#{xml_rexml.to_s}")
+        change_transportguid(functional, '00000000-0000-0000-0000-000000000000') # Перехватываем сообщение до ядра и меняем TransportGUID на значение из заглушки
         answer = get_file_body(@dir_inbound)
         if answer.size == 0
           @result["payment_cancellation"] = "false"

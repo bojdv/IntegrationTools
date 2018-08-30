@@ -3,6 +3,7 @@ class XmlSenderController < ApplicationController
     logged_in? ? @qm = QueueManager.where(user_id: current_user.id).or(QueueManager.where(visible_all: true)).order('manager_name').pluck(:manager_name) : @qm = QueueManager.where(visible_all: true).pluck(:manager_name)
     @product = Product.all.order('product_name')
     @category = Category.all.order(category_name: :asc)
+    @cat = Category.new
   end
 
   def create_xml

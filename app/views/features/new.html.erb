@@ -8,7 +8,7 @@
 <div class="container">
   <%= simple_form_for [@plan, @new_feature], remote: true, html: {class: 'form-group' } do |f| %>
     <%= f.input :name, :label => 'Название доработки' %>
-    <%= f.input :status, :label => 'Статус доработки', :required => false, :collection => ['Новая', 'В работе', 'Приемка ДЭИС', 'Готово'], selected: 1 %>
+    <%= f.input :status, :label => 'Статус доработки', :required => false, :collection => ['Новая', 'В работе', 'Приемка ДЭИС', 'Готово', 'Отменена'], selected: 1 %>
     <%= f.input :start_date, :label => 'Дата начала тестирования (план)', :required => false , :order => [:day, :month, :year]%>
     <%= f.input :end_date, :label => 'Дата окончания тестирования (план)', :required => false , :order => [:day, :month, :year], include_blank: true%>
     <%= f.input :labels, :label => 'Метка для задач', :placeholder => 'Например: eGG_java8' %>

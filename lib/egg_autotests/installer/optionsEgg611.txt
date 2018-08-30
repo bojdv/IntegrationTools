@@ -16,7 +16,7 @@ unattendedmodeui=minimalWithDialogs
 installdir=C:\EGG
 
 # устанавливаемые компоненты перечисляются через запятую
-enable-components=egg,DBcreate,ServiceMix,iaAmqComponent,saSpepComponent,saGmpComponent,iaFileGmpComponent,saZkhComponent,iaFileZkhComponent, saZkhPayeesComponent, iaFileMqGmpComponent,iaFileMqZkhComponent,saGmp20Component,saFnsEgripComponent,saFnsEgrulComponent
+enable-components=egg,DBcreate,ServiceMix,iaAmqComponent,saSpepComponent,saGmpComponent,iaFileGmpComponent,saZkhComponent,iaFileZkhComponent, saZkhPayeesComponent, iaFileMqGmpComponent,iaFileMqZkhComponent,saGmp20Component,saFnsEgripComponent,saFnsEgrulComponent,saEfrsbComponent
 # компоненты, установка которых не требуется, перечисляются через запятую
 disable-components=crypto,CryptoService,saEsiaComponent,saReestrFsspComponent,saUpridComponent
 
@@ -306,3 +306,13 @@ egg_gmp20_sendingTicket1012=true
 #fileUfebs_mq_gmp_inbox=C:\data\INAD_GISGMP_UFEBS\inbox
 #fileUfebs_mq_gmp_outbox=
 #fileUfebs_mq_gmp_backupbox=
+
+# saEfrsbComponent - СА Банкроты
+efrsb_efrsbService=http://test.fedresurs.ru/MessageService/WebService.svc
+efrsb_username=demowebuser
+efrsb_password=Ax!761BN
+efrsb_ValidateDocumentSA=true
+efrsb_timeout=60000
+efrsb_proxy_host=127.0.0.1
+efrsb_proxy_port=8080
+efrsb_use_proxy=false

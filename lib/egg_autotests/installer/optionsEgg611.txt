@@ -16,7 +16,7 @@ unattendedmodeui=minimalWithDialogs
 installdir=C:\EGG
 
 # устанавливаемые компоненты перечисляются через запятую
-enable-components=egg,DBcreate,ServiceMix,iaAmqComponent,saSpepComponent,saGmpComponent,iaFileGmpComponent,saZkhComponent,iaFileZkhComponent, saZkhPayeesComponent, iaFileMqGmpComponent,iaFileMqZkhComponent,saGmp20Component,saFnsEgripComponent,saFnsEgrulComponent,saEfrsbComponent
+enable-components=egg,DBcreate,ServiceMix,iaAmqComponent,saSpepComponent,saGmpComponent,iaFileGmpComponent,saZkhComponent,iaFileZkhComponent, saZkhPayeesComponent, iaFileMqGmpComponent,iaFileMqZkhComponent,saGmp20Component,saFnsEgripComponent,saFnsEgrulComponent,saEfrsbComponent,saEsiaSmev3Component
 # компоненты, установка которых не требуется, перечисляются через запятую
 disable-components=crypto,CryptoService,saEsiaComponent,saReestrFsspComponent,saUpridComponent
 
@@ -316,3 +316,29 @@ efrsb_timeout=60000
 efrsb_proxy_host=127.0.0.1
 efrsb_proxy_port=8080
 efrsb_use_proxy=false
+
+# saEsiaSmev3Component - СА ЕСИА СМЭВ3
+esia_smev3_SMEV3_ESIA=http://vm-itools:4085/SA_ESIA_SMEV3?WSDL
+esia_smev3_CryptoService=http://vm-eggcrypttest:9090/axis2/services/CryptoService
+esia_smev3_isCryptoLog=true
+esia_smev3_TestMessage=true
+esia_smev3_timer_period=10000
+esia_smev3_http_client=http4
+esia_smev3_deadLine=10
+esia_smev3_NodeID=node1
+esia_smev3_DeliverySchedule=1
+esia_smev3_NumberOfAttempts=5
+esia_smev3_isResponseLock=true
+esia_smev3_attachmentMode=true
+esia_smev3_CheckingSignature=none
+esia_smev3_CheckSignatureAttachment=none
+esia_smev3_CheckEPOV=none
+esia_smev3_CheckEPSP=none
+esia_smev3_sendingTicket1000=false
+esia_smev3_sendingTicket1012=true
+esia_smev3_SMEV3_ESIA_consumers=10
+esia_smev3_SMEV3_ESIA_SGD_consumers=10
+esia_smev3_SMEV3_ESIA_adapterId=amq-jms-iadp
+esia_smev3_SMEV3_ESIA_systemId=egg
+esia_smev3_SMEV3_ESIA_departmentId=egg
+esia_smev3_apply_to_all=true

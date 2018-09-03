@@ -23,7 +23,8 @@ class EggAutoTestsController < ApplicationController
                         'СА SPEP',
                         'СА ФНС ЕГРИП',
                         'СА ФНС ЕГРЮЛ',
-                        'СА EFRSB (Банкроты)']
+                        'СА EFRSB (Банкроты)',
+                        'СА ЕСИА СМЭВ3']
     @egg68_components = Array.new(@egg67_components)
     @egg68_components.push('ЕСИА')
     regex = /\A[6]{,1}[.](9|10|11|12|13){,2}[.][\d]{,3}[-][\w]{,8}\Z/

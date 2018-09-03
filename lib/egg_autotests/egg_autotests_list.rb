@@ -111,5 +111,17 @@ class EggAutotestsList
       sa_efrsb.searchPersonByInn
       sa_efrsb.searchPersonBySnils
     end
+    if components.include?('СА ЕСИА СМЭВ3')
+      sa_esia_smev3 = SA_ESIA_SMEV3.new(@pass_menu_color, @fail_menu_color, @not_find_xml, @not_receive_answer, @egg_version, @try_count, @db_username)
+      sa_esia_smev3.request_Confirm
+      sa_esia_smev3.request_DELETE_ACCOUNT
+      sa_esia_smev3.request_FIND_ACCOUNT
+      sa_esia_smev3.request_RECOVER
+      sa_esia_smev3.request_REGISTER
+      sa_esia_smev3.request_REGISTER_BY_SIMPLIFIED
+      sa_esia_smev3.request_REGISTER_CERTIFICATE
+      sa_esia_smev3.request_REGISTER_CHILD
+      sa_esia_smev3.request_UPRID
+    end
   end
 end

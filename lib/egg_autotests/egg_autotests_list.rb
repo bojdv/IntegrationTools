@@ -15,6 +15,7 @@ require_dependency "#{Rails.root}/lib/egg_autotests/sa_SPEP"
 require_dependency "#{Rails.root}/lib/egg_autotests/sa_FNS_EGRIP"
 require_dependency "#{Rails.root}/lib/egg_autotests/SA_FNS_EGRUL"
 require_dependency "#{Rails.root}/lib/egg_autotests/SA_EFRSB"
+require_dependency "#{Rails.root}/lib/egg_autotests/SA_ESIA_SMEV3"
 
 class EggAutotestsList
 

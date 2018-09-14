@@ -536,19 +536,47 @@ END;})
   end
 
   def change_smevmessageid(xml_rexml, smev_id, db_user, functional) # метод меняет id для запросов в СМЭВ3
-    process_id = xml_rexml.elements["//mq:RequestMessage"].attributes["processID"]
     begin
+      process_id = xml_rexml.elements["//mq:RequestMessage"].attributes["processID"]
       url = "jdbc:oracle:thin:@vm-corint:1521:corint"
       connection = java.sql.DriverManager.getConnection(url, db_user, db_user);
       stmt = connection.create_statement
       result = 0
+      count = 30
       while result == 0 # 0, if no rows are affected by the operation.
         result = stmt.executeUpdate("UPDATE EGG_SMEV3_CONTEXT SET SMEVMESSAGEID = '#{smev_id}' WHERE PROCESSID = '#{process_id}'")
         sleep 1
+        puts count -=1
+        return nil if count == 0
       end
     rescue Exception => msg
       $log_egg.write_to_browser("Ошибка! #{msg}")
-      $log_egg.write_to_log(@end_test_message, "Ошибка при копировании логов", "Ошибка! #{msg}\n#{msg.backtrace.join("\n")}")
+      $log_egg.write_to_log(@end_test_message, "Ошибка при замене SMEVMESSAGEID", "Ошибка! #{msg}\n#{msg.backtrace.join("\n")}")
+    ensure
+      stmt.close if stmt
+      connection.close if connection
+    end
+    $log_egg.write_to_browser("Заменили id в SMEVMESSAGEID на #{smev_id}")
+    $log_egg.write_to_log(functional, "Заменили id в SMEVMESSAGEID", "UPDATE EGG_SMEV3_CONTEXT SET SMEVMESSAGEID = '#{smev_id}' WHERE PROCESSID = '#{process_id}'")
+  end
+
+  def change_smevmessageid_gis_gmp(xml_rexml, smev_id, db_user, functional) # метод меняет id для запросов ГИС ГМП в СМЭВ3
+    begin
+      process_id = xml_rexml.elements["//mq:RequestMessage"].attributes["processID"]
+      url = "jdbc:oracle:thin:@vm-corint:1521:corint"
+      connection = java.sql.DriverManager.getConnection(url, db_user, db_user);
+      stmt = connection.create_statement
+      result = 0
+      count = 60
+      while result == 0 # 0, if no rows are affected by the operation.
+        result = stmt.executeUpdate("UPDATE FK_SMEV3 SET SMEVMESSAGEID = '#{smev_id}' WHERE PROCESSID = '#{process_id}'")
+        sleep 0.5
+        puts count -=1
+        return nil if count == 0
+      end
+    rescue Exception => msg
+      $log_egg.write_to_browser("Ошибка! #{msg}")
+      $log_egg.write_to_log(@end_test_message, "Ошибка при замене SMEVMESSAGEID", "Ошибка! #{msg}\n#{msg.backtrace.join("\n")}")
     ensure
       stmt.close if stmt
       connection.close if connection

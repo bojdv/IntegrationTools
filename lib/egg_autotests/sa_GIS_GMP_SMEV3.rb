@@ -16,7 +16,7 @@ class SA_GIS_GMP_SMEV3
     @functional = "Проверка СА ГИС ГМП СМЭВ3"
   end
 
-  def Payment_new
+  def payment_new
     sleep 1.5
     begin
       count = 1
@@ -84,7 +84,7 @@ class SA_GIS_GMP_SMEV3
     end
   end
 
-  def Payment_refinement
+  def payment_refinement
     sleep 1.5
     begin
       count = 1
@@ -152,7 +152,7 @@ class SA_GIS_GMP_SMEV3
     end
   end
 
-  def Payment_cancellation
+  def payment_cancellation
     sleep 1.5
     begin
       count = 1
@@ -220,7 +220,7 @@ class SA_GIS_GMP_SMEV3
     end
   end
 
-  def Charges
+  def charges
     sleep 1.5
     begin
       count = 1
@@ -243,7 +243,7 @@ class SA_GIS_GMP_SMEV3
         $log_egg.write_to_log(functional, "Валидация исходящей XML", "Валидируем XML для запроса:\n#{xml.xml_name}\nПо XSD:\n #{xsd}")
         validate_egg_xml(xsd, xml_rexml.to_s, functional)
         if send_to_amq_egg(@manager, xml_rexml.to_s, functional)
-          change_smevmessageid_gis_gmp(xml_rexml, '93c40542-657b-11e8-b6ef-005056b644cd', @db_username, functional)
+          change_smevmessageid(xml_rexml, '93c40542-657b-11e8-b6ef-005056b644cd', @db_username, functional)
           answer = receive_from_amq_egg(@manager, functional, true, 80)
         end
         if answer.nil? # Если ответ от ЕГГ пустой, начинаем цикл заново

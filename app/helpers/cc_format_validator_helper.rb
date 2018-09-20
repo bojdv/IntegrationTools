@@ -49,6 +49,8 @@ module CcFormatValidatorHelper
       case(@xml_doc_type)
         when 'PayDocRu'
           xsd = Nokogiri::XML::Schema(File.read("C:/correqts_xsd/corporate/integration_gate/Платежное поручение.xsd"))
+        when 'StateRequest'
+          xsd = Nokogiri::XML::Schema(File.read("C:/correqts_xsd/corporate/integration_gate/Запрос статуса.xsd"))
         when 'CurrBuy'
           xsd = Nokogiri::XML::Schema(File.read("C:/correqts_xsd/corporate/integration_gate/Поручение на покупку валюты.xsd"))
         when 'CurrSell'
@@ -229,7 +231,11 @@ module CcFormatValidatorHelper
           when 'StateResponse'
             xml_rexml.elements['//createTime'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
             xml_rexml.elements['//operationDate'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
-            xml_rexml.elements['//docType'].text = @xml_doc_type
+            if @xml_doc_type == 'StateRequest'
+              xml_rexml.elements['//docType'].text = @xml.elements["//docType"].text
+            else
+              xml_rexml.elements['//docType'].text = @xml_doc_type
+            end
             xml_rexml.elements['//state'].text = status
             xml_rexml.elements['//docId'].text = @xml.elements["//docId"].text
             xml_rexml.elements['//bankMessage'].text = message
@@ -278,6 +284,7 @@ module CcFormatValidatorHelper
             xml_rexml.elements['//docDate'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
             xml_rexml.elements['//lastModifyDate'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
             xml_rexml.elements['//statementDate'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
+            xml_rexml.elements['//fileContent'].text = Base64.encode64(message)
           when 'SystemCreditsResponse'
             xml_rexml.elements['//branchId'].text = @xml.elements["//branchId"].text
             xml_rexml.elements['//creditLoadRequestId'].text = @xml.elements["//docId"].text

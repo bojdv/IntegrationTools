@@ -1,15 +1,15 @@
 require 'zip'
 module EggAutoTestsHelper
-
+  
   class Logger_egg # Класс логирования в браузер и БД
-
+    
     def initialize
       @log_egg = Hash.new # Переменная класса, пустой хэш. В него пишется весь лог.
       @log_dir = "#{Rails.root}/log/egg_log/#{Time.now.strftime('%Y-%m-%d(%H-%M-%S)')}" # Переменная с именем каталога для логов, имя генерится с текущим временем.
       Dir.mkdir @log_dir # Создаем каталог для логов
     end
     attr_accessor :log_egg, :log_dir # Создаются методы для доступа к переменным класса на чтение и запись.
-
+    
     def write_to_log(functional, action, result = '') # Метод для записи в лог html.
       # Параметры: functional - Корневое имя теста, action - действие (левая колонка в логе), result - результат (правая колонка в логе), его можно не указывать при вызове.
       if @log_egg.has_key?(functional) # Если хэш уже содержит ключ с именем такого теста, то делаем из этого ключа хэш с ключом action и значением result
@@ -18,7 +18,7 @@ module EggAutoTestsHelper
         @log_egg[functional] = {action => result}
       end
     end
-
+    
     def write_to_browser(text) # Метод для записи текста в лог браузера. text - текст сообщения
       if text.include?('--') # Если в тексте есть тире, то вставляем в лог разделитель. это сделано, если вызов идет из метода puts_line_egg
         $browser_egg[:message] += "#{text}\n"
@@ -26,7 +26,7 @@ module EggAutoTestsHelper
         $browser_egg[:message] += "[#{Time.now.strftime('%H:%M:%S')}]: #{text}\n" # Вставляем временную метку перед текстом и сам текст
       end
     end
-
+    
     def make_log # Метод формирующий  файл лога
       log_file_name = "log_egg_autotests_#{Time.now.strftime('%Y-%m-%d(%H-%M-%S)')}.html" # формируем имя файла
       template = File.read("#{Rails.root}/lib/egg_autotests/logs/log_template.html.erb") # читаем шаблон для лога
@@ -50,13 +50,13 @@ module EggAutoTestsHelper
       return zipfile_name, zipfile_path
     end
   end
-
+  
   def response_ajax_auto_egg(text, time = 3000)
     respond_to do |format|
       format.js {render :js => "open_modal(#{text.inspect}, #{time.inspect}); kill_listener_egg();"}
     end
   end
-
+  
   def end_test_egg(startTime = false)
     begin
       endTime = Time.now
@@ -78,7 +78,7 @@ module EggAutoTestsHelper
       end
     end
   end
-
+  
   def end_auto_test_egg(startTime = false, build_version)
     begin
       endTime = Time.now
@@ -124,7 +124,7 @@ module EggAutoTestsHelper
       puts "#{msg.to_s}"
     end
   end
-
+  
   def send_to_amq_egg(manager, xml, functional) # Отправка сообщений в Active MQ по протоколу OpenWire.
     # manager - объект менеджера очередей, xml - объект XML сообщения или класса REXML, functional - имя теста, ignore_ticket - игнорирование промежуточного тикета, count - время ожидания
     # Метод возвращает текст XML сообщения, полученного от ЕГГ
@@ -161,7 +161,7 @@ module EggAutoTestsHelper
       connection.close if connection
     end
   end
-
+  
   def receive_from_amq_egg(manager, functional, ignore_ticket = false, counter = 60) # Получение сообщений из Active MQ по протоколу OpenWire
     java_import 'org.apache.activemq.ActiveMQConnectionFactory'
     java_import 'javax.jms.Session'
@@ -217,25 +217,25 @@ module EggAutoTestsHelper
       connection.close if connection
     end
   end
-
+  
   def colorize_egg(egg_version, functional, color) # Метод окраски сообщений. Аргументы - версия ЕГГ, имя меню, цвет
     $browser_egg[:event] = 'colorize_egg'
     $browser_egg[:egg_version] = egg_version
     $browser_egg[:functional] = functional
     $browser_egg[:color] = color
   end
-
+  
   def puts_line_egg # Метод, который вставляет в лог браузера пунктирную линию
     return '--'*40
   end
-
+  
   def puts_time_egg(startTime, endTime)
     dif = (endTime-startTime).to_i.abs
     min = dif/1.minutes
     $log_egg.write_to_browser("Завершили проверку в #{Time.now.strftime('%H-%M-%S')} за: #{min} мин, #{dif-(min*1.minutes)} сек")
     $log_egg.write_to_log(@end_test_message, "Завершили проверку", "Завершили проверку в #{Time.now.strftime('%H-%M-%S')} за: #{min} мин, #{dif-(min*1.minutes)} сек")
   end
-
+  
   def dir_empty_egg?(egg_dir)
     begin
       $log_egg.write_to_browser("Проверка наличия каталога '#{egg_dir}'")
@@ -262,7 +262,7 @@ module EggAutoTestsHelper
       return true
     end
   end
-
+  
   def delete_db_egg(functional)
     java_import 'oracle.jdbc.OracleDriver'
     java_import 'java.sql.DriverManager'
@@ -292,7 +292,7 @@ END;})
     $log_egg.write_to_browser("Удалили БД '#{@db_username}'")
     $log_egg.write_to_log(functional, "Результат удаления БД '#{@db_username}'", "Done!")
   end
-
+  
   def start_servicemix_egg(dir)
     $log_egg.write_to_browser("Запускаем Servicemix...")
     $log_egg.write_to_log(@run_test_message, "Запускаем Servicemix...", "Ждем окончания запуска eGG")
@@ -322,7 +322,7 @@ END;})
       stop_servicemix_egg
     end
   end
-
+  
   def stop_servicemix_egg(dir = false)
     $log_egg.write_to_log(@end_test_message, "Останавливаем Servicemix...", "Ждем окончания остановки eGG")
     $log_egg.write_to_browser("Останавливаем Servicemix...")
@@ -350,7 +350,7 @@ END;})
     $log_egg.write_to_log(@end_test_message, "Результат остановки Servicemix", "Done! Остановили Servicemix...")
     $log_egg.write_to_browser("Done! Остановили Servicemix...")
   end
-
+  
   def ping_server_egg(host)
     begin
       uri = URI.parse(host)
@@ -361,7 +361,7 @@ END;})
       return false
     end
   end
-
+  
   def get_decode_answer(xml) # Метод, который получает текст XML и возвращает раскодированный текст тега '//mq:Answer'
     response = Document.new(xml)
     answer = response.elements['//mq:Answer'].text
@@ -369,7 +369,7 @@ END;})
     answer_decode = answer_decode.force_encoding("utf-8")
     return answer_decode
   end
-
+  
   def get_decode_request(xml) # Тоже, что и get_decode_answer
     request = Document.new(xml)
     answer = request.elements['//mq:Request'].text
@@ -377,7 +377,7 @@ END;})
     answer_decode = answer_decode.force_encoding("utf-8")
     return answer_decode
   end
-
+  
   def get_decode_core_request(xml) # Тоже, что и get_decode_answer
     request = Document.new(xml)
     answer = request.elements['//tns:request'].text
@@ -385,7 +385,7 @@ END;})
     answer_decode = answer_decode.force_encoding("utf-8")
     return Document.new(answer_decode)
   end
-
+  
   def get_encode_core_request(functional, xml, request)
     # Метод, который получает XML и запрос (tns:request) и вставляет в него закодированный запрос
     # xml - конверт с типом строка
@@ -395,7 +395,7 @@ END;})
     xml_from_ia_rexml.elements['//tns:request'].text = Base64.encode64(request)
     return xml_from_ia_rexml.to_s
   end
-
+  
   def get_encode_request(xml) # Метод, который получает XML для запроса и возвращает закодированный тег '//mq:Answer'
     request = Document.new(xml)
     answer = request.elements['//mq:Answer'].text
@@ -405,7 +405,7 @@ END;})
     $log_egg.write_to_browser("Закодировали запрос!")
     return answer_decode
   end
-
+  
   def validate_egg_xml(xsd_in, xml, functional) # Метод валидации по XSD. xsd_in - путь к XSD, xml - текст XML, functional - название теста
     # Ничего не возвращает, а только пишет в лог результат
     begin
@@ -430,7 +430,7 @@ END;})
       $log_egg.write_to_log("Валидация XML по XSD", "Ошибка при валидации по XSD#{a}", "Ошибка при валидации по XSD #{xsd_in}: #{msg}")
     end
   end
-
+  
   def get_file_body(dir)
     body = String.new
     count = 80 # Ожидание ответа в секундах
@@ -450,7 +450,7 @@ END;})
     end
     return body
   end
-
+  
   def ufebs_file_count(functional, packetepd = false, gis_type = 'gis_gmp') # Метод, который возвращает кол-во полученных из УФЭБС файлов
     # functional - название тест, packetepd - признак, что это запрос packetepd, gis_type - тип адаптера, по умолчанию ГИС ГМП
     case gis_type # Анализируем тип адаптера и соответственно выбираем каталог, куда класть файлы
@@ -519,7 +519,7 @@ END;})
     end
     return adps000_count, adps001_count # Возвращаем кол-во файлов с каждым статусом
   end
-
+  
   def download_installer_egg(build_version) # Качаем сборку с ftp
     $log_egg.write_to_browser("Скачиваем инсталлятор eGG #{build_version}...")
     $log_egg.write_to_log(@run_test_message, "Скачиваем инсталлятор eGG #{build_version}...", "Запустили задачу в #{Time.now.strftime('%H-%M-%S')}")
@@ -534,7 +534,7 @@ END;})
       $log_egg.write_to_log(@run_test_message, "Ошибка при скачивании инсталлятора", "Ошибка! #{msg}. #{msg.backtrace.join("\n")}")
     end
   end
-
+  
   def copy_installer_egg # Копируем сборку в каталог C:\EGG_Installer
     $log_egg.write_to_browser("Копируем инсталлятор...")
     $log_egg.write_to_log(@run_test_message, "Копируем инсталлятор...", "Запустили задачу в #{Time.now.strftime('%H-%M-%S')}")
@@ -550,7 +550,7 @@ END;})
       $log_egg.write_to_log(@run_test_message, "Ошибка при копировании инсталлятора", "Ошибка! #{msg}")
     end
   end
-
+  
   def egg_log_include?(egg_dir, text)
     log_path = "#{egg_dir}\\apache-servicemix-6.1.2\\data\\log\\servicemix.log"
     begin
@@ -561,7 +561,7 @@ END;})
       return false
     end
   end
-
+  
   def copy_egg_files
     begin
       FileUtils.cp_r("C:/EGG/apache-servicemix-6.1.2/data/log/.", $log_egg.log_dir) # копируем лог сервисмикса
@@ -572,7 +572,7 @@ END;})
       $log_egg.write_to_log(@end_test_message, "Ошибка при копировании логов", "Ошибка! #{msg}\n#{msg.backtrace.join("\n")}")
     end
   end
-
+  
   def insert_inn(db_user) # Метод вставляет в таблицу zkh_inn запись с поставщиком для тестов. Ничего не возвращает.
     begin
       url = "jdbc:oracle:thin:@vm-corint:1521:corint"
@@ -588,7 +588,7 @@ END;})
       connection.close if connection
     end
   end
-
+  
   def change_smevmessageid(xml_rexml, smev_id, db_user, functional) # метод меняет id для запросов в СМЭВ3
     begin
       process_id = xml_rexml.elements["//mq:RequestMessage"].attributes["processID"]
@@ -613,7 +613,7 @@ END;})
       connection.close if connection
     end
   end
-
+  
   def change_smevmessageid_gis_gmp(xml_rexml, smev_id, db_user, functional, ufebs = false) # метод меняет id для запросов ГИС ГМП в СМЭВ3
     begin
       if ufebs
@@ -624,30 +624,28 @@ END;})
       url = "jdbc:oracle:thin:@vm-corint:1521:corint"
       connection = java.sql.DriverManager.getConnection(url, db_user, db_user);
       stmt = connection.create_statement
-      result = false
-      count = 60
-      while result == false # if no rows are affected by the operation.
-        select = <<-query
-          UPDATE FK_SMEV3 SET SMEVMESSAGEID = '#{smev_id}' WHERE PROCESSID = '#{process_id}' 
-          query
-        result = stmt.execute(select)
-        puts result
-        puts count -=1
-        if result = true
-          puts Time.now.strftime('%Y-%m-%dT%H:%M:%S')
-          rs = stmt.execute_query("select DATECREATE, SMEVMESSAGEID from FK_SMEV3 WHERE PROCESSID = '#{process_id}'")
-          while (rs.next()) do
-            puts rs.getString('DATECREATE')
-            puts rs.getString('SMEVMESSAGEID')
+      row_updated = 0
+      count = 30
+      while row_updated.zero?
+        rs = stmt.executeQuery("select SMEVMESSAGEID from FK_SMEV3 WHERE PROCESSID = '#{process_id}'")
+        if rs.isBeforeFirst()
+          while rs.next() do
+            check_null = rs.getString('SMEVMESSAGEID')
           end
-          $log_egg.write_to_browser("Заменили id в SMEVMESSAGEID на #{smev_id}")
-          $log_egg.write_to_log(functional, "Заменили id в SMEVMESSAGEID", "UPDATE EGG_SMEV3_CONTEXT SET SMEVMESSAGEID = '#{smev_id}' WHERE PROCESSID = '#{process_id}'")
+          if check_null
+            row_updated = stmt.executeUpdate("UPDATE FK_SMEV3 SET SMEVMESSAGEID = '#{smev_id}' WHERE PROCESSID = '#{process_id}'")
+            if row_updated == 1
+              $log_egg.write_to_browser("Заменили id в SMEVMESSAGEID на #{smev_id}")
+              $log_egg.write_to_log(functional, "Заменили id в SMEVMESSAGEID", "UPDATE EGG_SMEV3_CONTEXT SET SMEVMESSAGEID = '#{smev_id}' WHERE PROCESSID = '#{process_id}'")
+            end
+          end
         end
         if count == 0
           $log_egg.write_to_browser("Не заменили id в SMEVMESSAGEID")
           $log_egg.write_to_log(functional, "Не заменили id в SMEVMESSAGEID", "UPDATE EGG_SMEV3_CONTEXT SET SMEVMESSAGEID = '#{smev_id}' WHERE PROCESSID = '#{process_id}'")
           return nil
         end
+        puts count -=1
         sleep 0.5
       end
     rescue Exception => msg
@@ -658,7 +656,7 @@ END;})
       connection.close if connection
     end
   end
-
+  
   # def change_correlationid(xml_rexml, correlation_id, db_user, functional) # метод меняет id для запросов в УФЭБС
   #   request_EDAuthor = xml_rexml.root.attributes['EDAuthor']
   #   begin
@@ -672,7 +670,7 @@ END;})
   #   end
   #   $log_egg.write_to_log(functional, "Заменили id в EGG_FILE_ADAPTER_MCICB", "UPDATE EGG_FILE_ADAPTER_MCICB SET CORRELATION_ID = '#{correlation_id}' WHERE EDAUTHOR = '#{request_EDAuthor}'")
   # end
-
+  
   def get_installer_config(build_version)
     case # Определяем название файла с конфигом инсталлятора
       when build_version.include?('6.9')
@@ -685,7 +683,7 @@ END;})
         "optionsEgg69.txt"
     end
   end
-
+  
   def copy_core_config
     begin
       config = <<-EOF
@@ -713,7 +711,7 @@ queue_core_ia_consumers=5
       return false
     end
   end
-
+  
   class EggCoreIntegrator
     def initialize
       java_import 'org.apache.activemq.ActiveMQConnectionFactory'
@@ -726,9 +724,9 @@ queue_core_ia_consumers=5
       @manager = QueueManager.find_by_manager_name('iTools[EGG]')
       start_core_in_listener # Запускаем прослушку входной очереди ядра
     end
-
+    
     attr_accessor :core_in_ufebs_gmp, :core_in_ufebs_zkh, :core_in_ufebs_jpm, :core_in_ufebs_gmp_smev3
-
+    
     def start_core_in_listener
       @thread_get_core_message = Thread.new do
         begin
@@ -776,7 +774,7 @@ queue_core_ia_consumers=5
         end
       end
     end
-
+    
     # def start_core_out_listener # не используется
     #   @thread_get_core_message = Thread.new do
     #     begin
@@ -814,15 +812,15 @@ queue_core_ia_consumers=5
     #     end
     #   end
     # end
-
+    
     def stop_core_in_listener
       @thread_get_core_message.kill
     end
-
+    
     def core_in_listener_live?
       @thread_get_core_message.alive?
     end
-
+    
     def send_to_core(xml, correlation_id)
       begin
         factory = ActiveMQConnectionFactory.new
@@ -844,7 +842,7 @@ queue_core_ia_consumers=5
         connection.close if connection
       end
     end
-
+    
     def get_ufebs_xml_from_ia
       20.times do
         $egg_integrator.core_in_ufebs_gmp.any? ? (break) : (sleep 1)

@@ -174,7 +174,9 @@ class EggAutoTestsController < ApplicationController
                             'СА ФНС ЕГРИП',
                             'СА ФНС ЕГРЮЛ',
                             'СА EFRSB (Банкроты)',
-                            'СА ЕСИА СМЭВ3']
+                            'СА ЕСИА СМЭВ3',
+                            'СА ГИС ГМП СМЭВ3',
+                            'ИА УФЭБС (ГИС ГМП СМЭВ3)']
                          else
                            ['ИА Active MQ',
                             'ИА УФЭБС (ГИС ГМП)',
@@ -292,32 +294,30 @@ class EggAutoTestsController < ApplicationController
   end
   
   def tester
-    require 'mail'
     begin
-      options = { :address              => "postman.bssys.com",
-                  :port                 => 25,
-                  :authentication       => 'plain',
-                  :openssl_verify_mode => "none",
-                  :enable_starttls_auto => true}
-      mail = Mail.new do
-        from     'iTools@bssys.com'
-        to       ['a.pekhov@bssys.com', 'a.pekhov@bssys.com']
-        subject  "Результаты прохождения автотестов"
-        body     "Выполнены автотесты на новой сборке ЕГГ . Отчет прикреплен к письму."
+      url = "jdbc:oracle:thin:@vm-corint:1521:corint"
+      connection = java.sql.DriverManager.getConnection(url, 'egg_autotest2', 'egg_autotest2');
+      stmt = connection.create_statement
+      # select = <<-query
+      #     UPDATE FK_SMEV3 SET SMEVMESSAGEID = '888' WHERE PROCESSID = 'dc7de387-d39b-43fa-a3aa-5aeeade26ee1'
+      # query
+      connection.setAutoCommit(false)
+      rs = stmt.executeQuery("select SMEVMESSAGEID from FK_SMEV3 WHERE PROCESSID = '8cd8b2f2-93b5-4b0b-8678-70b31b52c3cf'")
+      connection.commit()
+      if rs.isBeforeFirst()
+        while rs.next() do
+          a = rs.getString('SMEVMESSAGEID')
+          puts a.nil?
+          puts "a = #{a}"
+        end
       end
-      mail.delivery_method :smtp, options
-      mail.deliver
-      puts "Send Email"
     rescue Exception => msg
-      puts "#{msg.to_s}"
+      puts '2'
+      puts "Ошибка! #{msg}\n#{msg.backtrace.join("\n")}"
+    ensure
+      stmt.close if stmt
+      connection.close if connection
     end
-    sleep 3
-    thread_get_core_message.kill
-    puts @core_in_message.first
-    @core_in_message.clear
-    puts @core_in_message.any?
-    puts @core_in_message.first
-=end
   end
 end
 

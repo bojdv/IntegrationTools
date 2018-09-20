@@ -32,7 +32,7 @@ class CcFormatValidatorController < ApplicationController
             elsif !validate_result.empty? and check_etalon_result.any?
               validator.make_answer('DECLINED_BY_ABS', "\nРезультат валидации: \n#{validate_result}\nРезультат проверки наличия эталонных элементов:\nЭти элементы отсутствуют в xml: #{check_etalon_result.join(',')}\n")
             end
-            validator.send_to_amq_openwire(answer)
+            validator.send_to_amq_openwire(answer) unless answer.nil?
           rescue Exception => msg
             puts "Error! #{msg.message}\n#{msg.backtrace.join("\n")}"
           end
@@ -51,6 +51,31 @@ class CcFormatValidatorController < ApplicationController
   end
 
   def tester
-    puts $thread.alive?
+    puts Xml.find_by_xml_name('PayRequestIn')
+    
+#     xml = <<-EOF
+#     <?xml version="1.0" encoding="UTF-8"?>
+# <tns:AnswerMessage xmlns:tns="MQMessage" processID="ID_#id#"
+#                    serviceID="GIS_GMP_1.16_Charges"
+#                    systemID="Correqts"
+#                    departmentID="0">
+#     <tns:Parameters>
+#         <tns:Parameter Key="docType" Value="positiveResponse"/>
+#         <tns:Parameter Key="EPOVCheckResult" Value="Valid"/>
+#         <tns:Parameter Key="CaseNumber" Value="ID_#id#"/>
+#         <tns:Parameter Key="timeStamp" Value="#dateTime#"/>
+#         <tns:Parameter Key="responseId" Value="u_#UUID#"/>
+#         <tns:Parameter Key="senderIdentifier" Value="950000"/>
+#         <tns:Parameter Key="rqId" Value="ID_ID_#id#"/>
+#         <tns:Parameter Key="correlationID" Value="#UUID#"/>
+#         <tns:Parameter Key="departmentID" Value="0"/>
+#         <tns:Parameter Key="queue_name" Value="GIS_GMP.OUT"/>
+#         <tns:Parameter Key="hasMore" Value="false"/>
+#         <tns:Parameter Key="parentID" Value="#id#"/>
+#     </tns:Parameters>
+# </tns:AnswerMessage>
+#     EOF
+#     xml = Document.new(xml)
+#     puts xml.elements['//tns:Parameter[1]'].attributes['Value']
   end
 end

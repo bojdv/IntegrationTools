@@ -126,7 +126,7 @@
       <li class="nav-item">
         <a class="nav-link active" id="777" data-toggle="tab" href="#Main" role="tab" aria-controls="output" aria-selected="true">Общая статистика</a>
       </li>
-      <% @show_plan.features.each do |f| %>
+      <% @show_plan.features.sort_by(&:created_at).each do |f| %>
         <li class="nav-item">
           <a class="nav-link" id="<%=f.id%>" data-toggle="tab" href="#id<%=f.id%>" role="tab" aria-controls="output" aria-selected="false"><%=f.name%></a>
         </li>

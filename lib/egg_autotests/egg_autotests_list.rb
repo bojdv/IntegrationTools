@@ -31,10 +31,10 @@ class EggAutotestsList
     @db_username = db_username # имя схемы Oracle на которую ставится БД еГГ
     @build_version = build_version
     case # Определяем версию форматов по версии сборки
-      when build_version.include?('6.9')
-        @ufebs_version = '2018.2.2' #\app\smx\resourceapp.war\wsdl\XSD\CBR\х\ed\cbr_ed101_vх.xsd
+      when build_version.include?('6.10')
+        @ufebs_version = '2018.3.2' #\app\smx\resourceapp.war\wsdl\XSD\CBR\х\ed\cbr_ed101_vх.xsd
       else
-        @ufebs_version = '2018.3.2'
+        @ufebs_version = '2018.4.1'
     end
 
   end

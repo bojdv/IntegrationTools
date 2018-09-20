@@ -47,7 +47,7 @@ module EggAutoTestsHelper
       FileUtils.rm Dir.glob("#{@log_dir}/*.html")
       FileUtils.rm Dir.glob("#{@log_dir}/*.txt")
       FileUtils.rm Dir.glob("#{@log_dir}/*.1")
-      return zipfile_name
+      return zipfile_name, zipfile_path
     end
   end
 
@@ -61,8 +61,10 @@ module EggAutoTestsHelper
     begin
       endTime = Time.now
       puts_time_egg(startTime, endTime) if startTime
-      until $browser_egg[:message].empty? && $browser_egg[:event].empty?
+      count = 20
+      until ($browser_egg[:message].empty? and $browser_egg[:event].empty?) or count < 0
         sleep 0.5
+        count -=1
       end
       log_file_name = $log_egg.make_log
     rescue Exception => msg
@@ -70,9 +72,56 @@ module EggAutoTestsHelper
       $log_egg.write_to_browser("Ошибка! #{msg}")
       $log_egg.write_to_log(@end_test_message, "Ошибка при завершении тестов:", "#{msg.backtrace.join("\n")}")
     ensure
+      $status_egg_tests = false
       respond_to do |format|
-        format.js { render :js => "kill_listener_egg(); download_link_egg('#{log_file_name}')" }
+        format.js { render :js => "kill_listener_egg(); download_link_egg('#{log_file_name[0]}')" }
       end
+    end
+  end
+
+  def end_auto_test_egg(startTime = false, build_version)
+    begin
+      endTime = Time.now
+      puts_time_egg(startTime, endTime) if startTime
+      count = 10
+      until ($browser_egg[:message].empty? and $browser_egg[:event].empty?) or count > 0
+        sleep 0.5
+        count -=1
+      end
+      log_file_path = $log_egg.make_log
+      puts log_file_path[1]
+      send_email(log_file_path[1], build_version)
+    rescue Exception => msg
+      puts msg.backtrace.join("\n")
+      $log_egg.write_to_log(@end_test_message, "Ошибка при завершении тестов:", "#{msg.backtrace.join("\n")}")
+    ensure
+      $status_egg_tests = false
+      respond_to do |format|
+        format.js { render :js => "kill_listener_egg();" }
+      end
+    end
+  end
+  
+  def send_email(attachment, build_version)
+    require 'mail'
+    begin
+      options = { :address              => "postman.bssys.com",
+                  :port                 => 25,
+                  :authentication       => 'plain',
+                  :openssl_verify_mode => "none",
+                  :enable_starttls_auto => true}
+      mail = Mail.new do
+        from     'iTools@bssys.com'
+        to       ['a.pekhov@bssys.com', 'd.bojko@bssys.com', 'A.Shpinko@bssys.com']
+        subject  "[#{build_version}] Результаты прохождения автотестов"
+        body     "Выполнены автотесты на новой сборке ЕГГ #{build_version}. Отчет прикреплен к письму."
+        add_file attachment
+      end
+      mail.delivery_method :smtp, options
+      mail.deliver
+      puts "Send Email"
+    rescue Exception => msg
+      puts "#{msg.to_s}"
     end
   end
 
@@ -280,7 +329,7 @@ END;})
     Dir.chdir "#{dir}\\apache-servicemix-6.1.2\\bin"
     @servicemix_stop_thread_egg = Thread.new do
       sleep 1
-      system('servicemix.bat stop')
+      system('stop.bat')
     end
     sleep 5
     @kill_cmd_thread_egg = Thread.new do
@@ -466,15 +515,15 @@ END;})
     return adps000_count, adps001_count # Возвращаем кол-во файлов с каждым статусом
   end
 
-  def download_installer_egg # Качаем сборку с ftp
-    $log_egg.write_to_browser("Скачиваем инсталлятор eGG #{tests_params_egg[:build_version]}...")
-    $log_egg.write_to_log(@run_test_message, "Скачиваем инсталлятор eGG #{tests_params_egg[:build_version]}...", "Запустили задачу в #{Time.now.strftime('%H-%M-%S')}")
+  def download_installer_egg(build_version) # Качаем сборку с ftp
+    $log_egg.write_to_browser("Скачиваем инсталлятор eGG #{build_version}...")
+    $log_egg.write_to_log(@run_test_message, "Скачиваем инсталлятор eGG #{build_version}...", "Запустили задачу в #{Time.now.strftime('%H-%M-%S')}")
     begin
       ftp = Net::FTP.new('10.1.1.163')
       ftp.login
-      ftp.chdir("build-release/egg-installer/#{tests_params_egg[:build_version]}")
+      ftp.chdir("build-release/egg-installer/#{build_version}")
       ftp.passive = true
-      ftp.getbinaryfile("egg-installer-#{tests_params_egg[:build_version]}-installer-windows.exe", localfile = File.basename(@build_file_egg))
+      ftp.getbinaryfile("egg-installer-#{build_version}-installer-windows.exe", localfile = File.basename(@build_file_egg))
     rescue Exception => msg
       $log_egg.write_to_browser("Ошибка! #{msg}")
       $log_egg.write_to_log(@run_test_message, "Ошибка при скачивании инсталлятора", "Ошибка! #{msg}. #{msg.backtrace.join("\n")}")
@@ -510,8 +559,8 @@ END;})
 
   def copy_egg_files
     begin
-      FileUtils.cp_r("#{tests_params_egg[:egg_dir]}/apache-servicemix-6.1.2/data/log/.", $log_egg.log_dir) # копируем лог сервисмикса
-      FileUtils.cp_r Dir.glob("#{tests_params_egg[:egg_dir]}/*.txt"), $log_egg.log_dir # копируем лог инсталлятора
+      FileUtils.cp_r("C:/EGG/apache-servicemix-6.1.2/data/log/.", $log_egg.log_dir) # копируем лог сервисмикса
+      FileUtils.cp_r Dir.glob("C:/EGG/*.txt"), $log_egg.log_dir # копируем лог инсталлятора
       $log_egg.write_to_log(@end_test_message, "Копирование логов eGG", "Done!")
     rescue Exception => msg
       $log_egg.write_to_browser("Ошибка! #{msg}")
@@ -571,13 +620,13 @@ END;})
   #   $log_egg.write_to_log(functional, "Заменили id в EGG_FILE_ADAPTER_MCICB", "UPDATE EGG_FILE_ADAPTER_MCICB SET CORRELATION_ID = '#{correlation_id}' WHERE EDAUTHOR = '#{request_EDAuthor}'")
   # end
 
-  def get_installer_config
+  def get_installer_config(build_version)
     case # Определяем название файла с конфигом инсталлятора
-      when tests_params_egg[:build_version].include?('6.9')
+      when build_version.include?('6.9')
         "optionsEgg69.txt"
-      when tests_params_egg[:build_version].include?('6.10')
+      when build_version.include?('6.10')
         "optionsEgg610.txt"
-      when tests_params_egg[:build_version].include?('6.11')
+      when build_version.include?('6.11')
         "optionsEgg611.txt"
       else
         "optionsEgg69.txt"

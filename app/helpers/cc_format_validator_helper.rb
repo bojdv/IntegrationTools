@@ -12,6 +12,39 @@ module CcFormatValidatorHelper
     end
     attr_accessor :xml
 
+    def receive_xml # Получение сообщений из Active MQ по протоколу OpenWire
+      manager = QueueManager.find_by_manager_name('iTools[CC_Validator]')
+      java_import 'org.apache.activemq.ActiveMQConnectionFactory'
+      java_import 'javax.jms.Session'
+      java_import 'javax.jms.TextMessage'
+      java_import 'org.apache.activemq.command.ActiveMQDestination'
+      begin
+        factory = ActiveMQConnectionFactory.new
+        factory.setBrokerURL("tcp://#{manager.host}:#{manager.port}")
+        manager.user.nil? ? user ='' : user=manager.user
+        manager.password.nil? ? password ='' : password=manager.user
+        connection = factory.createQueueConnection(user, password)
+        session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE)
+        receiver = session.createReceiver(session.createQueue(manager.queue_out))
+        connection.start
+        xml = receiver.receive(1000)
+        if !xml.nil?
+          xml = Document.new(xml.getText)
+          @xml_doc_type = xml.root.name
+          CcFormatValidatorLog.create(uuid: @uuid, events: 'Получение сообщения', status: 'OK', short_message: "Получили XML: #{@xml_doc_type}", xml: xml)
+          return xml
+        end
+        return nil
+      rescue => msg
+        CcFormatValidatorLog.create(uuid: @uuid, events: 'Получение XML', status: 'FAIL', short_message: 'Ошибка при получении XML', full_message: "Ошибка! #{msg.message}\n#{msg.backtrace.join("\n")}")
+        puts "Error! #{msg.message}\n#{msg.backtrace.join("\n")}"
+      ensure
+        receiver.close if receiver
+        session.close if session
+        connection.close if connection
+      end
+    end
+
     def get_xsd
       case(@xml_doc_type)
         when 'PayDocRu'
@@ -34,48 +67,76 @@ module CcFormatValidatorHelper
           xsd = Nokogiri::XML::Schema(File.read("C:/correqts_xsd/corporate/integration_gate/Запрос выписки пользовательский.xsd"))
         when 'Statement'
           xsd = Nokogiri::XML::Schema(File.read("C:/correqts_xsd/corporate/integration_gate/Выписка.xsd"))
+        when 'CancelRequest'
+          xsd = Nokogiri::XML::Schema(File.read("C:/correqts_xsd/corporate/integration_gate/Запрос на отзыв документа.xsd"))
+        when 'NsoOpen'
+          xsd = Nokogiri::XML::Schema(File.read("C:/correqts_xsd/corporate/integration_gate/Заявление на установление неснижаемого остатка на счете.xsd"))
+        when 'PayRequest'
+          xsd = Nokogiri::XML::Schema(File.read("C:/correqts_xsd/corporate/integration_gate/Исходящее платежное требование.xsd"))
+        when 'CashFunds'
+          xsd = Nokogiri::XML::Schema(File.read("C:/correqts_xsd/corporate/integration_gate/Заявление на выдачу наличных денежных средств.xsd"))
+        when 'CollectionOrder'
+          xsd = Nokogiri::XML::Schema(File.read("C:/correqts_xsd/corporate/integration_gate/Инкассовое поручение.xsd"))
+        when 'SalaryDoc'
+          xsd = Nokogiri::XML::Schema(File.read("C:/correqts_xsd/corporate/integration_gate/Зарплатная ведомость.xsd"))
+        when 'PayRoll'
+          xsd = Nokogiri::XML::Schema(File.read("C:/correqts_xsd/corporate/integration_gate/Зарплатная ведомость зарплатного проекта.xsd"))
+        when 'DepositAddGrant'
+          xsd = Nokogiri::XML::Schema(File.read("C:/correqts_xsd/corporate/integration_gate/Заявка на пополнение депозита.xsd"))
+        when 'DepositLongGrand'
+          xsd = Nokogiri::XML::Schema(File.read("C:/correqts_xsd/corporate/integration_gate/Заявка на пролонгацию депозита.xsd"))
+        when 'DepositReturnGrant'
+          xsd = Nokogiri::XML::Schema(File.read("C:/correqts_xsd/corporate/integration_gate/Заявки на возврат депозита.xsd"))
+        when 'DepositGrant'
+          xsd = Nokogiri::XML::Schema(File.read("C:/correqts_xsd/corporate/integration_gate/Заявки на депозит.xsd"))
+        when 'CreditRepay'
+          xsd = Nokogiri::XML::Schema(File.read("C:/correqts_xsd/corporate/integration_gate/Заявление на досрочное погашение кредита.xsd"))
+        when 'CreditGrant'
+          xsd = Nokogiri::XML::Schema(File.read("C:/correqts_xsd/corporate/integration_gate/Заявление на кредит.xsd"))
+        when 'AccrRu'
+          xsd = Nokogiri::XML::Schema(File.read("C:/correqts_xsd/corporate/integration_gate/Заявление на открытие аккредитива в валюте РФ.xsd"))
+        when 'CreditTranche'
+          xsd = Nokogiri::XML::Schema(File.read("C:/correqts_xsd/corporate/integration_gate/Заявление на транш.xsd"))
+        when 'LetterInBank'
+          xsd = Nokogiri::XML::Schema(File.read("C:/correqts_xsd/corporate/integration_gate/Письмо в банк.xsd"))
+        when 'BankGuarantee'
+          xsd = Nokogiri::XML::Schema(File.read("C:/correqts_xsd/corporate/integration_gate/Поручение на выдачу банковской гарантии.xsd"))
+        when 'DetachmentPayRoll'
+          xsd = Nokogiri::XML::Schema(File.read("C:/correqts_xsd/corporate/integration_gate/Реестр на открепление от зарплатного проекта.xsd"))
+        when 'IssueCards'
+          xsd = Nokogiri::XML::Schema(File.read("C:/correqts_xsd/corporate/integration_gate/Реестр на присоединение к зарплатному проекту.xsd"))
+        when 'AcceptPayRequest'
+          xsd = Nokogiri::XML::Schema(File.read("C:/correqts_xsd/corporate/integration_gate/Заявление об акцепте, отказе от акцепта.xsd"))
+        when 'DealContract181I'
+          xsd = Nokogiri::XML::Schema(File.read("C:/correqts_xsd/corporate/integration_gate/Контракт для постановки на учет.xsd"))
+        when 'DealCred181I'
+          xsd = Nokogiri::XML::Schema(File.read("C:/correqts_xsd/corporate/integration_gate/Кредитные договоры для постановки на учет.xsd"))
+        when 'ConfDocCertificate138I'
+          xsd = Nokogiri::XML::Schema(File.read("C:/correqts_xsd/corporate/integration_gate/Справка о подтверждающих документах.xsd"))
+        when 'CurrDealCertificate181I'
+          xsd = Nokogiri::XML::Schema(File.read("C:/correqts_xsd/corporate/integration_gate/Сведения о валютных операциях.xsd"))
+        when 'ContractReissue'
+          xsd = Nokogiri::XML::Schema(File.read("C:/correqts_xsd/corporate/integration_gate/Заявление об изменении сведений о контракте (кредитном договоре).xsd"))
+        when 'DeregDP'
+          xsd = Nokogiri::XML::Schema(File.read("C:/correqts_xsd/corporate/integration_gate/Заявление о снятии с учета контракта (кредитного договора).xsd"))
+        when 'RegChanDPCC112'
+          xsd = Nokogiri::XML::Schema(File.read("C:/correqts_xsd/corporate/integration_gate/Заявление на оформление справки о подтверждающих документах.xsd"))
+        when 'DataRequest'
+          xsd = Nokogiri::XML::Schema(File.read("C:/correqts_xsd/corporate/integration_gate/Запрос о начислениях.xsd"))
+        when 'FinalPayment'
+          xsd = Nokogiri::XML::Schema(File.read("C:/correqts_xsd/corporate/integration_gate/Извещение в ГИС ГМП.xsd"))
+        when 'SystemDepositsRequest'
+          xsd = Nokogiri::XML::Schema(File.read("C:/correqts_xsd/corporate/integration_gate/Запрос состояния по депозитному продукту.xsd"))
+        when 'SystemCreditsRequest'
+          xsd = Nokogiri::XML::Schema(File.read("C:/correqts_xsd/corporate/integration_gate/Запрос состояния по кредитному продукту.xsd"))
+        when 'TCNoticeRequest'
+          xsd = Nokogiri::XML::Schema(File.read("C:/correqts_xsd/corporate/integration_gate/Запрос уведомлений о зачислении средств на транзитный валютный счет.xsd"))
+        when 'TRNoticeRequest'
+          xsd = Nokogiri::XML::Schema(File.read("C:/correqts_xsd/corporate/integration_gate/Запрос извещений о зачислении средств на рублевый расчетный счет.xsd"))
+        when 'SystemPayRequestsIn'
+          xsd = Nokogiri::XML::Schema(File.read("C:/correqts_xsd/corporate/integration_gate/Запрос входящих платежных требований.xsd"))
       end
       return xsd
-    end
-
-    def make_answer(status = 'PROCESSED', message = "\nРезультат валидации:\nвалидация пройдена\nРезультат проверки наличия эталонных элементов: \nэлементы присутствуют\n")
-      begin
-        answer = case(@xml_doc_type)
-                   when 'PayDocRu','PayDocCur','CurrBuy','CurrSell','CurrConv','MandatorySaleBox','MT202','MT103'
-                     Xml.find_by_xml_name('StateResponse')
-                   when 'StatementRequest'
-                     if status == 'PROCESSED'
-                       Xml.find_by_xml_name('Statement')
-                     else
-                       Xml.find_by_xml_name('StateResponse')
-                     end
-                   else
-                     Xml.find_by_xml_name('StateResponse')
-                 end
-        xml_rexml = Document.new(answer.xml_text)
-        case answer.xml_name
-          when 'StateResponse'
-            xml_rexml.elements['//createTime'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
-            xml_rexml.elements['//operationDate'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
-            xml_rexml.elements['//docType'].text = @xml_doc_type
-            xml_rexml.elements['//state'].text = status
-            xml_rexml.elements['//docId'].text = @xml.elements["//docId"].text
-            xml_rexml.elements['//bankMessage'].text = message
-          when 'Statement'
-            xml_rexml.elements['//acceptDate'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
-            xml_rexml.elements['//fromDate'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
-            xml_rexml.elements['//lastOperationDate'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
-            xml_rexml.elements['//toDate'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
-            xml_rexml.elements['//documentDate'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
-            xml_rexml.elements['//recieptDate'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
-            xml_rexml.elements['//valueDate'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
-            xml_rexml.elements['//writeOffDate'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
-        end
-        xml_rexml.context[:attribute_quote] = :quote
-        return xml_rexml.to_s.gsub('\'', '"') # иначе в декларации одинарные ковычки
-      rescue Exception => msg
-        puts "Error! #{msg.message}\n#{msg.backtrace.join("\n")}"
-      end
     end
 
     def validate_cc_xml
@@ -127,37 +188,129 @@ module CcFormatValidatorHelper
       end
     end
 
-    def receive_xml # Получение сообщений из Active MQ по протоколу OpenWire
-      manager = QueueManager.find_by_manager_name('iTools[CC_Validator]')
-      queue = 'correqts_in'
-      java_import 'org.apache.activemq.ActiveMQConnectionFactory'
-      java_import 'javax.jms.Session'
-      java_import 'javax.jms.TextMessage'
-      java_import 'org.apache.activemq.command.ActiveMQDestination'
+    def make_answer(status = 'PROCESSED', message = "\nРезультат валидации:\nвалидация пройдена\nРезультат проверки наличия эталонных элементов: \nэлементы присутствуют\n")
       begin
-        factory = ActiveMQConnectionFactory.new
-        factory.setBrokerURL("tcp://#{manager.host}:#{manager.port}")
-        manager.user.nil? ? user ='' : user=manager.user
-        manager.password.nil? ? password ='' : password=manager.user
-        connection = factory.createQueueConnection(user, password)
-        session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE)
-        receiver = session.createReceiver(session.createQueue(queue))
-        connection.start
-        xml = receiver.receive(1000)
-        if !xml.nil?
-          xml = Document.new(xml.getText)
-          @xml_doc_type = xml.root.name
-          CcFormatValidatorLog.create(uuid: @uuid, events: 'Получение сообщения', status: 'OK', short_message: "Получили XML: #{@xml_doc_type}", xml: xml)
-          return xml
+        answer = case(@xml_doc_type)
+                   when 'PayDocRu','PayDocCur','CurrBuy','CurrSell','CurrConv','MandatorySaleBox','MT202','MT103'
+                     Xml.find_by_xml_name('StateResponse')
+                   when 'StatementRequest'
+                     if status == 'PROCESSED'
+                       Xml.find_by_xml_name('Statement')
+                     else
+                       Xml.find_by_xml_name('StateResponse')
+                     end
+                   when 'DataRequest'
+                     if status == 'PROCESSED'
+                       Xml.find_by_xml_name('DataRequestResponse')
+                     else
+                       Xml.find_by_xml_name('EGG_Ticket')
+                     end
+                   when 'FinalPayment'
+                     if status == 'PROCESSED'
+                       Xml.find_by_xml_name('FinalPaymentResponse')
+                     else
+                       Xml.find_by_xml_name('EGG_Ticket')
+                     end
+                   when 'SystemDepositsRequest'
+                     Xml.find_by_xml_name('SystemDepositsResponse')
+                   when 'SystemCreditsRequest'
+                     Xml.find_by_xml_name('SystemCreditsResponse')
+                   when 'TCNoticeRequest'
+                     Xml.find_by_xml_name('TCNotice')
+                   when 'TRNoticeRequest'
+                     Xml.find_by_xml_name('TRNotice')
+                   when 'SystemPayRequestsIn'
+                     Xml.find_by_xml_name('PayRequestIn')
+                   else
+                     Xml.find_by_xml_name('StateResponse')
+                 end
+        xml_rexml = Document.new(answer.xml_text)
+        case answer.xml_name
+          when 'StateResponse'
+            xml_rexml.elements['//createTime'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
+            xml_rexml.elements['//operationDate'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
+            xml_rexml.elements['//docType'].text = @xml_doc_type
+            xml_rexml.elements['//state'].text = status
+            xml_rexml.elements['//docId'].text = @xml.elements["//docId"].text
+            xml_rexml.elements['//bankMessage'].text = message
+          when 'Statement'
+            xml_rexml.elements['//acceptDate'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
+            xml_rexml.elements['//fromDate'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
+            xml_rexml.elements['//lastOperationDate'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
+            xml_rexml.elements['//toDate'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
+            xml_rexml.elements['//documentDate'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
+            xml_rexml.elements['//recieptDate'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
+            xml_rexml.elements['//valueDate'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
+            xml_rexml.elements['//writeOffDate'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
+          when 'DataRequestResponse'
+            xml_rexml.elements['//tns:AnswerMessage'].attributes['processID'] = "ID_#{@xml.elements["//docId"].text}"
+            xml_rexml.elements['//tns:Parameter[3]'].attributes['Value'] = "ID_#{@xml.elements["//docId"].text}"
+            xml_rexml.elements['//tns:Parameter[4]'].attributes['Value'] = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
+            xml_rexml.elements['//tns:Parameter[5]'].attributes['Value'] = "u_#{SecureRandom.uuid}"
+            xml_rexml.elements['//tns:Parameter[7]'].attributes['Value'] = "ID_#{@xml.elements["//docId"].text}"
+            xml_rexml.elements['//tns:Parameter[8]'].attributes['Value'] = SecureRandom.uuid
+            xml_rexml.elements['//tns:Parameter[12]'].attributes['Value'] = @xml.elements["//docId"].text
+          when 'EGG_Ticket'
+            xml_rexml.elements['//ServiceID'].text = 'GIS_GMP_1.16_Payment' if @xml_doc_type == 'FinalPayment'
+            xml_rexml.elements['//RSMEVDocID'].text = "ID_#{@xml.elements["//docId"].text}"
+            xml_rexml.elements['//ErrorDescription'].text = message
+          when 'FinalPaymentResponse'
+            xml_rexml.elements['//tns:AnswerMessage'].attributes['processID'] = "ID_#{@xml.elements["//docId"].text}"
+            xml_rexml.elements['//tns:Parameter[2]'].attributes['Value'] = "ID_#{@xml.elements["//docId"].text}"
+            xml_rexml.elements['//tns:Parameter[3]'].attributes['Value'] = "ID_#{@xml.elements["//docId"].text}"
+            xml_rexml.elements['//tns:Parameter[4]'].attributes['Value'] = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
+            xml_rexml.elements['//tns:Parameter[5]'].attributes['Value'] = "u_#{SecureRandom.uuid}"
+            xml_rexml.elements['//tns:Parameter[7]'].attributes['Value'] = "ID_#{@xml.elements["//docId"].text}"
+            xml_rexml.elements['//tns:Parameter[9]'].attributes['Value'] = SecureRandom.uuid
+            answer_decode = Base64.decode64(xml_rexml.elements['//tns:Answer'].text)
+            answer_decode = answer_decode.force_encoding("utf-8")
+            answer_decode = Document.new(answer_decode)
+            answer_decode.elements['//ns2:EntityProcessResult'].attributes['entityId'] = "ID_#{@xml.elements["//docId"].text}"
+            answer_encode = Base64.encode64(answer_decode.to_s)
+            answer_encode = answer_encode.force_encoding("utf-8")
+            xml_rexml.elements['//tns:Answer'].text = answer_encode
+          when 'SystemDepositsResponse'
+            xml_rexml.elements['//branchId'].text = @xml.elements["//branchId"].text
+            xml_rexml.elements['//depoLoadRequestId'].text = @xml.elements["//docId"].text
+            xml_rexml.elements['//orgId'].text = @xml.elements["//orgId"].text
+            xml_rexml.elements['//depTermFrom'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
+            xml_rexml.elements['//depTermTo'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
+            xml_rexml.elements['//docDate'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
+            xml_rexml.elements['//lastModifyDate'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
+            xml_rexml.elements['//statementDate'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
+          when 'SystemCreditsResponse'
+            xml_rexml.elements['//branchId'].text = @xml.elements["//branchId"].text
+            xml_rexml.elements['//creditLoadRequestId'].text = @xml.elements["//docId"].text
+            xml_rexml.elements['//orgId'].text = @xml.elements["//orgId"].text
+            xml_rexml.elements['//docDate'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
+            xml_rexml.elements['//dataActuality'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
+            xml_rexml.elements['//docCloseDate'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
+            xml_rexml.elements['//lastModifyDate'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
+            xml_rexml.elements['//nextPayDate'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
+            xml_rexml.elements['//repaymentDate'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
+            xml_rexml.elements['//statementDate'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
+            xml_rexml.elements['//trancheDate'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
+            xml_rexml.elements['//debtDate'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
+          when 'TCNotice'
+            xml_rexml.elements['//docDate'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
+            xml_rexml.elements['//docsFromResidentDate'].text = (Time.now + (60*60*24)).strftime('%Y-%m-%dT%H:%M:%S')
+          when 'TRNotice'
+            xml_rexml.elements['//docDate'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
+          when 'PayRequestIn'
+            xml_rexml.elements['//acceptTermDate'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
+            xml_rexml.elements['//docDate'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
+            xml_rexml.elements['//docDispatchDate'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
+            xml_rexml.elements['//lastModifyDate'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
+            xml_rexml.elements['//operationDate'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
+            xml_rexml.elements['//queueDate'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
+            xml_rexml.elements['//receivedPayerBank'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
         end
-        return nil
-      rescue => msg
-        CcFormatValidatorLog.create(uuid: @uuid, events: 'Получение XML', status: 'FAIL', short_message: 'Ошибка при получении XML', full_message: "Ошибка! #{msg.message}\n#{msg.backtrace.join("\n")}")
+        xml_rexml.context[:attribute_quote] = :quote
+        return xml_rexml.to_s.gsub('\'', '"') # иначе в декларации одинарные ковычки
+      rescue Exception => msg
         puts "Error! #{msg.message}\n#{msg.backtrace.join("\n")}"
-      ensure
-        receiver.close if receiver
-        session.close if session
-        connection.close if connection
+        CcFormatValidatorLog.create(uuid: @uuid, events: 'Формирование ответа', status: 'FAIL', short_message: msg.message, full_message: msg.backtrace.join("\n"))
+        return nil
       end
     end
 

@@ -58,7 +58,7 @@ class TestPlansController < ApplicationController
           @project_estimate/@backlog_estimate >= 2.5 ? @use_tester_estimate = true : @use_tester_estimate = false
         end
         @report_feature = Array.new
-        @show_plan.features.each_with_index do |f, i|
+        @show_plan.features.sort_by(&:created_at).each_with_index do |f, i|
           @report_feature[i] = JIRA_Report.new(f.backlog, f.labels, $qa)
         end
       end

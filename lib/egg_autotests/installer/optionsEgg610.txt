@@ -88,7 +88,7 @@ fk_DeliverySchedule=3
 fk_SID0003663=http://vm-itools:5000/GIS-GMP
 #fk_SID0003663=http://smev-mvf.test.gosuslugi.ru:7777/gateway/services/SID0003663/1.00
 
-sadp_CryptoService=http://vm-eggcryptdev:9090/axis2/services/CryptoService
+sadp_CryptoService=http://vm-eggcrypttest:9090/axis2/services/CryptoService
 fk_isCryptoLog=true
 fk_sendingTicket1012=true
 fk_proxy_host=127.0.0.1
@@ -118,7 +118,7 @@ zkh_SA_GIS_ZHKH_Payment_details_1=http://vm-itools:5000/SA_GIS_ZHKH_Payment_deta
 zkh_GIS_ZHKH_Payment_2=http://smev-mvf.test.gosuslugi.ru:7777/gateway/services/SID0004766
 zkh_SA_GIS_ZHKH_Payment_details_2=http://smev-mvf.test.gosuslugi.ru:7777/gateway/services/SID0004157
 zkh_GisZkhVersion=zkh_GisZkhVersion_8
-zkh_CryptoService=http://vm-eggcryptdev:9090/axis2/services/CryptoService
+zkh_CryptoService=http://vm-eggcrypttest:9090/axis2/services/CryptoService
 zkh_NumberOfAttempts=2
 zkh_NumberOfPackages=10
 zkh_DeliverySchedule=1
@@ -163,7 +163,7 @@ zkh_file_is_payees_request=true
 
 # saZkhPayeesComponent - Импорт справочника поставщиков
 zkhPayees_zkhPayeesService=http://smev-mvf.test.gosuslugi.ru:7777/gateway/services/SID0004768/1.00
-zkhPayees_CryptoService=http://vm-eggcryptdev:9090/axis2/services/CryptoService
+zkhPayees_CryptoService=http://vm-eggcrypttest:9090/axis2/services/CryptoService
 zkhPayees_zkh_payees_sadp_consumers=5
 zkhPayees_zkh_payees_sgd_consumers=5
 zkhPayees_zkh_payees_result_sgd_consumers=5
@@ -214,9 +214,9 @@ file_mq_zkh_adapterCode=egg-zkhfileMq-adapter
 file_mq_zkh_brokerURL=failover:tcp://127.0.0.1:61616
 
 # saFnsEgripComponent - ФНС ЕГРИП
-#fns_egrip_SMEV=http://vm-itools:5000/egrip_smev3
-fns_egrip_SMEV=http://smev3-n0.test.gosuslugi.ru:7500/smev/v1.1/ws
-fns_egrip_CryptoService=http://vm-eggcryptdev:9090/axis2/services/CryptoService
+fns_egrip_SMEV=http://vm-itools:5000/egrip_smev3
+#fns_egrip_SMEV=http://smev3-n0.test.gosuslugi.ru:7500/smev/v1.1/ws
+fns_egrip_CryptoService=http://vm-eggcrypttest:9090/axis2/services/CryptoService
 fns_egrip_isCryptoLog=false
 fns_egrip_fns_egrip_sadp_consumers=5
 fns_egrip_TestMessage=true
@@ -226,7 +226,7 @@ fns_egrip_deadLine=10
 fns_egrip_EgripFormatVersion=4.0.5
 fns_egrip_NodeID=node1
 fns_egrip_isResponseLock=true
-fns_egrip_attachmentMode=none
+fns_egrip_attachmentMode=true
 fns_egrip_CheckingSignature=none
 fns_egrip_CheckSignatureAttachment=check
 fns_egrip_CheckEPOV=none
@@ -237,9 +237,9 @@ fns_egrip_sendingTicket1012=true
 
 
 # saFnsEgrulComponent - ФНС ЕГРЮЛ
-#fns_egrul_FNS_URL=http://vm-itools:5000/egrul_smev3
-fns_egrul_FNS_URL=http://smev3-n0.test.gosuslugi.ru:7500/smev/v1.1/ws
-fns_egrul_CryptoService=http://vm-eggcryptdev:9090/axis2/services/CryptoService
+fns_egrul_FNS_URL=http://vm-itools:5000/egrul_smev3
+#fns_egrul_FNS_URL=http://smev3-n0.test.gosuslugi.ru:7500/smev/v1.1/ws
+fns_egrul_CryptoService=http://vm-eggcrypttest:9090/axis2/services/CryptoService
 fns_egrul_fns_sadp_consumers=10
 fns_egrul_fns_queue_request_consumers=10
 fns_egrul_TestMessage=true
@@ -254,7 +254,7 @@ fns_egrul_isResponseLock=true
 fns_egrul_attachmentMode=true
 fns_egrul_CheckingSignature=check
 fns_egrul_CheckSignatureAttachment=check
-fns_egrul_CheckEPOV=check
+fns_egrul_CheckEPOV=none
 fns_egrul_CheckEPSP=none
 fns_egrul_isCryptoLog=true
 fns_egrul_sendingTicket1000=false

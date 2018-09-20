@@ -13,19 +13,21 @@ class EggAutoTestsController < ApplicationController
     $browser_egg = Hash.new
     $browser_egg[:event] = ''
     $browser_egg[:message] = ''
-    @egg67_components = ['ИА Active MQ',
-                         'ИА УФЭБС (ГИС ГМП)',
-                         'ИА УФЭБС (ГИС ЖКХ)',
-                         'ИА JPMorgan (ГИС ГМП)',
-                         'ИА JPMorgan (ГИС ЖКХ)',
-                         'ИА ZKH-Loader/СА ZkhPayees',
-                         'СА ГИС ГМП',
-                         'СА ГИС ЖКХ',
-                         'СА SPEP',
-                         'СА ФНС ЕГРИП',
-                         'СА ФНС ЕГРЮЛ',
-                         'СА EFRSB (Банкроты)',
-                         'СА ЕСИА СМЭВ3']
+    @egg67_components= ['ИА Active MQ',
+                        'ИА УФЭБС (ГИС ГМП)',
+                        'ИА УФЭБС (ГИС ЖКХ)',
+                        'ИА JPMorgan (ГИС ГМП)',
+                        'ИА JPMorgan (ГИС ЖКХ)',
+                        'ИА ZKH-Loader/СА ZkhPayees',
+                        'СА ГИС ГМП',
+                        'СА ГИС ЖКХ',
+                        'СА SPEP',
+                        'СА ФНС ЕГРИП',
+                        'СА ФНС ЕГРЮЛ',
+                        'СА EFRSB (Банкроты)',
+                        'СА ЕСИА СМЭВ3',
+                        'СА ГИС ГМП СМЭВ3',
+                        'ИА УФЭБС (ГИС ГМП СМЭВ3)']
     @egg68_components = Array.new(@egg67_components)
     @egg68_components.push('ЕСИА')
     regex = /\A[6]{,1}[.](9|10|11|12|13){,2}[.][\d]{,3}[-][\w]{,8}\Z/
@@ -309,6 +311,13 @@ class EggAutoTestsController < ApplicationController
     rescue Exception => msg
       puts "#{msg.to_s}"
     end
+    sleep 3
+    thread_get_core_message.kill
+    puts @core_in_message.first
+    @core_in_message.clear
+    puts @core_in_message.any?
+    puts @core_in_message.first
+=end
   end
 end
 

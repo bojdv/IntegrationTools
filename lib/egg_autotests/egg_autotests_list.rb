@@ -16,6 +16,8 @@ require_dependency "#{Rails.root}/lib/egg_autotests/sa_FNS_EGRIP"
 require_dependency "#{Rails.root}/lib/egg_autotests/SA_FNS_EGRUL"
 require_dependency "#{Rails.root}/lib/egg_autotests/SA_EFRSB"
 require_dependency "#{Rails.root}/lib/egg_autotests/SA_ESIA_SMEV3"
+require_dependency "#{Rails.root}/lib/egg_autotests/SA_GIS_GMP_SMEV3"
+require_dependency "#{Rails.root}/lib/egg_autotests/IA_UFEBS_GIS_GMP_SMEV3"
 
 class EggAutotestsList
 
@@ -123,6 +125,21 @@ class EggAutotestsList
       sa_esia_smev3.request_REGISTER_CERTIFICATE
       sa_esia_smev3.request_REGISTER_CHILD
       sa_esia_smev3.request_UPRID
+    end
+    if components.include?('СА ГИС ГМП СМЭВ3')
+      sa_gis_gmp_smev3 = SA_GIS_GMP_SMEV3.new(@pass_menu_color, @fail_menu_color, @not_find_xml, @not_receive_answer, @egg_version, @try_count, @db_username)
+      sa_gis_gmp_smev3.Payment_new
+      sa_gis_gmp_smev3.Payment_refinement
+      sa_gis_gmp_smev3.Payment_cancellation
+      sa_gis_gmp_smev3.Charges
+    end
+    if components.include?('ИА УФЭБС (ГИС ГМП СМЭВ3)')
+      ia_ufebs_gis_gmp_smev3 = IA_UFEBS_GIS_GMP_SMEV3.new(@pass_menu_color, @fail_menu_color, @not_find_xml, @not_receive_answer, @egg_version, @try_count, @ufebs_version, @db_username)
+      ia_ufebs_gis_gmp_smev3.ed101_test
+      ia_ufebs_gis_gmp_smev3.ed104_test
+      ia_ufebs_gis_gmp_smev3.ed105_test
+      ia_ufebs_gis_gmp_smev3.ed108_test
+      ia_ufebs_gis_gmp_smev3.packetepd_test
     end
   end
 end

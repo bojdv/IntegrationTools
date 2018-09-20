@@ -16,7 +16,7 @@ unattendedmodeui=minimalWithDialogs
 installdir=C:\EGG
 
 # устанавливаемые компоненты перечисляются через запятую
-enable-components=egg,DBcreate,ServiceMix,iaAmqComponent,saSpepComponent,saGmpComponent,iaFileGmpComponent,saZkhComponent,iaFileZkhComponent, saZkhPayeesComponent, iaFileMqGmpComponent,iaFileMqZkhComponent,saGmp20Component,saFnsEgripComponent,saFnsEgrulComponent,saEfrsbComponent,saEsiaSmev3Component
+enable-components=egg,DBcreate,ServiceMix,iaAmqComponent,saSpepComponent,saGmpComponent,iaFileGmpComponent,saZkhComponent,iaFileZkhComponent, saZkhPayeesComponent, iaFileMqGmpComponent,iaFileMqZkhComponent,saGmp20Component,saFnsEgripComponent,saFnsEgrulComponent,saEfrsbComponent,saEsiaSmev3Component,iaFileUfebsGmpComponent
 # компоненты, установка которых не требуется, перечисляются через запятую
 disable-components=crypto,CryptoService,saEsiaComponent,saReestrFsspComponent,saUpridComponent
 
@@ -273,29 +273,35 @@ egg_gmp20_attachmentMode=true
 egg_gmp20_timer_period=10000
 egg_gmp20_isCryptoLog=true
 egg_gmp20_CryptoService=http://vm-eggcrypttest:9090/axis2/services/CryptoService
-egg_gmp20_CheckSignatureAttachment=check
-egg_gmp20_CheckEPOV=check
+egg_gmp20_CheckingSignature=none
+egg_gmp20_CheckSignatureAttachment=none
+egg_gmp20_CheckEPOV=none
 egg_gmp20_CheckEPSP=none
 egg_gmp20_deadLine=10
-egg_gmp20_NumberOfAttempts=3
-egg_gmp20_DeliverySchedule=3
+egg_gmp20_NumberOfAttempts=1
+egg_gmp20_DeliverySchedule=1
 egg_gmp20_TestMessage=true
-egg_gmp20_charges_isResponseLock=false
+egg_gmp20_charges_isResponseLock=true
 egg_gmp20_charges_adapterId=amq-jms-iadp
 egg_gmp20_charges_CodesForRepeat=1
-egg_gmp20_payment_isResponseLock=false
+egg_gmp20_payment_isResponseLock=true
 egg_gmp20_payment_adapterId=amq-jms-iadp
 egg_gmp20_payment_CodesForRepeat=1
 egg_gmp20_sendingTicket1000=false
 egg_gmp20_sendingTicket1012=true
 
-
 # iaFileUfebsGmpComponent - ИА УФЭБС (СМЭВ3)
-#fileUfebs_mq_gmp_testMode=true
-#fileUfebs_mq_gmp_ValidateInputEgg=false
-#fileUfebs_mq_gmp_inbox=C:\data\INAD_GISGMP_UFEBS\inbox
-#fileUfebs_mq_gmp_outbox=
-#fileUfebs_mq_gmp_backupbox=
+fileUfebs_mq_gmp_testMode=true
+fileUfebs_mq_gmp_ValidateInputEgg=true
+fileUfebs_mq_gmp_inbox=C:/data/INAD_GISGMP_UFEBS/outbound
+fileUfebs_mq_gmp_outbox=C:/data/INAD_GISGMP_UFEBS/inbound
+fileUfebs_mq_gmp_backupbox=C:/data/INAD_GISGMP_UFEBS/outbound/archive
+fileUfebs_mq_gmp_errorbox=C:/data/INAD_GISGMP_UFEBS/error
+fileUfebs_mq_gmp_systemID=Egg
+fileUfebs_mq_gmp_serviceID=GIS_GMP_2.0_Payment
+fileUfebs_mq_gmp_queue=gisgmp-fileUfebs-iadp
+fileUfebs_mq_gmp_consumers=5
+fileUfebs_mq_gmp_FormatVersion=2018.4.1
 
 # saEfrsbComponent - СА Банкроты
 efrsb_efrsbService=http://test.fedresurs.ru/MessageService/WebService.svc

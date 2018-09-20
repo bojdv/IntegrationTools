@@ -16,7 +16,7 @@ unattendedmodeui=minimalWithDialogs
 installdir=C:\EGG
 
 # устанавливаемые компоненты перечисляются через запятую
-enable-components=egg,DBcreate,ServiceMix,iaAmqComponent,saSpepComponent,saGmpComponent,iaFileGmpComponent,saZkhComponent,iaFileZkhComponent, saZkhPayeesComponent, iaFileMqGmpComponent,iaFileMqZkhComponent,saGmp20Component,saFnsEgripComponent,saFnsEgrulComponent,saEfrsbComponent,saEsiaSmev3Component
+enable-components=egg,DBcreate,ServiceMix,iaAmqComponent,saSpepComponent,saGmpComponent,iaFileGmpComponent,saZkhComponent,iaFileZkhComponent, saZkhPayeesComponent, iaFileMqGmpComponent,iaFileMqZkhComponent,saGmp20Component,saFnsEgripComponent,saFnsEgrulComponent,saEfrsbComponent,saEsiaSmev3Component,iaFileUfebsGmpComponent
 # компоненты, установка которых не требуется, перечисляются через запятую
 disable-components=crypto,CryptoService,saEsiaComponent,saReestrFsspComponent,saUpridComponent
 
@@ -291,11 +291,17 @@ egg_gmp20_sendingTicket1000=false
 egg_gmp20_sendingTicket1012=true
 
 # iaFileUfebsGmpComponent - ИА УФЭБС (СМЭВ3)
-#fileUfebs_mq_gmp_testMode=true
-#fileUfebs_mq_gmp_ValidateInputEgg=false
-#fileUfebs_mq_gmp_inbox=C:\data\INAD_GISGMP_UFEBS\inbox
-#fileUfebs_mq_gmp_outbox=
-#fileUfebs_mq_gmp_backupbox=
+fileUfebs_mq_gmp_testMode=true
+fileUfebs_mq_gmp_ValidateInputEgg=true
+fileUfebs_mq_gmp_inbox=C:/data/INAD_GISGMP_UFEBS/outbound
+fileUfebs_mq_gmp_outbox=C:/data/INAD_GISGMP_UFEBS/inbound
+fileUfebs_mq_gmp_backupbox=C:/data/INAD_GISGMP_UFEBS/outbound/archive
+fileUfebs_mq_gmp_errorbox=C:/data/INAD_GISGMP_UFEBS/error
+fileUfebs_mq_gmp_systemID=Egg
+fileUfebs_mq_gmp_serviceID=GIS_GMP_2.0_Payment
+fileUfebs_mq_gmp_queue=gisgmp-fileUfebs-iadp
+fileUfebs_mq_gmp_consumers=5
+fileUfebs_mq_gmp_FormatVersion=2018.4.1
 
 # saEfrsbComponent - СА Банкроты
 efrsb_efrsbService=http://test.fedresurs.ru/MessageService/WebService.svc

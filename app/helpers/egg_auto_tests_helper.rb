@@ -403,11 +403,14 @@ END;})
   end
 
   def ufebs_file_count(functional, packetepd = false, gis_type = 'gis_gmp') # Метод, который возвращает кол-во полученных из УФЭБС файлов
-    # functional - название тест, packetepd - признак, что это запрос packetepd, gis_type - тип адаптера, по умолчанию ГИС ГМП, если другое, то будет ГИС ЖКХ
-    if gis_type == 'gis_gmp' # Анализируем тип адаптера и соответственно выбираем каталог, куда класть файлы
-      dir = 'C:/data/inbox/1/inbound/all'
-    else
-      dir = 'C:/data/inbox/GIS_ZKH/inbound/all'
+    # functional - название тест, packetepd - признак, что это запрос packetepd, gis_type - тип адаптера, по умолчанию ГИС ГМП
+    case gis_type # Анализируем тип адаптера и соответственно выбираем каталог, куда класть файлы
+      when 'gis_gmp'
+        dir = 'C:/data/inbox/1/inbound/all'
+      when 'gis_zkh'
+        dir = 'C:/data/inbox/GIS_ZKH/inbound/all'
+      when 'gis_gmp_smev3'
+        dir = 'C:/data/INAD_GISGMP_UFEBS/inbound/all'
     end
     code_adps000 = 'ADPS000' # Переменная хранит код промежуточного тикета от адаптера
     code_adps001 = 'ADPS001' # Переменная хранит код успешного сообщения от СМЭВ
@@ -422,6 +425,8 @@ END;})
           positive_code = 3 # Ждем три файла со статусом ADPS001
         when 'gis_zkh'
           positive_code = 2
+        when 'gis_gmp_smev3'
+          positive_code = 3
       end
     else
       positive_code = 1
@@ -549,6 +554,8 @@ END;})
         puts count -=1
         return nil if count == 0
       end
+      $log_egg.write_to_browser("Заменили id в SMEVMESSAGEID на #{smev_id}")
+      $log_egg.write_to_log(functional, "Заменили id в SMEVMESSAGEID", "UPDATE EGG_SMEV3_CONTEXT SET SMEVMESSAGEID = '#{smev_id}' WHERE PROCESSID = '#{process_id}'")
     rescue Exception => msg
       $log_egg.write_to_browser("Ошибка! #{msg}")
       $log_egg.write_to_log(@end_test_message, "Ошибка при замене SMEVMESSAGEID", "Ошибка! #{msg}\n#{msg.backtrace.join("\n")}")
@@ -556,23 +563,43 @@ END;})
       stmt.close if stmt
       connection.close if connection
     end
-    $log_egg.write_to_browser("Заменили id в SMEVMESSAGEID на #{smev_id}")
-    $log_egg.write_to_log(functional, "Заменили id в SMEVMESSAGEID", "UPDATE EGG_SMEV3_CONTEXT SET SMEVMESSAGEID = '#{smev_id}' WHERE PROCESSID = '#{process_id}'")
   end
 
-  def change_smevmessageid_gis_gmp(xml_rexml, smev_id, db_user, functional) # метод меняет id для запросов ГИС ГМП в СМЭВ3
+  def change_smevmessageid_gis_gmp(xml_rexml, smev_id, db_user, functional, ufebs = false) # метод меняет id для запросов ГИС ГМП в СМЭВ3
     begin
-      process_id = xml_rexml.elements["//mq:RequestMessage"].attributes["processID"]
+      if ufebs
+        process_id = xml_rexml.elements["//tns:Request"].attributes["processId"]
+      else
+        process_id = xml_rexml.elements["//mq:RequestMessage"].attributes["processID"]
+      end
       url = "jdbc:oracle:thin:@vm-corint:1521:corint"
       connection = java.sql.DriverManager.getConnection(url, db_user, db_user);
       stmt = connection.create_statement
-      result = 0
+      result = false
       count = 60
-      while result == 0 # 0, if no rows are affected by the operation.
-        result = stmt.executeUpdate("UPDATE FK_SMEV3 SET SMEVMESSAGEID = '#{smev_id}' WHERE PROCESSID = '#{process_id}'")
-        sleep 0.5
+      while result == false # if no rows are affected by the operation.
+        select = <<-query
+          UPDATE FK_SMEV3 SET SMEVMESSAGEID = '#{smev_id}' WHERE PROCESSID = '#{process_id}' 
+          query
+        result = stmt.execute(select)
+        puts result
         puts count -=1
-        return nil if count == 0
+        if result = true
+          puts Time.now.strftime('%Y-%m-%dT%H:%M:%S')
+          rs = stmt.execute_query("select DATECREATE, SMEVMESSAGEID from FK_SMEV3 WHERE PROCESSID = '#{process_id}'")
+          while (rs.next()) do
+            puts rs.getString('DATECREATE')
+            puts rs.getString('SMEVMESSAGEID')
+          end
+          $log_egg.write_to_browser("Заменили id в SMEVMESSAGEID на #{smev_id}")
+          $log_egg.write_to_log(functional, "Заменили id в SMEVMESSAGEID", "UPDATE EGG_SMEV3_CONTEXT SET SMEVMESSAGEID = '#{smev_id}' WHERE PROCESSID = '#{process_id}'")
+        end
+        if count == 0
+          $log_egg.write_to_browser("Не заменили id в SMEVMESSAGEID")
+          $log_egg.write_to_log(functional, "Не заменили id в SMEVMESSAGEID", "UPDATE EGG_SMEV3_CONTEXT SET SMEVMESSAGEID = '#{smev_id}' WHERE PROCESSID = '#{process_id}'")
+          return nil
+        end
+        sleep 0.5
       end
     rescue Exception => msg
       $log_egg.write_to_browser("Ошибка! #{msg}")
@@ -581,8 +608,6 @@ END;})
       stmt.close if stmt
       connection.close if connection
     end
-    $log_egg.write_to_browser("Заменили id в SMEVMESSAGEID на #{smev_id}")
-    $log_egg.write_to_log(functional, "Заменили id в SMEVMESSAGEID", "UPDATE EGG_SMEV3_CONTEXT SET SMEVMESSAGEID = '#{smev_id}' WHERE PROCESSID = '#{process_id}'")
   end
 
   # def change_correlationid(xml_rexml, correlation_id, db_user, functional) # метод меняет id для запросов в УФЭБС
@@ -648,25 +673,26 @@ queue_core_ia_consumers=5
       @core_in_ufebs_gmp = Array.new
       @core_in_ufebs_zkh = Array.new
       @core_in_ufebs_jpm = Array.new
+      @core_in_ufebs_gmp_smev3 = Array.new
       @manager = QueueManager.find_by_manager_name('iTools[EGG]')
       start_core_in_listener # Запускаем прослушку входной очереди ядра
     end
 
-    attr_accessor :core_in_ufebs_gmp, :core_in_ufebs_zkh, :core_in_ufebs_jpm
+    attr_accessor :core_in_ufebs_gmp, :core_in_ufebs_zkh, :core_in_ufebs_jpm, :core_in_ufebs_gmp_smev3
 
     def start_core_in_listener
       @thread_get_core_message = Thread.new do
         begin
-            factory = ActiveMQConnectionFactory.new
-            factory.setBrokerURL("tcp://#{@manager.host}:#{@manager.port}")
-            @manager.user.nil? ? user ='' : user=@manager.user
-            @manager.password.nil? ? password ='' : password=@manager.user
-            connection = factory.createQueueConnection(user, password)
-            session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-            connection.start
-            receiver = session.createReceiver(session.createQueue('core_sa'))
-            sender = session.createSender(session.createQueue('core_sa_real'))
-            while true do
+          factory = ActiveMQConnectionFactory.new
+          factory.setBrokerURL("tcp://#{@manager.host}:#{@manager.port}")
+          @manager.user.nil? ? user ='' : user=@manager.user
+          @manager.password.nil? ? password ='' : password=@manager.user
+          connection = factory.createQueueConnection(user, password)
+          session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+          connection.start
+          receiver = session.createReceiver(session.createQueue('core_sa'))
+          sender = session.createSender(session.createQueue('core_sa_real'))
+          while true do
             message = receiver.receiveNoWait()
             if message
               message_rexml = Document.new(message.getText)
@@ -680,6 +706,9 @@ queue_core_ia_consumers=5
                 when 'egg-zkhfileMq-adapter'
                   puts "Receive UFEBS GIS ZKH JPMorgan message"
                   @core_in_ufebs_jpm << {correlation_id: message.getJMSCorrelationID, body: message.getText }
+                when 'gisgmp-fileUfebs-iadp'
+                  puts "Receive UFEBS GIS GMP SMEV3 message"
+                  @core_in_ufebs_gmp_smev3 << {correlation_id: message.getJMSCorrelationID, body: message.getText }
                 else
                   puts "Receive not UFEBS message"
                   sender.send(message)

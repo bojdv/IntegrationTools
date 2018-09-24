@@ -284,7 +284,8 @@ module CcFormatValidatorHelper
             xml_rexml.elements['//docDate'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
             xml_rexml.elements['//lastModifyDate'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
             xml_rexml.elements['//statementDate'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
-            xml_rexml.elements['//fileContent'].text = Base64.encode64(message)
+            xml_rexml.elements['//status'].text = 'depo_closed' if status == 'DECLINED_BY_ABS'
+            #xml_rexml.elements['//fileContent'].text = Base64.encode64(message)
           when 'SystemCreditsResponse'
             xml_rexml.elements['//branchId'].text = @xml.elements["//branchId"].text
             xml_rexml.elements['//creditLoadRequestId'].text = @xml.elements["//docId"].text
@@ -298,6 +299,7 @@ module CcFormatValidatorHelper
             xml_rexml.elements['//statementDate'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
             xml_rexml.elements['//trancheDate'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
             xml_rexml.elements['//debtDate'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
+            xml_rexml.elements['//creditStatus'].text = 'credit_closed' if status == 'DECLINED_BY_ABS'
           when 'TCNotice'
             xml_rexml.elements['//docDate'].text = Time.now.strftime('%Y-%m-%dT%H:%M:%S')
             xml_rexml.elements['//docsFromResidentDate'].text = (Time.now + (60*60*24)).strftime('%Y-%m-%dT%H:%M:%S')
@@ -329,24 +331,46 @@ module CcFormatValidatorHelper
         factory = ActiveMQConnectionFactory.new
         factory.setBrokerURL("tcp://vm-itools:61611")
         connection = factory.createConnection('smx', 'smx')
+        # Queue Settings
         session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-        textMessage = session.createTextMessage(message)
-        textMessage.setJMSCorrelationID(SecureRandom.uuid)
-        sender = session.createSender(session.createQueue('correqts_out'))
-        sender2 = session.createSender(session.createQueue('correqts_out2'))
+        queueMessage = session.createTextMessage(message)
+        queueMessage.setJMSCorrelationID(SecureRandom.uuid)
+        queue1 = session.createSender(session.createQueue('validator_queue_out1'))
+        queue2 = session.createSender(session.createQueue('validator_queue_out2'))
+        queue3 = session.createSender(session.createQueue('validator_queue_out3'))
+        queue4 = session.createSender(session.createQueue('validator_queue_out4'))
+        queue5 = session.createSender(session.createQueue('validator_queue_out5'))
+        queue6 = session.createSender(session.createQueue('validator_queue_out6'))
+        queue1.setTimeToLive(120000)
+        queue2.setTimeToLive(120000)
+        queue3.setTimeToLive(120000)
+        queue4.setTimeToLive(120000)
+        queue5.setTimeToLive(120000)
+        queue6.setTimeToLive(120000)
+        # Topic Settings
+        # topic_session = connection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
+        # topicMessage = topic_session.createTextMessage(message)
+        # topic = topic_session.createPublisher(topic_session.createTopic('validator_topic_out'))
         connection.start
-        sender.send(textMessage)
-        sender2.send(textMessage)
-        sender.close
-        sender2.close
+        #connection.destroyDestination(session.createQueue('validator_queue_out'))
+        queue1.send(queueMessage)
+        queue2.send(queueMessage)
+        queue3.send(queueMessage)
+        queue4.send(queueMessage)
+        queue5.send(queueMessage)
+        queue6.send(queueMessage)
+        #topic.send(topicMessage)
+        #topic.close
         session.close
+        #topic_session.close
         connection.close
-        CcFormatValidatorLog.create(uuid: @uuid, events: 'Отправка ответа', status: 'OK', short_message: 'Отправили ответ в очередь correqts_out', xml: textMessage.text )
+        CcFormatValidatorLog.create(uuid: @uuid, events: 'Отправка ответа', status: 'OK', short_message: 'Отправили ответ в очередь', xml: queueMessage.text )
       rescue => msg
         CcFormatValidatorLog.create(uuid: @uuid, events: 'Отправка ответа', status: 'FAIL', short_message: 'Ошибка при отправке ответа', full_message: "Ошибка! #{msg.message}\n#{msg.backtrace.join("\n")}")
         puts "Error! #{msg.message}\n#{msg.backtrace.join("\n")}"
       ensure
         session.close if session
+        #topic_session.close if topic_session
         connection.close if connection
       end
     end

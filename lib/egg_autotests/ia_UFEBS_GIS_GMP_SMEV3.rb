@@ -18,6 +18,7 @@ class IA_UFEBS_GIS_GMP_SMEV3
     @result = Hash.new
     @functional = "Проверка ИА УФЭБС (ГИС ГМП СМЭВ3)"
     @ufebs_version = ufebs_version #\app\smx\resourceapp.war\wsdl\XSD\CBR\х\ed\cbr_ed101_vх.xsd
+    @edno_ed101 = Random.rand(1000..50000)
   end
 
   def change_id(functional, correlation_id)
@@ -62,7 +63,7 @@ class IA_UFEBS_GIS_GMP_SMEV3
         $log_egg.write_to_log(functional, "Получили xml", "Получили xml: #{xml.xml_name}\n#{xml.xml_text}")
         xml_rexml = Document.new(xml.xml_text)
         xsd = "#{Rails.root}/lib/egg_autotests/xsd/ufebs_file/#{@ufebs_version}/cbr_#{xml_name}_v#{@ufebs_version}.xsd"
-        xml_rexml.elements["//ed:#{xml_root_element}"].attributes['EDNo'] = Random.rand(1000..50000)
+        xml_rexml.elements["//ed:#{xml_root_element}"].attributes['EDNo'] = @edno_ed101
         $log_egg.write_to_browser("Валидируем XML для запроса...")
         $log_egg.write_to_log(functional, "Валидация исходящей XML", "Валидируем XML для запроса:\n#{xml.xml_name}\nПо XSD:\n #{xsd}")
         if !validate_egg_xml(xsd, xml_rexml.to_s, functional)
@@ -344,7 +345,7 @@ class IA_UFEBS_GIS_GMP_SMEV3
         end
         #########################################################
         change_smevmessageid_gis_gmp(Document.new(@xml_from_ia), '25106819-6012-11e8-9f80-005056b644cd', @db_username, functional, true)
-        answer = ufebs_file_count(functional, true)
+        answer = ufebs_file_count(functional, true, 'gis_gmp_smev3')
         if answer.first == 3 and answer.last == 3
           @result["packetepd_test"] = "true"
           $log_egg.write_to_browser("Проверка пройдена!")
@@ -370,6 +371,128 @@ class IA_UFEBS_GIS_GMP_SMEV3
       end
     rescue Exception => msg
       @result["packetepd_test"] = "false"
+      $log_egg.write_to_browser("Ошибка! #{msg}")
+      $log_egg.write_to_log(functional, "Ошибка!", "Ошибка! #{msg}\n#{msg.backtrace.join("\n")}")
+      colorize_egg(@egg_version, @menu_name, @fail_menu_color)
+    end
+  end
+
+  def ed101_change
+    sleep 1.5
+    begin
+      count = 1
+      until @result["ed101_change"] == "true" or count > @try_count
+        xml_name = 'change_ed101'
+        functional = "#{@functional}. #{xml_name}. Попытка #{count}"
+        xml_root_element = 'ED101'
+        $log_egg.write_to_log(functional, "Начали проверку в #{Time.now.strftime('%H-%M-%S')}", "#{@menu_name} #{xml_name}")
+        $log_egg.write_to_browser("#{puts_line_egg}")
+        $log_egg.write_to_browser("Начали проверку: #{@menu_name}. #{xml_name}. Попытка #{count}")
+        $log_egg.write_to_browser("Пытаемся найти XML в БД")
+        $log_egg.write_to_log(functional, "Пытаемся найти XML в БД")
+        xml = Xml.where(xml_name: xml_name, category_id: @category.id).first
+        raise @not_find_xml if xml.nil?
+        $log_egg.write_to_log(functional, "Получили xml", "Получили xml: #{xml.xml_name}\n#{xml.xml_text}")
+        xml_rexml = Document.new(xml.xml_text)
+        xsd = "#{Rails.root}/lib/egg_autotests/xsd/ufebs_file/#{@ufebs_version}/cbr_ed101_v#{@ufebs_version}.xsd"
+        xml_rexml.elements["//ed:#{xml_root_element}"].attributes['EDNo'] = @edno_ed101
+        $log_egg.write_to_browser("Валидируем XML для запроса...")
+        $log_egg.write_to_log(functional, "Валидация исходящей XML", "Валидируем XML для запроса:\n#{xml.xml_name}\nПо XSD:\n #{xsd}")
+        if !validate_egg_xml(xsd, xml_rexml.to_s, functional)
+          @result["ed101_change"] = "false"
+          colorize_egg(@egg_version, @menu_name, @fail_menu_color)
+          return
+        end
+        FileUtils.rm_r @dir_inbound if File.directory?(@dir_inbound)# Чистим каталог для получения
+        $log_egg.write_to_browser("Удалили каталог #{@dir_inbound}...")
+        $log_egg.write_to_log(functional, "Удаляем каталог для отправления", "Удалили каталог #{@dir_inbound}")
+        File.open("#{@dir_outbound}/#{xml_name}.xml", 'w'){ |file| file.write xml_rexml.to_s }
+        $log_egg.write_to_browser("Положили запрос в каталог #{@dir_outbound}")
+        $log_egg.write_to_log(functional, "Подкладываем запрос #{xml_name}.xml", "Положили запрос в каталог #{@dir_outbound}:\n#{xml_rexml.to_s}")
+        change_id(functional, 'I_09bcf2c6-a08a-4ea2-959d-8e198ba689d9') # Перехватываем сообщение до ядра и меняем Id на entityId ответа из заглушки
+        change_smevmessageid_gis_gmp(Document.new(@xml_from_ia), '25106819-6012-11e8-9f80-005056b644cd', @db_username, functional, true)
+        answer = ufebs_file_count(functional, false, 'gis_gmp_smev3')
+        if answer.first == 1 and answer.last == 1 # Если нашли в каталоге 1 файл со статусом ADPS000 (Принят адаптером) и 1 файл со статусом ADPS001 (Принят СМЭВ), считаем, что все ок.
+          @result["ed101_change"] = "true"
+          $log_egg.write_to_browser("Проверка пройдена!")
+          $log_egg.write_to_log(functional, "Проверка пройдена!", "Done!")
+          colorize_egg(@egg_version, @menu_name, @pass_menu_color) if !@result.has_value?("false")
+        elsif answer.first == 0 and answer.last == 0 # Если ничего не нашли в каталоге
+          @result["ed101_change"] = "false"
+          $log_egg.write_to_browser("Проверка не пройдена! Не получили ответ от eGG")
+          $log_egg.write_to_log(functional, "Проверка не пройдена!", "Проверка не пройдена! Не получили ответ от eGG!")
+          colorize_egg(@egg_version, @menu_name, @fail_menu_color)
+        elsif answer.first == 1 and answer.last == 0 # Если получили только ответ от адаптера (ADPS000), а не от СМЭВ
+          @result["ed101_change"] = "false"
+          $log_egg.write_to_browser("Проверка не пройдена! Получили квиток от eGG, но не получили финальный статус")
+          $log_egg.write_to_log(functional, "Проверка не пройдена!", "Проверка не пройдена! Получили квиток от eGG, но не получили финальный статус")
+          colorize_egg(@egg_version, @menu_name, @fail_menu_color)
+        end
+        count +=1
+      end
+    rescue Exception => msg
+      @result["ed101_change"] = "false"
+      $log_egg.write_to_browser("Ошибка! #{msg}")
+      $log_egg.write_to_log(functional, "Ошибка!", "Ошибка! #{msg}\n#{msg.backtrace.join("\n")}")
+      colorize_egg(@egg_version, @menu_name, @fail_menu_color)
+    end
+  end
+
+  def ed101_delete
+    sleep 1.5
+    begin
+      count = 1
+      until @result["ed101_delete"] == "true" or count > @try_count
+        xml_name = 'delete_ed101'
+        functional = "#{@functional}. #{xml_name}. Попытка #{count}"
+        xml_root_element = 'ED101'
+        $log_egg.write_to_log(functional, "Начали проверку в #{Time.now.strftime('%H-%M-%S')}", "#{@menu_name} #{xml_name}")
+        $log_egg.write_to_browser("#{puts_line_egg}")
+        $log_egg.write_to_browser("Начали проверку: #{@menu_name}. #{xml_name}. Попытка #{count}")
+        $log_egg.write_to_browser("Пытаемся найти XML в БД")
+        $log_egg.write_to_log(functional, "Пытаемся найти XML в БД")
+        xml = Xml.where(xml_name: xml_name, category_id: @category.id).first
+        raise @not_find_xml if xml.nil?
+        $log_egg.write_to_log(functional, "Получили xml", "Получили xml: #{xml.xml_name}\n#{xml.xml_text}")
+        xml_rexml = Document.new(xml.xml_text)
+        xsd = "#{Rails.root}/lib/egg_autotests/xsd/ufebs_file/#{@ufebs_version}/cbr_ed101_v#{@ufebs_version}.xsd"
+        xml_rexml.elements["//ed:#{xml_root_element}"].attributes['EDNo'] = @edno_ed101
+        $log_egg.write_to_browser("Валидируем XML для запроса...")
+        $log_egg.write_to_log(functional, "Валидация исходящей XML", "Валидируем XML для запроса:\n#{xml.xml_name}\nПо XSD:\n #{xsd}")
+        if !validate_egg_xml(xsd, xml_rexml.to_s, functional)
+          @result["ed101_delete"] = "false"
+          colorize_egg(@egg_version, @menu_name, @fail_menu_color)
+          return
+        end
+        FileUtils.rm_r @dir_inbound if File.directory?(@dir_inbound)# Чистим каталог для получения
+        $log_egg.write_to_browser("Удалили каталог #{@dir_inbound}...")
+        $log_egg.write_to_log(functional, "Удаляем каталог для отправления", "Удалили каталог #{@dir_inbound}")
+        File.open("#{@dir_outbound}/#{xml_name}.xml", 'w'){ |file| file.write xml_rexml.to_s }
+        $log_egg.write_to_browser("Положили запрос в каталог #{@dir_outbound}")
+        $log_egg.write_to_log(functional, "Подкладываем запрос #{xml_name}.xml", "Положили запрос в каталог #{@dir_outbound}:\n#{xml_rexml.to_s}")
+        change_id(functional, 'I_09bcf2c6-a08a-4ea2-959d-8e198ba689d9') # Перехватываем сообщение до ядра и меняем Id на entityId ответа из заглушки
+        change_smevmessageid_gis_gmp(Document.new(@xml_from_ia), '25106819-6012-11e8-9f80-005056b644cd', @db_username, functional, true)
+        answer = ufebs_file_count(functional, false, 'gis_gmp_smev3')
+        if answer.first == 1 and answer.last == 1 # Если нашли в каталоге 1 файл со статусом ADPS000 (Принят адаптером) и 1 файл со статусом ADPS001 (Принят СМЭВ), считаем, что все ок.
+          @result["ed101_delete"] = "true"
+          $log_egg.write_to_browser("Проверка пройдена!")
+          $log_egg.write_to_log(functional, "Проверка пройдена!", "Done!")
+          colorize_egg(@egg_version, @menu_name, @pass_menu_color) if !@result.has_value?("false")
+        elsif answer.first == 0 and answer.last == 0 # Если ничего не нашли в каталоге
+          @result["ed101_delete"] = "false"
+          $log_egg.write_to_browser("Проверка не пройдена! Не получили ответ от eGG")
+          $log_egg.write_to_log(functional, "Проверка не пройдена!", "Проверка не пройдена! Не получили ответ от eGG!")
+          colorize_egg(@egg_version, @menu_name, @fail_menu_color)
+        elsif answer.first == 1 and answer.last == 0 # Если получили только ответ от адаптера (ADPS000), а не от СМЭВ
+          @result["ed101_delete"] = "false"
+          $log_egg.write_to_browser("Проверка не пройдена! Получили квиток от eGG, но не получили финальный статус")
+          $log_egg.write_to_log(functional, "Проверка не пройдена!", "Проверка не пройдена! Получили квиток от eGG, но не получили финальный статус")
+          colorize_egg(@egg_version, @menu_name, @fail_menu_color)
+        end
+        count +=1
+      end
+    rescue Exception => msg
+      @result["ed101_delete"] = "false"
       $log_egg.write_to_browser("Ошибка! #{msg}")
       $log_egg.write_to_log(functional, "Ошибка!", "Ошибка! #{msg}\n#{msg.backtrace.join("\n")}")
       colorize_egg(@egg_version, @menu_name, @fail_menu_color)

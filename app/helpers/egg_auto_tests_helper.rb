@@ -861,5 +861,13 @@ queue_core_ia_consumers=5
       end
     end
   end
-
+  # def change_db_user_in_options(user)
+  #   file = IO.read("#{Rails.root}/lib/egg_autotests/installer/optionsEgg611.txt")
+  #   file = file.gsub('egg_autotest', user)
+  #   IO.write("#{Rails.root}/lib/egg_autotests/installer/optionsEgg611.txt", file)
+  #
+  #   file2 = IO.read("#{Rails.root}/lib/egg_autotests/installer/optionsEgg610.txt")
+  #   file2 = file2.gsub('egg_autotest', user)
+  #   IO.write("#{Rails.root}/lib/egg_autotests/installer/optionsEgg610.txt", file2)
+  # end
 end

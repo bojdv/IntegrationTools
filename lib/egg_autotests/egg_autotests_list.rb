@@ -62,6 +62,8 @@ class EggAutotestsList
       ia_ufebs_gis_gmp.ed105_test
       ia_ufebs_gis_gmp.ed108_test
       ia_ufebs_gis_gmp.packetepd_test
+      ia_ufebs_gis_gmp.ed101_change
+      ia_ufebs_gis_gmp.ed101_delete
     end
     if components.include?('ИА Active MQ')
       ia_amq = IA_ActiveMQ.new(@pass_menu_color, @fail_menu_color, @not_find_xml, @not_receive_answer, @egg_version, @try_count)
@@ -138,8 +140,10 @@ class EggAutotestsList
       ia_ufebs_gis_gmp_smev3.ed101_test
       ia_ufebs_gis_gmp_smev3.ed104_test
       ia_ufebs_gis_gmp_smev3.ed105_test
-      #ia_ufebs_gis_gmp_smev3.ed108_test
+      ia_ufebs_gis_gmp_smev3.ed108_test
       ia_ufebs_gis_gmp_smev3.packetepd_test
+      ia_ufebs_gis_gmp_smev3.ed101_change
+      ia_ufebs_gis_gmp_smev3.ed101_delete
     end
   end
 end

@@ -19,6 +19,6 @@ class ApplicationController < ActionController::Base
   $CLASSPATH << "lib/javax.resource.jar"
   $CLASSPATH << "lib/javax.transaction.jar"
   $CLASSPATH << "com.ibm.msg.client.osgi.wmq_7.0.1.3.jar"
-
+  $CLASSPATH << "lib/sqljdbc4-4.1.jar"
 
 end

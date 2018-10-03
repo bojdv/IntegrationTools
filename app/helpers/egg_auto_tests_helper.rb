@@ -2,6 +2,7 @@ require 'zip'
 module EggAutoTestsHelper
   
   class Logger_egg # Класс логирования в браузер и БД
+    attr_reader :log_dir, :log_egg
     
     def initialize
       @log_egg = Hash.new # Переменная класса, пустой хэш. В него пишется весь лог.
@@ -105,6 +106,30 @@ module EggAutoTestsHelper
   def send_email(attachment, build_version)
     require 'mail'
     begin
+      error = false
+      body = "Выполнены автотесты на новой сборке ЕГГ #{build_version}. Отчет прикреплен к письму.\n"
+      body << "Выполненные проверки:\n\n"
+      $log_egg.log_egg.each do |key, value|
+        if value.is_a?(Hash)
+          @result = true
+          value.each do |key2, value|
+            @result = false if key2.include?("Проверка не пройдена!") || key2.include?("Случилось непредвиденное") || key2.include?("Ошибка")
+          end
+          if @result
+            body << "#{key} - Пройдено\n"
+          else
+            error = true
+            body << "#{key} - Провалено!!!\n"
+          end
+          body << "------------\n"
+        end
+      end
+      subject = "[#{build_version}] Результаты прохождения автотестов. "
+      subject << if error
+                   "Есть ошибки!"
+                 else
+                   "Ошибок нет"
+                 end
       options = { :address              => "postman.bssys.com",
                   :port                 => 25,
                   :authentication       => 'plain',
@@ -113,15 +138,16 @@ module EggAutoTestsHelper
       mail = Mail.new do
         from     'iTools@bssys.com'
         to       ['a.pekhov@bssys.com', 'd.bojko@bssys.com', 'A.Shpinko@bssys.com']
-        subject  "[#{build_version}] Результаты прохождения автотестов"
-        body     "Выполнены автотесты на новой сборке ЕГГ #{build_version}. Отчет прикреплен к письму."
+        subject  subject
+        body      body
         add_file attachment
       end
       mail.delivery_method :smtp, options
       mail.deliver
       puts "Send Email"
     rescue Exception => msg
-      puts "#{msg.to_s}"
+      puts msg
+      puts msg.backtrace.join('\n')
     end
   end
   
@@ -454,12 +480,12 @@ END;})
   def ufebs_file_count(functional, packetepd = false, gis_type = 'gis_gmp') # Метод, который возвращает кол-во полученных из УФЭБС файлов
     # functional - название тест, packetepd - признак, что это запрос packetepd, gis_type - тип адаптера, по умолчанию ГИС ГМП
     case gis_type # Анализируем тип адаптера и соответственно выбираем каталог, куда класть файлы
-      when 'gis_gmp'
-        dir = 'C:/data/inbox/1/inbound/all'
-      when 'gis_zkh'
-        dir = 'C:/data/inbox/GIS_ZKH/inbound/all'
-      when 'gis_gmp_smev3'
-        dir = 'C:/data/INAD_GISGMP_UFEBS/inbound/all'
+    when 'gis_gmp'
+      dir = 'C:/data/inbox/1/inbound/all'
+    when 'gis_zkh'
+      dir = 'C:/data/inbox/GIS_ZKH/inbound/all'
+    when 'gis_gmp_smev3'
+      dir = 'C:/data/INAD_GISGMP_UFEBS/inbound/all'
     end
     code_adps000 = 'ADPS000' # Переменная хранит код промежуточного тикета от адаптера
     code_adps001 = 'ADPS001' # Переменная хранит код успешного сообщения от СМЭВ
@@ -470,12 +496,12 @@ END;})
     $log_egg.write_to_browser("Ждем ответ в течении #{count} секунд")
     if packetepd
       case gis_type
-        when 'gis_gmp'
-          positive_code = 3 # Ждем три файла со статусом ADPS001
-        when 'gis_zkh'
-          positive_code = 2
-        when 'gis_gmp_smev3'
-          positive_code = 3
+      when 'gis_gmp'
+        positive_code = 3 # Ждем три файла со статусом ADPS001
+      when 'gis_zkh'
+        positive_code = 2
+      when 'gis_gmp_smev3'
+        positive_code = 3
       end
     else
       positive_code = 1
@@ -673,14 +699,14 @@ END;})
   
   def get_installer_config(build_version)
     case # Определяем название файла с конфигом инсталлятора
-      when build_version.include?('6.9')
-        "optionsEgg69.txt"
-      when build_version.include?('6.10')
-        "optionsEgg610.txt"
-      when build_version.include?('6.11')
-        "optionsEgg611.txt"
-      else
-        "optionsEgg69.txt"
+    when build_version.include?('6.9')
+      "optionsEgg69.txt"
+    when build_version.include?('6.10')
+      "optionsEgg610.txt"
+    when build_version.include?('6.11')
+      "optionsEgg611.txt"
+    else
+      "optionsEgg69.txt"
     end
   end
   
@@ -694,9 +720,9 @@ ValidateOutputEgg=true
 #Настройка логирования
 isLog=false
 
-#Входная очередь ядра 
+#Входная очередь ядра
 core_sa=core_sa_real
-#Ответная очередь ядра 
+#Ответная очередь ядра
 core_ia=core_ia
 #Количество потоков чтения входной очереди ядра
 queue_core_sa_consumers=5
@@ -744,21 +770,21 @@ queue_core_ia_consumers=5
             if message
               message_rexml = Document.new(message.getText)
               case message_rexml.elements['//tns:Request'].attributes['adapterId']
-                when 'egg-file-adapter-mcicb'
-                  puts "Receive UFEBS GIS GMP message"
-                  @core_in_ufebs_gmp << {correlation_id: message.getJMSCorrelationID, body: message.getText }
-                when 'egg-file-adapter-zkh-mcicb'
-                  puts "Receive UFEBS GIS ZKH message"
-                  @core_in_ufebs_zkh << {correlation_id: message.getJMSCorrelationID, body: message.getText }
-                when 'egg-zkhfileMq-adapter'
-                  puts "Receive UFEBS GIS ZKH JPMorgan message"
-                  @core_in_ufebs_jpm << {correlation_id: message.getJMSCorrelationID, body: message.getText }
-                when 'gisgmp-fileUfebs-iadp'
-                  puts "Receive UFEBS GIS GMP SMEV3 message"
-                  @core_in_ufebs_gmp_smev3 << {correlation_id: message.getJMSCorrelationID, body: message.getText }
-                else
-                  puts "Receive not UFEBS message"
-                  sender.send(message)
+              when 'egg-file-adapter-mcicb'
+                puts "Receive UFEBS GIS GMP message"
+                @core_in_ufebs_gmp << {correlation_id: message.getJMSCorrelationID, body: message.getText }
+              when 'egg-file-adapter-zkh-mcicb'
+                puts "Receive UFEBS GIS ZKH message"
+                @core_in_ufebs_zkh << {correlation_id: message.getJMSCorrelationID, body: message.getText }
+              when 'egg-zkhfileMq-adapter'
+                puts "Receive UFEBS GIS ZKH JPMorgan message"
+                @core_in_ufebs_jpm << {correlation_id: message.getJMSCorrelationID, body: message.getText }
+              when 'gisgmp-fileUfebs-iadp'
+                puts "Receive UFEBS GIS GMP SMEV3 message"
+                @core_in_ufebs_gmp_smev3 << {correlation_id: message.getJMSCorrelationID, body: message.getText }
+              else
+                puts "Receive not UFEBS message"
+                sender.send(message)
               end
             end
             sleep 1
@@ -861,13 +887,4 @@ queue_core_ia_consumers=5
       end
     end
   end
-  # def change_db_user_in_options(user)
-  #   file = IO.read("#{Rails.root}/lib/egg_autotests/installer/optionsEgg611.txt")
-  #   file = file.gsub('egg_autotest', user)
-  #   IO.write("#{Rails.root}/lib/egg_autotests/installer/optionsEgg611.txt", file)
-  #
-  #   file2 = IO.read("#{Rails.root}/lib/egg_autotests/installer/optionsEgg610.txt")
-  #   file2 = file2.gsub('egg_autotest', user)
-  #   IO.write("#{Rails.root}/lib/egg_autotests/installer/optionsEgg610.txt", file2)
-  # end
 end

@@ -133,6 +133,7 @@ class EggAutotestsList
       sa_gis_gmp_smev3.payment_new
       sa_gis_gmp_smev3.payment_refinement
       sa_gis_gmp_smev3.payment_cancellation
+      sa_gis_gmp_smev3.payment_change_delete
       sa_gis_gmp_smev3.charges
     end
     if components.include?('ИА УФЭБС (ГИС ГМП СМЭВ3)')
@@ -144,6 +145,7 @@ class EggAutotestsList
       ia_ufebs_gis_gmp_smev3.packetepd_test
       ia_ufebs_gis_gmp_smev3.ed101_change
       ia_ufebs_gis_gmp_smev3.ed101_delete
+      ia_ufebs_gis_gmp_smev3.ed101_change_delete
     end
   end
 end

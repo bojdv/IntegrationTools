@@ -136,7 +136,7 @@ module EggAutoTestsHelper
                   :enable_starttls_auto => true}
       mail = Mail.new do
         from     'iTools@bssys.com'
-        to       ['a.pekhov@bssys.com', 'd.bojko@bssys.com', 'A.Shpinko@bssys.com']
+        to       ['a.pekhov@bssys.com', 'd.bojko@bssys.com', 'A.Shpinko@bssys.com', 'N.Tkachenko@bssys.com']
         subject  subject
         body      body
         add_file attachment

@@ -32,8 +32,8 @@ module IntegrationUI
     config.active_record.default_timezone = :local
     config.after_initialize do
       if Rails.env == 'production'
-        validator = CcFormatValidatorController.new
-        validator.start
+        # validator = CcFormatValidatorController.new
+        # validator.start
         egg_build_tester = EggAutoTestsController.new
         egg_build_tester.index
         egg_build_tester.run_automate

@@ -14,6 +14,7 @@ module EggAutoTestsHelper
     def write_to_log(functional, action, result = '') # Метод для записи в лог html.
       # Параметры: functional - Корневое имя теста, action - действие (левая колонка в логе), result - результат (правая колонка в логе), его можно не указывать при вызове.
       if @log_egg.has_key?(functional) # Если хэш уже содержит ключ с именем такого теста, то делаем из этого ключа хэш с ключом action и значением result
+        action = "#{Time.now.strftime('[%H-%M-%S.%L]')} #{action}"
         @log_egg[functional][action] = result # Таким образом мы формируем единую таблицу с одним заголовком functional для каждого теста
       else # Если ключ новый, то просто создаем новый хэш
         @log_egg[functional] = {action => result}
@@ -107,7 +108,7 @@ module EggAutoTestsHelper
     require 'mail'
     begin
       error = false
-      body = "Выполнены автотесты на новой сборке ЕГГ #{build_version}. Отчет прикреплен к письму.\n"
+      body = "Выполнены автотесты на новой сборке ЕГГ #{build_version} на #{SQL_query.db_type}. Отчет прикреплен к письму.\n"
       body << "Проваленные проверки:\n\n"
       $log_egg.log_egg.each do |key, value|
         if value.is_a?(Hash)
@@ -187,7 +188,7 @@ module EggAutoTestsHelper
     end
   end
 
-  def receive_from_amq_egg(manager, functional, ignore_ticket = false, counter = 60) # Получение сообщений из Active MQ по протоколу OpenWire
+  def receive_from_amq_egg(manager, functional, process_ticket = false, counter = 60) # Получение сообщений из Active MQ по протоколу OpenWire
     java_import 'org.apache.activemq.ActiveMQConnectionFactory'
     java_import 'javax.jms.Session'
     java_import 'javax.jms.TextMessage'
@@ -216,7 +217,7 @@ module EggAutoTestsHelper
         $log_egg.write_to_log(functional, "Результат отправки:", "Пришла ошибка из СМЭВ: Внешний сервис недоступен.\n#{xml_actual.getText}")
         return nil
       end
-      if ignore_ticket
+      if process_ticket && xml_actual.getText.include?("Ticket")
         $log_egg.write_to_log(functional, "Получили квиток", "Получили промежуточный квиток из очереди #{manager.queue_in}:\n #{xml_actual.getText}")
         $log_egg.write_to_browser("Получили промежуточный квиток от eGG")
         count = counter
@@ -286,36 +287,6 @@ module EggAutoTestsHelper
       $log_egg.write_to_log(@run_test_message, "Проверка наличия каталога '#{egg_dir}'", "Ошибка! Каталог '#{egg_dir}' не найден")
       return true
     end
-  end
-
-  def delete_db_egg(functional)
-    java_import 'oracle.jdbc.OracleDriver'
-    java_import 'java.sql.DriverManager'
-    begin
-      $log_egg.write_to_browser("Удаляем БД '#{@db_username}'")
-      $log_egg.write_to_log(functional, "Удаляем БД '#{@db_username}'", "...")
-      url = "jdbc:oracle:thin:@vm-corint:1521:corint"
-      connection = java.sql.DriverManager.getConnection(url, "sys as sysdba", "waaaaa");
-      stmt = connection.create_statement
-      stmt.executeUpdate(%Q{BEGIN
-  EXECUTE IMMEDIATE 'DROP USER #{@db_username} cascade';
-EXCEPTION
-  WHEN OTHERS THEN
-    IF SQLCODE != -1918 THEN
-      RAISE;
-    END IF;
-END;})
-    rescue Exception => msg
-      $log_egg.write_to_browser("Ошибка! #{msg}")
-      $log_egg.write_to_log(functional, "Ошибка при удалении БД '#{@db_username}'", "#{msg}")
-      return true
-    ensure
-      stmt.close
-      connection.close
-    end
-    sleep 0.5
-    $log_egg.write_to_browser("Удалили БД '#{@db_username}'")
-    $log_egg.write_to_log(functional, "Результат удаления БД '#{@db_username}'", "Done!")
   end
 
   def start_servicemix_egg(dir)
@@ -598,88 +569,19 @@ END;})
     end
   end
 
-  def insert_inn(db_user) # Метод вставляет в таблицу zkh_inn запись с поставщиком для тестов. Ничего не возвращает.
-    begin
-      url = "jdbc:oracle:thin:@vm-corint:1521:corint"
-      connection = java.sql.DriverManager.getConnection(url, db_user, db_user);
-      stmt = connection.create_statement
-      # stmt.executeUpdate("TRUNCATE TABLE zkh_inn")
-      # $log_egg.write_to_browser("Очистили таблицу ZKH_INN")
-      #$log_egg.write_to_log(functional, "Очистили таблицу ZKH_INN")
-      #stmt.executeUpdate("insert into zkh_inn (inn, kpp, name, account, bank_name, bank_bik) values (5406562465, 540501001, 'ФОНД МОДЕРНИЗАЦИИ И РАЗВИТИЯ ЖИЛИЩНО-КОММУНАЛЬНОГО ХОЗЯЙСТВА МУНИЦИПАЛЬНЫХ ОБРАЗОВАНИЙ НОВОСИБИРСКОЙ ОБЛАСТИ', 40604810200290003717, '\"ГАЗПРОМБАНК\" (АКЦИОНЕРНОЕ ОБЩЕСТВО)', '045004783')")
-      stmt.executeUpdate("insert into zkh_inn (inn, kpp, name, account, bank_name, bank_bik) values (9909400765, 774763002, 'ООО Межгосударственный банк', 30301810000006000001, 'ПАО СБЕРБАНК', '044525225')")
-    ensure
-      stmt.close if stmt
-      connection.close if connection
-    end
+  def insert_inn # Метод вставляет в таблицу zkh_inn запись с поставщиком для тестов. Ничего не возвращает.
+    @sql_query = SQL_query.new
+    @sql_query.insert_inn # Вставляем в БД запись с поставщиком
   end
 
-  def change_smevmessageid(xml_rexml, smev_id, db_user, functional) # метод меняет id для запросов в СМЭВ3
-    begin
-      process_id = xml_rexml.elements["//mq:RequestMessage"].attributes["processID"]
-      url = "jdbc:oracle:thin:@vm-corint:1521:corint"
-      connection = java.sql.DriverManager.getConnection(url, db_user, db_user);
-      stmt = connection.create_statement
-      result = 0
-      count = 30
-      while result == 0 # 0, if no rows are affected by the operation.
-        result = stmt.executeUpdate("UPDATE EGG_SMEV3_CONTEXT SET SMEVMESSAGEID = '#{smev_id}' WHERE PROCESSID = '#{process_id}'")
-        sleep 1
-        puts count -=1
-        return nil if count == 0
-      end
-      $log_egg.write_to_browser("Заменили id в SMEVMESSAGEID на #{smev_id}")
-      $log_egg.write_to_log(functional, "Заменили id в SMEVMESSAGEID", "UPDATE EGG_SMEV3_CONTEXT SET SMEVMESSAGEID = '#{smev_id}' WHERE PROCESSID = '#{process_id}'")
-    rescue Exception => msg
-      $log_egg.write_to_browser("Ошибка! #{msg}")
-      $log_egg.write_to_log(@end_test_message, "Ошибка при замене SMEVMESSAGEID", "Ошибка! #{msg}\n#{msg.backtrace.join("\n")}")
-    ensure
-      stmt.close if stmt
-      connection.close if connection
-    end
+  def change_smevmessageid(xml_rexml, smev_id, functional) # метод меняет id для запросов в СМЭВ3
+    @sql_query = SQL_query.new
+    @sql_query.change_smevmessageid(xml_rexml, smev_id, functional)
   end
 
-  def change_smevmessageid_gis_gmp(xml_rexml, smev_id, db_user, functional, ufebs = false) # метод меняет id для запросов ГИС ГМП в СМЭВ3
-    begin
-      if ufebs
-        process_id = xml_rexml.elements["//tns:Request"].attributes["processId"]
-      else
-        process_id = xml_rexml.elements["//mq:RequestMessage"].attributes["processID"]
-      end
-      url = "jdbc:oracle:thin:@vm-corint:1521:corint"
-      connection = java.sql.DriverManager.getConnection(url, db_user, db_user);
-      stmt = connection.create_statement
-      row_updated = 0
-      count = 30
-      while row_updated.zero?
-        rs = stmt.executeQuery("select SMEVMESSAGEID from FK_SMEV3 WHERE PROCESSID = '#{process_id}'")
-        if rs.isBeforeFirst()
-          while rs.next() do
-            check_null = rs.getString('SMEVMESSAGEID')
-          end
-          if check_null
-            row_updated = stmt.executeUpdate("UPDATE FK_SMEV3 SET SMEVMESSAGEID = '#{smev_id}' WHERE PROCESSID = '#{process_id}'")
-            if row_updated == 1
-              $log_egg.write_to_browser("Заменили id в SMEVMESSAGEID на #{smev_id}")
-              $log_egg.write_to_log(functional, "Заменили id в SMEVMESSAGEID", "UPDATE EGG_SMEV3_CONTEXT SET SMEVMESSAGEID = '#{smev_id}' WHERE PROCESSID = '#{process_id}'")
-            end
-          end
-        end
-        if count == 0
-          $log_egg.write_to_browser("Не заменили id в SMEVMESSAGEID")
-          $log_egg.write_to_log(functional, "Не заменили id в SMEVMESSAGEID", "UPDATE EGG_SMEV3_CONTEXT SET SMEVMESSAGEID = '#{smev_id}' WHERE PROCESSID = '#{process_id}'")
-          return nil
-        end
-        puts count -=1
-        sleep 0.5
-      end
-    rescue Exception => msg
-      $log_egg.write_to_browser("Ошибка! #{msg}")
-      $log_egg.write_to_log(@end_test_message, "Ошибка при замене SMEVMESSAGEID", "Ошибка! #{msg}\n#{msg.backtrace.join("\n")}")
-    ensure
-      stmt.close if stmt
-      connection.close if connection
-    end
+  def change_smevmessageid_gis_gmp(xml_rexml, smev_id, functional, ufebs = false) # метод меняет id для запросов ГИС ГМП в СМЭВ3
+    @sql_query = SQL_query.new
+    @sql_query.change_smevmessageid_gis_gmp(xml_rexml, smev_id, functional, ufebs)
   end
 
   # def change_correlationid(xml_rexml, correlation_id, db_user, functional) # метод меняет id для запросов в УФЭБС
@@ -764,7 +666,7 @@ queue_core_ia_consumers=5
           connection.start
           receiver = session.createReceiver(session.createQueue('core_sa'))
           sender = session.createSender(session.createQueue('core_sa_real'))
-          while true do
+          loop do
             message = receiver.receiveNoWait()
             if message
               message_rexml = Document.new(message.getText)

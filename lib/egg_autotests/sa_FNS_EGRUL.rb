@@ -1,12 +1,11 @@
 class SA_FNS_EGRUL
-  def initialize(pass_menu_color, fail_menu_color, not_find_xml, not_receive_answer, egg_version, try_count, db_username)
+  def initialize(pass_menu_color, fail_menu_color, not_find_xml, not_receive_answer, egg_version, try_count)
     @pass_menu_color = pass_menu_color
     @fail_menu_color = fail_menu_color
     @not_find_xml = not_find_xml
     @not_receive_answer = not_receive_answer
     @egg_version = egg_version
     @try_count = try_count
-    @db_username = db_username
 
     @menu_name = 'СА ФНС ЕГРЮЛ'
     @category = Category.find_by_category_name('СА ФНС ЕГРЮЛ')
@@ -38,7 +37,7 @@ class SA_FNS_EGRUL
         $log_egg.write_to_log(functional, "Валидация исходящей XML", "Валидируем XML для запроса:\n#{xml.xml_name}\nПо XSD:\n #{xsd}")
         validate_egg_xml(xsd, xml_rexml.to_s, functional)
         if send_to_amq_egg(@manager, xml_rexml.to_s, functional)
-          change_smevmessageid(xml_rexml, 'b396b307-8ff4-11e8-a3af-005056b644cd', @db_username, functional)
+          change_smevmessageid(xml_rexml, 'b396b307-8ff4-11e8-a3af-005056b644cd', functional)
           answer = receive_from_amq_egg(@manager, functional, true, 80)
         end
         if answer.nil? # Если ответ от ЕГГ пустой, начинаем цикл заново

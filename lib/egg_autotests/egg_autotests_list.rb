@@ -98,11 +98,11 @@ class EggAutotestsList
       sa_spep.verifycertificate_nocert
     end
     if components.include?('СА ФНС ЕГРИП')
-      sa_gis_gmp = SA_FNS_EGRIP.new(@pass_menu_color, @fail_menu_color, @not_find_xml, @not_receive_answer, @egg_version, @try_count, @db_username)
+      sa_gis_gmp = SA_FNS_EGRIP.new(@pass_menu_color, @fail_menu_color, @not_find_xml, @not_receive_answer, @egg_version, @try_count)
       sa_gis_gmp.request_EGRIP_v405
     end
     if components.include?('СА ФНС ЕГРЮЛ')
-      sa_gis_gmp = SA_FNS_EGRUL.new(@pass_menu_color, @fail_menu_color, @not_find_xml, @not_receive_answer, @egg_version, @try_count, @db_username)
+      sa_gis_gmp = SA_FNS_EGRUL.new(@pass_menu_color, @fail_menu_color, @not_find_xml, @not_receive_answer, @egg_version, @try_count)
       sa_gis_gmp.request_EGRUL_v405
     end
     if components.include?('СА EFRSB (Банкроты)')
@@ -117,7 +117,7 @@ class EggAutotestsList
       sa_efrsb.searchPersonBySnils
     end
     if components.include?('СА ЕСИА СМЭВ3')
-      sa_esia_smev3 = SA_ESIA_SMEV3.new(@pass_menu_color, @fail_menu_color, @not_find_xml, @not_receive_answer, @egg_version, @try_count, @db_username)
+      sa_esia_smev3 = SA_ESIA_SMEV3.new(@pass_menu_color, @fail_menu_color, @not_find_xml, @not_receive_answer, @egg_version, @try_count)
       sa_esia_smev3.request_Confirm
       sa_esia_smev3.request_DELETE_ACCOUNT
       sa_esia_smev3.request_FIND_ACCOUNT
@@ -129,7 +129,7 @@ class EggAutotestsList
       sa_esia_smev3.request_UPRID
     end
     if components.include?('СА ГИС ГМП СМЭВ3')
-      sa_gis_gmp_smev3 = SA_GIS_GMP_SMEV3.new(@pass_menu_color, @fail_menu_color, @not_find_xml, @not_receive_answer, @egg_version, @try_count, @db_username)
+      sa_gis_gmp_smev3 = SA_GIS_GMP_SMEV3.new(@pass_menu_color, @fail_menu_color, @not_find_xml, @not_receive_answer, @egg_version, @try_count)
       sa_gis_gmp_smev3.payment_new
       sa_gis_gmp_smev3.payment_refinement
       sa_gis_gmp_smev3.payment_cancellation
@@ -137,7 +137,7 @@ class EggAutotestsList
       sa_gis_gmp_smev3.charges
     end
     if components.include?('ИА УФЭБС (ГИС ГМП СМЭВ3)')
-      ia_ufebs_gis_gmp_smev3 = IA_UFEBS_GIS_GMP_SMEV3.new(@pass_menu_color, @fail_menu_color, @not_find_xml, @not_receive_answer, @egg_version, @try_count, @ufebs_version, @db_username)
+      ia_ufebs_gis_gmp_smev3 = IA_UFEBS_GIS_GMP_SMEV3.new(@pass_menu_color, @fail_menu_color, @not_find_xml, @not_receive_answer, @egg_version, @try_count, @ufebs_version)
       ia_ufebs_gis_gmp_smev3.ed101_test
       ia_ufebs_gis_gmp_smev3.ed104_test
       ia_ufebs_gis_gmp_smev3.ed105_test

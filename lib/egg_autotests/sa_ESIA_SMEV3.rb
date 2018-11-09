@@ -1,13 +1,12 @@
 class SA_ESIA_SMEV3
 
-  def initialize(pass_menu_color, fail_menu_color, not_find_xml, not_receive_answer, egg_version, try_count, db_username)
+  def initialize(pass_menu_color, fail_menu_color, not_find_xml, not_receive_answer, egg_version, try_count)
     @pass_menu_color = pass_menu_color
     @fail_menu_color = fail_menu_color
     @not_find_xml = not_find_xml
     @not_receive_answer = not_receive_answer
     @egg_version = egg_version
     @try_count = try_count
-    @db_username = db_username
 
     @menu_name = 'СА ЕСИА СМЭВ3'
     @category = Category.find_by_category_name('СА ЕСИА СМЭВ3')
@@ -39,7 +38,7 @@ class SA_ESIA_SMEV3
         $log_egg.write_to_log(functional, "Валидация исходящей XML", "Валидируем XML для запроса:\n#{xml.xml_name}\nПо XSD:\n #{xsd}")
         validate_egg_xml(xsd, xml_rexml.to_s, functional)
         if send_to_amq_egg(@manager, xml_rexml.to_s, functional)
-          change_smevmessageid(xml_rexml, '666ac963-7aaf-11e8-af4d-005056b644cd', @db_username, functional)
+          change_smevmessageid(xml_rexml, '666ac963-7aaf-11e8-af4d-005056b644cd', functional)
           answer = receive_from_amq_egg(@manager, functional, true, 80)
         end
         if answer.nil? # Если ответ от ЕГГ пустой, начинаем цикл заново
@@ -107,7 +106,7 @@ class SA_ESIA_SMEV3
         $log_egg.write_to_log(functional, "Валидация исходящей XML", "Валидируем XML для запроса:\n#{xml.xml_name}\nПо XSD:\n #{xsd}")
         validate_egg_xml(xsd, xml_rexml.to_s, functional)
         if send_to_amq_egg(@manager, xml_rexml.to_s, functional)
-          change_smevmessageid(xml_rexml, '54cc4e23-7ad8-11e8-acd0-005056b644cd', @db_username, functional)
+          change_smevmessageid(xml_rexml, '54cc4e23-7ad8-11e8-acd0-005056b644cd', functional)
           answer = receive_from_amq_egg(@manager, functional, true, 80)
         end
         if answer.nil? # Если ответ от ЕГГ пустой, начинаем цикл заново
@@ -175,7 +174,7 @@ class SA_ESIA_SMEV3
         $log_egg.write_to_log(functional, "Валидация исходящей XML", "Валидируем XML для запроса:\n#{xml.xml_name}\nПо XSD:\n #{xsd}")
         validate_egg_xml(xsd, xml_rexml.to_s, functional)
         if send_to_amq_egg(@manager, xml_rexml.to_s, functional)
-          change_smevmessageid(xml_rexml, '72e05f8e-786f-11e8-8700-005056b644cd', @db_username, functional)
+          change_smevmessageid(xml_rexml, '72e05f8e-786f-11e8-8700-005056b644cd', functional)
           answer = receive_from_amq_egg(@manager, functional, true, 80)
         end
         if answer.nil? # Если ответ от ЕГГ пустой, начинаем цикл заново
@@ -243,7 +242,7 @@ class SA_ESIA_SMEV3
         $log_egg.write_to_log(functional, "Валидация исходящей XML", "Валидируем XML для запроса:\n#{xml.xml_name}\nПо XSD:\n #{xsd}")
         validate_egg_xml(xsd, xml_rexml.to_s, functional)
         if send_to_amq_egg(@manager, xml_rexml.to_s, functional)
-          change_smevmessageid(xml_rexml, '31149fb9-7911-11e8-b972-005056b644cd', @db_username, functional)
+          change_smevmessageid(xml_rexml, '31149fb9-7911-11e8-b972-005056b644cd', functional)
           answer = receive_from_amq_egg(@manager, functional, true, 80)
         end
         if answer.nil? # Если ответ от ЕГГ пустой, начинаем цикл заново
@@ -311,7 +310,7 @@ class SA_ESIA_SMEV3
         $log_egg.write_to_log(functional, "Валидация исходящей XML", "Валидируем XML для запроса:\n#{xml.xml_name}\nПо XSD:\n #{xsd}")
         validate_egg_xml(xsd, xml_rexml.to_s, functional)
         if send_to_amq_egg(@manager, xml_rexml.to_s, functional)
-          change_smevmessageid(xml_rexml, '42ffdfac-7911-11e8-b972-005056b644cd', @db_username, functional)
+          change_smevmessageid(xml_rexml, '42ffdfac-7911-11e8-b972-005056b644cd', functional)
           answer = receive_from_amq_egg(@manager, functional, true, 80)
         end
         if answer.nil? # Если ответ от ЕГГ пустой, начинаем цикл заново
@@ -379,7 +378,7 @@ class SA_ESIA_SMEV3
         $log_egg.write_to_log(functional, "Валидация исходящей XML", "Валидируем XML для запроса:\n#{xml.xml_name}\nПо XSD:\n #{xsd}")
         validate_egg_xml(xsd, xml_rexml.to_s, functional)
         if send_to_amq_egg(@manager, xml_rexml.to_s, functional)
-          change_smevmessageid(xml_rexml, '364498aa-7911-11e8-b972-005056b644cd', @db_username, functional)
+          change_smevmessageid(xml_rexml, '364498aa-7911-11e8-b972-005056b644cd', functional)
           answer = receive_from_amq_egg(@manager, functional, true, 80)
         end
         if answer.nil? # Если ответ от ЕГГ пустой, начинаем цикл заново
@@ -447,7 +446,7 @@ class SA_ESIA_SMEV3
         $log_egg.write_to_log(functional, "Валидация исходящей XML", "Валидируем XML для запроса:\n#{xml.xml_name}\nПо XSD:\n #{xsd}")
         validate_egg_xml(xsd, xml_rexml.to_s, functional)
         if send_to_amq_egg(@manager, xml_rexml.to_s, functional)
-          change_smevmessageid(xml_rexml, '48407a6d-7911-11e8-b972-005056b644cd', @db_username, functional)
+          change_smevmessageid(xml_rexml, '48407a6d-7911-11e8-b972-005056b644cd', functional)
           answer = receive_from_amq_egg(@manager, functional, true, 80)
         end
         if answer.nil? # Если ответ от ЕГГ пустой, начинаем цикл заново
@@ -515,7 +514,7 @@ class SA_ESIA_SMEV3
         $log_egg.write_to_log(functional, "Валидация исходящей XML", "Валидируем XML для запроса:\n#{xml.xml_name}\nПо XSD:\n #{xsd}")
         validate_egg_xml(xsd, xml_rexml.to_s, functional)
         if send_to_amq_egg(@manager, xml_rexml.to_s, functional)
-          change_smevmessageid(xml_rexml, '3de7b47b-7911-11e8-b972-005056b644cd', @db_username, functional)
+          change_smevmessageid(xml_rexml, '3de7b47b-7911-11e8-b972-005056b644cd', functional)
           answer = receive_from_amq_egg(@manager, functional, true, 80)
         end
         if answer.nil? # Если ответ от ЕГГ пустой, начинаем цикл заново
@@ -583,7 +582,7 @@ class SA_ESIA_SMEV3
         $log_egg.write_to_log(functional, "Валидация исходящей XML", "Валидируем XML для запроса:\n#{xml.xml_name}\nПо XSD:\n #{xsd}")
         validate_egg_xml(xsd, xml_rexml.to_s, functional)
         if send_to_amq_egg(@manager, xml_rexml.to_s, functional)
-          change_smevmessageid(xml_rexml, '57fcc4ba-8ff6-11e8-bbc2-005056b654e4', @db_username, functional)
+          change_smevmessageid(xml_rexml, '57fcc4ba-8ff6-11e8-bbc2-005056b654e4', functional)
           answer = receive_from_amq_egg(@manager, functional, true, 80)
         end
         if answer.nil? # Если ответ от ЕГГ пустой, начинаем цикл заново

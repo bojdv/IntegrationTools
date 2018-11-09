@@ -4,6 +4,7 @@ require 'net/http'
 require 'net/ftp'
 require 'zip'
 require 'nokogiri'
+require_dependency "#{Rails.root}/lib/egg_autotests/sql_query.rb"
 require_dependency "#{Rails.root}/lib/egg_autotests/installer/installer_options"
 
 #Test commit
@@ -13,6 +14,7 @@ class EggAutoTestsController < ApplicationController
   def initialize
     super
     @db_username = "egg_autotest2"
+    SQL_query.db_name = @db_username
   end
   # helper :egg_auto_tests
   def index
@@ -57,20 +59,33 @@ class EggAutoTestsController < ApplicationController
     response_ajax_auto_egg("Не выбран функционал для проверки") and return if tests_params_egg[:egg_version] == 'eGG 6.7' and tests_params_egg[:functional_egg67].nil?
     response_ajax_auto_egg("Не выбрана сборка") and return if tests_params_egg[:build_version].empty?
     begin
-      # Формируем файл с параметрами инсталлятора
-      option_file = InstallerOptions.new(tests_params_egg[:build_version])
-      option_file.make_oracle_options(@db_username)
-      file_path = option_file.write_file
-
       @build_file_egg = "#{Rails.root}/egg-#{tests_params_egg[:build_version]}-installer-windows.exe"
       @installer_path_egg = "C:/EGG_Installer/egg-#{tests_params_egg[:build_version]}-installer-windows.exe"
-      @run_test_message = "Установка/запуск eGG #{tests_params_egg[:build_version]}"
+      @run_test_message = "Установка/запуск eGG #{tests_params_egg[:build_version]} на #{tests_params_egg[:db_type]}"
       @end_test_message = "Завершение тестов"
       Dir.chdir "#{Rails.root}"
       $log_egg = Logger_egg.new
       startTime = Time.now
-      delete_db_egg(@run_test_message) if tests_params_egg[:drop_db] == 'true'
+      SQL_query.db_type = tests_params_egg[:db_type]
+      SQL_query.drop_db(@run_test_message) if tests_params_egg[:drop_db] == 'true'
       if tests_params_egg[:dont_install_egg] == 'false'
+        # Формируем файл с параметрами инсталлятора
+        option_file = InstallerOptions.new(tests_params_egg[:build_version])
+        case tests_params_egg[:db_type]
+        when 'Oracle 11G'
+          option_file.make_oracle_options(@db_username)
+        when 'SQL Server 2012'
+          SQL_query.create_mssql_db(@run_test_message)
+          option_file.make_mssql_options(@db_username, 'vm-corint', '1434', 'sa', '1qaz2WSX')
+        when 'SQL Server 2014'
+          SQL_query.create_mssql_db(@run_test_message)
+          option_file.make_mssql_options(@db_username, 'vm-corint2', '1433', 'sa', '1qaz2WSX')
+        when 'SQL Server 2016'
+          SQL_query.create_mssql_db(@run_test_message)
+          option_file.make_mssql_options(@db_username, 'vmns-test2', '1433', 'sa', '1qaz2WSX')
+        end
+        file_path = option_file.write_file
+
         download_installer_egg(tests_params_egg[:build_version])
         copy_installer_egg
         $log_egg.write_to_browser("Устанавливаем EGG #{tests_params_egg[:build_version]}...")
@@ -96,12 +111,12 @@ class EggAutoTestsController < ApplicationController
       $egg_integrator.start_core_in_listener
       $log_egg.write_to_browser("#{puts_line_egg}")
       if tests_params_egg[:egg_version] == 'eGG 6.7'
-        $log_egg.write_to_browser("Запустили тесты eGG #{tests_params_egg[:build_version]}")
+        $log_egg.write_to_browser("Запустили тесты eGG #{tests_params_egg[:build_version]} на #{tests_params_egg[:db_type]}")
         $log_egg.write_to_log(@run_test_message, "Запустили тесты eGG #{tests_params_egg[:build_version]}", "Done!")
         testlist = EggAutotestsList.new(tests_params_egg[:egg_version], tests_params_egg[:try_count], tests_params_egg[:egg_dir], @db_username, tests_params_egg[:build_version])
         testlist.runTest_egg(tests_params_egg[:functional_egg67])
       elsif tests_params_egg[:egg_version] == 'eGG 6.8'
-        $log_egg.write_to_browser("Запустили тесты eGG #{tests_params_egg[:build_version]}")
+        $log_egg.write_to_browser("Запустили тесты eGG #{tests_params_egg[:build_version]} на #{tests_params_egg[:db_type]}")
         $log_egg.write_to_log(@run_test_message, "Запустили тесты eGG #{tests_params_egg[:build_version]}", "Done!")
         testlist = EggAutotestsList.new(tests_params_egg[:egg_version], tests_params_egg[:try_count], tests_params_egg[:egg_dir], @db_username, tests_params_egg[:build_version])
         testlist.runTest_egg(tests_params_egg[:functional_egg68])
@@ -115,7 +130,7 @@ class EggAutoTestsController < ApplicationController
         begin
           $egg_integrator.stop_core_in_listener if $egg_integrator.core_in_listener_live?
           stop_servicemix_egg(tests_params_egg[:egg_dir]) if tests_params_egg[:dont_stop_egg] == 'false'
-          delete_db_egg(@end_test_message) if tests_params_egg[:dont_drop_db] == 'false'
+          SQL_query.drop_db(@end_test_message) if tests_params_egg[:dont_drop_db] == 'false'
         ensure
           $log_egg.write_to_browser("#{puts_line_egg}")
           if File.directory?(tests_params_egg[:egg_dir]) # Копируем логи из каталога ЕГГ
@@ -128,7 +143,7 @@ class EggAutoTestsController < ApplicationController
           end
           if File.exist?(@installer_path_egg) # Удаляем инсталлятор
             File.delete(@installer_path_egg)
-            option_file.move_options_file($log_egg.log_dir)
+            option_file.move_options_file($log_egg.log_dir) if option_file
             $log_egg.write_to_browser("Удалили инсталлятор")
             $log_egg.write_to_log(@end_test_message, "Удалили инсталлятор", "Done!")
           end
@@ -215,7 +230,8 @@ class EggAutoTestsController < ApplicationController
               Dir.chdir "#{Rails.root}"
               $log_egg = Logger_egg.new
               startTime = Time.now
-              delete_db_egg(@run_test_message)
+              SQL_query.db_type = 'Oracle 11G'
+              SQL_query.drop_db(@run_test_message)
               puts "Download EGG"
               download_installer_egg(build_version)
               puts "Copy Installer..."
@@ -236,7 +252,7 @@ class EggAutoTestsController < ApplicationController
                 return if count == 0
                 sleep 1
               end
-              $log_egg.write_to_log(@run_test_message, "Запускаем Servicemix...", "Done! Запустили eGG")
+              $log_egg.write_to_log(@run_test_message, "Запускаем Servicemix...", "Done! Запустили eGG на #{SQL_query.db_type}")
               sleep 2
               $egg_integrator = EggCoreIntegrator.new
               $egg_integrator.start_core_in_listener
@@ -251,12 +267,12 @@ class EggAutoTestsController < ApplicationController
                 begin
                   $egg_integrator.stop_core_in_listener if $egg_integrator.core_in_listener_live?
                   stop_servicemix_egg('C:\EGG')
-                  delete_db_egg(@end_test_message)
+                  SQL_query.drop_db(@end_test_message)
                 ensure
                   $log_egg.write_to_browser("#{puts_line_egg}")
                   if File.directory?('C:\EGG') # Копируем логи из каталога ЕГГ
                     copy_egg_files
-                    option_file.move_options_file($log_egg.log_dir)
+                    option_file.move_options_file($log_egg.log_dir) if option_file
                   end
                   if File.directory?('C:\EGG')
                     FileUtils.rm_r 'C:\EGG/.'
@@ -309,30 +325,32 @@ class EggAutoTestsController < ApplicationController
   end
 
   def tester
-    $log_egg = {"Проверка ActiveMQ. Payment_новый. Попытка 1" => {"проверки Active MQ" => "Текст ошибки"}, "Проверка WMQ. Payment_новый. Попытка 1" => {"Ошибка WMQ" => "Текст ошибки"}}
-    send_email('C:\Users\Pekav\Downloads\amqrecipient.xml', '6.11.105-RELEASE1')
-    # require "sqljdbc4-4.1.jar"
-    # java_import 'oracle.jdbc.OracleDriver'
-    # java_import 'java.sql.DriverManager'
-    # java_import 'java.sql.DriverManager'
-    # java_import 'com.microsoft.sqlserver.jdbc.SQLServerDriver'
-    #
-    # begin
-    #   url = "jdbc:sqlserver://vm-corint:1433"
-    #   connection = java.sql.DriverManager.getConnection(url, 'root', '12345');
-    #   stmt = connection.create_statement
-    #   stmt.executeUpdate("insert into zkh_inn (inn, kpp, name, account, bank_name, bank_bik) values (9909400765, 774763002, 'ООО Межгосударственный банк', 30301810000006000001, 'ПАО СБЕРБАНК', '044525225')")
-    # rescue Exception => msg
-    #   puts msg
-    #   puts msg.backtrace.join("\n")
-    # ensure
-    #   stmt.close if stmt
-    #   connection.close if connection
-    # end
+    require "sqljdbc4-4.1.jar"
+    java_import 'oracle.jdbc.OracleDriver'
+    java_import 'java.sql.DriverManager'
+    java_import 'java.sql.DriverManager'
+    java_import 'com.microsoft.sqlserver.jdbc.SQLServerDriver'
+
+    begin
+      url = "jdbc:oracle:thin:sys as sysdba/waaaaa@vm-corint:1521:corint"
+      #url = "jdbc:sqlserver://vm-corint:1434;databaseName=egg_6_11;user=sa;password=1qaz2WSX"
+      connection = java.sql.DriverManager.getConnection(url);
+      stmt = connection.create_statement
+      query = <<-QUERY
+select * from waa
+      QUERY
+      stmt.execute(query)
+    rescue Exception => msg
+      puts msg
+      puts msg.backtrace.join("\n")
+    ensure
+      stmt.close if stmt
+      connection.close if connection
+    end
   end
 end
 
 private
 def tests_params_egg
-  params.require(:test_data).permit(:egg_version, :egg_dir, :dont_drop_db, :dont_stop_egg, :build_version, :try_count, :drop_db, :dont_install_egg, :functional_egg67 => [], :functional_egg68 => [])
+  params.require(:test_data).permit(:egg_version, :egg_dir, :db_type, :dont_drop_db, :dont_stop_egg, :build_version, :try_count, :drop_db, :dont_install_egg, :functional_egg67 => [], :functional_egg68 => [])
 end

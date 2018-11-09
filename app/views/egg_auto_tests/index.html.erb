@@ -58,6 +58,7 @@
             </div>
             <!-- Вторая вкладка -->
             <div class="tab-pane fade" id="input" role="tabpanel" aria-labelledby="input-tab">
+              <%= f.input :db_type, label: 'Выберите СУБД:', selected: 'Oracle 11G', collection: ['Oracle 11G', 'SQL Server 2012', 'SQL Server 2014', 'SQL Server 2016'], required: false %>
               <%= f.input :egg_dir, label: 'Каталог eGG:', required: false, input_html: {value: 'C:\\EGG'} %>
               <%= f.input :try_count, label: 'Кол-во попыток отправки в СМЭВ:', required: false, input_html: {value: '3'} %>
               <%= f.input :drop_db, as: :boolean, :label => 'Удалять БД перед тестом', checked_value: true, unchecked_value: false, input_html: {checked: true} %>

@@ -1,13 +1,12 @@
 class SA_GIS_GMP_SMEV3
 
-  def initialize(pass_menu_color, fail_menu_color, not_find_xml, not_receive_answer, egg_version, try_count, db_username)
+  def initialize(pass_menu_color, fail_menu_color, not_find_xml, not_receive_answer, egg_version, try_count)
     @pass_menu_color = pass_menu_color
     @fail_menu_color = fail_menu_color
     @not_find_xml = not_find_xml
     @not_receive_answer = not_receive_answer
     @egg_version = egg_version
     @try_count = try_count
-    @db_username = db_username
 
     @menu_name = 'СА ГИС ГМП СМЭВ3'
     @category = Category.find_by_category_name('СА ГИС ГМП СМЭВ3')
@@ -39,7 +38,7 @@ class SA_GIS_GMP_SMEV3
         $log_egg.write_to_log(functional, "Валидация исходящей XML", "Валидируем XML для запроса:\n#{xml.xml_name}\nПо XSD:\n #{xsd}")
         validate_egg_xml(xsd, xml_rexml.to_s, functional)
         if send_to_amq_egg(@manager, xml_rexml.to_s, functional)
-          change_smevmessageid_gis_gmp(xml_rexml, '25106819-6012-11e8-9f80-005056b644cd', @db_username, functional)
+          change_smevmessageid_gis_gmp(xml_rexml, '25106819-6012-11e8-9f80-005056b644cd', functional)
           answer = receive_from_amq_egg(@manager, functional, true, 80)
         end
         if answer.nil? # Если ответ от ЕГГ пустой, начинаем цикл заново
@@ -107,7 +106,7 @@ class SA_GIS_GMP_SMEV3
         $log_egg.write_to_log(functional, "Валидация исходящей XML", "Валидируем XML для запроса:\n#{xml.xml_name}\nПо XSD:\n #{xsd}")
         validate_egg_xml(xsd, xml_rexml.to_s, functional)
         if send_to_amq_egg(@manager, xml_rexml.to_s, functional)
-          change_smevmessageid_gis_gmp(xml_rexml, '25106819-6012-11e8-9f80-005056b644cd', @db_username, functional)
+          change_smevmessageid_gis_gmp(xml_rexml, '25106819-6012-11e8-9f80-005056b644cd', functional)
           answer = receive_from_amq_egg(@manager, functional, true, 80)
         end
         if answer.nil? # Если ответ от ЕГГ пустой, начинаем цикл заново
@@ -175,7 +174,7 @@ class SA_GIS_GMP_SMEV3
         $log_egg.write_to_log(functional, "Валидация исходящей XML", "Валидируем XML для запроса:\n#{xml.xml_name}\nПо XSD:\n #{xsd}")
         validate_egg_xml(xsd, xml_rexml.to_s, functional)
         if send_to_amq_egg(@manager, xml_rexml.to_s, functional)
-          change_smevmessageid_gis_gmp(xml_rexml, '25106819-6012-11e8-9f80-005056b644cd', @db_username, functional)
+          change_smevmessageid_gis_gmp(xml_rexml, '25106819-6012-11e8-9f80-005056b644cd', functional)
           answer = receive_from_amq_egg(@manager, functional, true, 80)
         end
         if answer.nil? # Если ответ от ЕГГ пустой, начинаем цикл заново
@@ -243,7 +242,7 @@ class SA_GIS_GMP_SMEV3
         $log_egg.write_to_log(functional, "Валидация исходящей XML", "Валидируем XML для запроса:\n#{xml.xml_name}\nПо XSD:\n #{xsd}")
         validate_egg_xml(xsd, xml_rexml.to_s, functional)
         if send_to_amq_egg(@manager, xml_rexml.to_s, functional)
-          change_smevmessageid_gis_gmp(xml_rexml, '25106819-6012-11e8-9f80-005056b644cd', @db_username, functional)
+          change_smevmessageid_gis_gmp(xml_rexml, '25106819-6012-11e8-9f80-005056b644cd', functional)
           answer = receive_from_amq_egg(@manager, functional, true, 80)
         end
         if answer.nil? # Если ответ от ЕГГ пустой, начинаем цикл заново
@@ -311,7 +310,7 @@ class SA_GIS_GMP_SMEV3
         $log_egg.write_to_log(functional, "Валидация исходящей XML", "Валидируем XML для запроса:\n#{xml.xml_name}\nПо XSD:\n #{xsd}")
         validate_egg_xml(xsd, xml_rexml.to_s, functional)
         if send_to_amq_egg(@manager, xml_rexml.to_s, functional)
-          change_smevmessageid(xml_rexml, '93c40542-657b-11e8-b6ef-005056b644cd', @db_username, functional)
+          change_smevmessageid(xml_rexml, '93c40542-657b-11e8-b6ef-005056b644cd', functional)
           answer = receive_from_amq_egg(@manager, functional, true, 80)
         end
         if answer.nil? # Если ответ от ЕГГ пустой, начинаем цикл заново

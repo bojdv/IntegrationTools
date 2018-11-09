@@ -1,5 +1,4 @@
 class InstallerOptions
-  
   def initialize(build_version)
     @build_version = build_version
     @file_path = "#{Rails.root}/lib/egg_autotests/installer/#{@build_version}_installer_options.txt"
@@ -7,9 +6,9 @@ class InstallerOptions
     @finish_text = @file_template.read
     make_610 if @build_version.include?('6.10')
   end
-  
-  def make_mssql_options(db_user)
-    oracle_text = <<EOF
+
+  def make_mssql_options(db_name, host, port, user, password)
+    find_text = <<EOF
 # настройки подключения к СУБД Oracle
 dbType=oracle
 dbHost1=vm-corint
@@ -26,30 +25,29 @@ EOF
     mssql_text = <<EOF
 # настройки подключения к СУБД MSSQL
 dbType=mssql
-dbHost3=vm-corint
-dbPort3=1433
-dbSID3=#{db_user}
-dbLogin3=root
-dbPassword3=12345
+dbHost3=#{host}
+dbPort3=#{port}
+dbSID3=#{db_name}
+dbLogin3=#{user}
+dbPassword3=#{password}
 mssqlTrustServerCertificate=false
 mssqlEncrypt=false
 EOF
-    @finish_text.gsub!(oracle_text, mssql_text)
+    @finish_text.gsub!(find_text, mssql_text)
   end
 
   def make_oracle_options(db_user)
-    oracle_text = <<EOF
+    find_text = <<EOF
 dbLogin1=egg_autotest
 dbPassword1=egg_autotest
 EOF
-    mssql_text = <<EOF
-# настройки подключения к СУБД MSSQL
+    replace_text = <<EOF
 dbLogin1=#{db_user}
 dbPassword1=#{db_user}
 EOF
-    @finish_text.gsub!(oracle_text, mssql_text)
+    @finish_text.gsub!(find_text, replace_text)
   end
-  
+
   def make_610
     components = ''
     @finish_text.each_line.with_index {|line, index| components = line if index == 18}
@@ -82,9 +80,8 @@ EOF
     @file_template.close
     @file_path if File.exist?(@file_path)
   end
-  
+
   def move_options_file(log_path) # Перемещает файл с опциями в архив с логами
     FileUtils.move(@file_path, log_path) if File.exist?(@file_path)
   end
-  
 end

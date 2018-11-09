@@ -25,22 +25,8 @@ class IA_ZKH_Loader
       FileUtils.cp(catalog, in_dir)
       $log_egg.write_to_browser("Скопировали справочник из каталога: #{catalog}\nВ каталог: #{in_dir}")
       $log_egg.write_to_log(functional, "Копируем справочник", "Скопировали справочник из каталога: #{catalog}\nВ каталог: #{in_dir}")
-      url = "jdbc:oracle:thin:@vm-corint:1521:corint"
-      connection = java.sql.DriverManager.getConnection(url, "#{@db_username}", "#{@db_username}");
-      stmt = connection.create_statement
-      inn = Array.new
-      count = 60
-      $log_egg.write_to_browser("Ждем появления поставщика в таблице zkh_inn в течении #{count} секунд")
-      $log_egg.write_to_log(functional, "Ожидаем импорт", "Ждем появления поставщика в таблице zkh_inn в течении #{count} секунд")
-      until inn.include?('9999999999') or count < 0
-        org = stmt.execute_query("select * from zkh_inn")
-        while (org.next()) do
-          inn << org.getString('inn')
-        end
-        puts inn
-        count -= 1
-        sleep 1
-      end
+      check_inn = SQL_query.new
+      inn = check_inn.check_provider_file(functional)
       if inn.include?('9999999999')
         @result["providerCatalogFile_test"] = "true"
         $log_egg.write_to_browser("Проверка пройдена! Нашли поставщика с ИНН = 9999999999 в таблице zkh_inn")
@@ -57,9 +43,6 @@ class IA_ZKH_Loader
       $log_egg.write_to_browser("Ошибка! #{msg}")
       $log_egg.write_to_log(functional, "Случилось непредвиденное:(", "Ошибка! #{msg}\n#{msg.backtrace.join("\n")}")
       colorize_egg(@egg_version, @menu_name, @fail_menu_color)
-    ensure
-      stmt.close
-      connection.close
     end
   end
 
@@ -81,28 +64,8 @@ class IA_ZKH_Loader
       end
       $log_egg.write_to_browser("Обнаружили срабатывание задачи PaymentReceiverJob")
       $log_egg.write_to_log(functional, "Результат парсинга", "Обнаружили срабатывание задачи PaymentReceiverJob")
-      url = "jdbc:oracle:thin:@vm-corint:1521:corint"
-      begin
-        connection = java.sql.DriverManager.getConnection(url, "#{@db_username}", "#{@db_username}");
-        stmt = connection.create_statement
-        inn = Array.new
-        count = 180
-        $log_egg.write_to_browser("Ждем появления поставщика в таблице zkh_inn в течении #{count} секунд")
-        $log_egg.write_to_log(functional, "Ожидаем импорт", "Ждем появления поставщика в таблице zkh_inn в течении #{count} секунд")
-        until inn.include?('7707083893') or count < 0
-          org = stmt.execute_query("select bank_inn from zkh_inn where bank_name = 'ПАО СБЕРБАНК'")
-          while (org.next()) do
-            inn << org.getString('bank_inn')
-          end
-          puts inn
-          puts "Wait bank_inn..#{count}"
-          count -= 1
-          sleep 1
-        end
-      ensure
-        stmt.close
-        connection.close
-      end
+      check_inn = SQL_query.new
+      inn = check_inn.check_provider_mq(functional)
       if inn.include?('7707083893')
         @result["providerCatalogMQ_test"] = "true"
         $log_egg.write_to_browser("Проверка пройдена! Нашли поставщика с ИНН = 7707083893 в таблице zkh_inn")

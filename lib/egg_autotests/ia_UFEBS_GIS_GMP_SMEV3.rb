@@ -333,6 +333,7 @@ class IA_UFEBS_GIS_GMP_SMEV3
             $log_egg.write_to_browser("Изменили в XML Id и отправили в ядро")
             $log_egg.write_to_log(functional, "Изменили в XML Id и отправили в ядро", xml_to_sa)
             sleep 2
+            change_smevmessageid_gis_gmp(Document.new(@xml_from_ia), '25106819-6012-11e8-9f80-005056b644cd', functional, true)
           end
           $egg_integrator.core_in_ufebs_gmp_smev3.clear
         else
@@ -343,7 +344,6 @@ class IA_UFEBS_GIS_GMP_SMEV3
           # next
         end
         #########################################################
-        change_smevmessageid_gis_gmp(Document.new(@xml_from_ia), '25106819-6012-11e8-9f80-005056b644cd', functional, true)
         answer = ufebs_file_count(functional, true, 'gis_gmp_smev3')
         if answer.first == 3 and answer.last == 3
           @result["packetepd_test"] = "true"

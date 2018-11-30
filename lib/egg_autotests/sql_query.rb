@@ -191,13 +191,13 @@ END;})
             row_updated = @stmt.executeUpdate("UPDATE FK_SMEV3 SET SMEVMESSAGEID = '#{smev_id}' WHERE PROCESSID = '#{process_id}'")
             if row_updated == 1
               $log_egg.write_to_browser("Заменили id в SMEVMESSAGEID на #{smev_id}")
-              $log_egg.write_to_log(functional, "Заменили id в SMEVMESSAGEID", "UPDATE EGG_SMEV3_CONTEXT SET SMEVMESSAGEID = '#{smev_id}' WHERE PROCESSID = '#{process_id}'")
+              $log_egg.write_to_log(functional, "Заменили id в SMEVMESSAGEID", "UPDATE FK_SMEV3 SET SMEVMESSAGEID = '#{smev_id}' WHERE PROCESSID = '#{process_id}'")
             end
           end
         end
         if count == 0
           $log_egg.write_to_browser("Не заменили id в SMEVMESSAGEID")
-          $log_egg.write_to_log(functional, "Не заменили id в SMEVMESSAGEID", "UPDATE EGG_SMEV3_CONTEXT SET SMEVMESSAGEID = '#{smev_id}' WHERE PROCESSID = '#{process_id}'")
+          $log_egg.write_to_log(functional, "Не заменили id в SMEVMESSAGEID", "UPDATE FK_SMEV3 SET SMEVMESSAGEID = '#{smev_id}' WHERE PROCESSID = '#{process_id}'")
           return nil
         end
         puts count -=1

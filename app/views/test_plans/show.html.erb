@@ -141,7 +141,7 @@
           <!-- Первая группа. Трудозатраты/ информация о дефектах -->
           <%	all_worklog = @testing_worklogtime + @defect_worklogtime + @deis_defect_worklogtime + @consultation_worklogtime + @agreement_worklogtime  %>
           <%	 @use_tester_estimate ? estimate = @backlog_estimate : estimate = @project_estimate %>
-          <%	 progress = (all_worklog/estimate*100)/60 %>
+          <%	 progress = (all_worklog/estimate*100)/60 unless estimate.zero?%>
           <div class="card">
             <div class="card-header" id="headingMain">
               <h5 class="mb-0">
@@ -391,11 +391,13 @@
               <%
                 if @backlog_estimate == 0
                   @use_tester_estimate = false
+                elsif @backlog_estimate && @project_estimate == 0
+                  @use_tester_estimate = true
                 else
                   @project_estimate/@backlog_estimate >= 2.5 ? @use_tester_estimate = true : @use_tester_estimate = false
                 end %>
               <%	@use_tester_estimate ? estimate = @backlog_estimate : estimate = @project_estimate %>
-              <%	 progress = (all_worklog/estimate*100)/60 %>
+              <%	 progress = (all_worklog/estimate*100)/60 unless estimate.zero? %>
               <div class="card">
                 <div class="card-header" id="heading<%= id %>">
                   <h5 class="mb-0">

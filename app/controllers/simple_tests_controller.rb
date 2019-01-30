@@ -73,7 +73,7 @@ class SimpleTestsController < ApplicationController
         end
       end
       @xml_missed << 'Отсутствуют' if @xml_missed.empty?
-      response_ajax("<b>XML, прошедшие тесты:</b><br/>#{@xml_pass.join('<br/>')}<br/><br/><b>XML, не прошедшие тесты:</b><br/>#{@xml_fail.join('<br/>')}<br/><br/><b>XML, у которых нет Simple Test:</b><br/>#{@xml_missed.join('<br/>')}", 10000)
+      response_ajax("<b>XML, прошедшие тесты:</b><br/>#{@xml_pass.join('<br/>')}<br/><br/><b>XML, не прошедшие тесты:</b><br/>#{@xml_fail.join('<br/>')}<br/><br/><b>XML, у которых нет Simple Test:</b><br/>#{@xml_missed.join('<br/>')}", 120000)
     end
   end
 end

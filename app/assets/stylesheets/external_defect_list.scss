@@ -1,0 +1,17 @@
+// Place all the styles related to the external_defect_list controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+
+.button_best_in_place  {
+  margin: 0.1em 0.2em;
+  padding: 0.3em 0.4em;
+  border: 1px solid #f90;
+  background-color: #fff;
+  display: block;
+  height: 50px;
+  float: left;
+
+  -moz-box-sizing: content-box;
+  -webkit-box-sizing: content-box;
+  box-sizing: content-box;
+}

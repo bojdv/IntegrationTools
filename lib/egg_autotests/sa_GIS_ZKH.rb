@@ -20,7 +20,7 @@ class SA_GIS_ZKH
     begin
       count = 1
       until @result["paymentRequest_test"] == "true" or count > @try_count
-        insert_inn(@db_username)
+        insert_inn
         sleep 2
         xml_name = 'Payment_request'
         functional = "#{@functional}. #{xml_name}. Попытка #{count}"
@@ -79,7 +79,7 @@ class SA_GIS_ZKH
     begin
       count = 1
       until @result["paymentCancellation_test"] == "true" or count > @try_count
-        insert_inn(@db_username)
+        insert_inn
         sleep 2
         xml_name = 'Payment_Cancellation_request'
         functional = "#{@functional}. #{xml_name}. Попытка #{count}"
@@ -134,7 +134,7 @@ class SA_GIS_ZKH
     begin
       count = 1
       until @result["paymentDetails_test"] == "true" or count > @try_count
-        insert_inn(@db_username)
+        insert_inn
         sleep 2
         xml_name = 'Payment_Details_request'
         functional = "#{@functional}. #{xml_name}. Попытка #{count}"

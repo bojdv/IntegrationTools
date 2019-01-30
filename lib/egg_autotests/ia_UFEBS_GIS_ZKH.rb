@@ -50,7 +50,7 @@ class IA_UFEBS_GIS_ZKH
       xml_name = 'ed101' # Название XML в XML_sender, которую будем использовать
       until @result["ed101_test"] == "true" or count > @try_count # Выполняем цикл, пока результат не будет true или пока счетчик не превысит число попыток
         functional = "#{@functional}. #{xml_name}. Попытка #{count}" # Формируем название теста для лога
-        insert_inn(@db_username) # Вставляем в БД запись с поставщиком
+        insert_inn # Вставляем в БД запись с поставщиком
         xml_root_element = 'ED101'  # Корневой элемент, просто, что бы не писать руками в куче мест
         date = Date.parse("#{Random.rand(2010..2017)}-#{Random.rand(1..11)}-#{Random.rand(1..28)}")  # Формируем случайную дату
         $log_egg.write_to_log(functional, "Начали проверку в #{Time.now.strftime('%H-%M-%S')}", "#{@menu_name} #{xml_name}")  # Публикуем запись в html лог. Параметры см. в описании метода
@@ -110,7 +110,7 @@ class IA_UFEBS_GIS_ZKH
         xml_name = 'ed108'
         xml_root_element = 'ED108'
         functional = "#{@functional}. #{xml_name}. Попытка #{count}"
-        insert_inn(@db_username)
+        insert_inn # Вставляем в БД запись с поставщиком
         date = Date.parse("#{Random.rand(2010..2017)}-#{Random.rand(1..11)}-#{Random.rand(1..28)}")
         $log_egg.write_to_log(functional, "Начали проверку в #{Time.now.strftime('%H-%M-%S')}", "#{@menu_name} #{xml_name}")
         $log_egg.write_to_browser("#{puts_line_egg}")
@@ -174,7 +174,7 @@ class IA_UFEBS_GIS_ZKH
         xml_name = 'packetepd'
         functional = "#{@functional}. #{xml_name}. Попытка #{count}"
         xml_root_element = 'PacketEPD'
-        insert_inn(@db_username)
+        insert_inn # Вставляем в БД запись с поставщиком
         date = Date.parse("#{Random.rand(2010..2017)}-#{Random.rand(1..11)}-#{Random.rand(1..28)}")
         $log_egg.write_to_log(functional, "Начали проверку в #{Time.now.strftime('%H-%M-%S')}", "#{@menu_name} #{xml_name}")
         $log_egg.write_to_browser("#{puts_line_egg}")

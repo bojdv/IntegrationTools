@@ -25,14 +25,14 @@ class TestPlansController < ApplicationController
 
   def create
     response_ajax("<h5>Не заполнены параметры:</h5>#{@empty_filds.join}", 4000) and return unless get_empty_fields(new_plan_params).empty?
-      @create_plan = TestPlan.new(new_plan_params)
-      if @create_plan.save
-        respond_to do |format|
-          format.js { render :js => "window.location= '#{url_for(test_plans_url)}'" }
-        end
-      else
-        puts @create_plan.errors.full_messages.inspect
+    @create_plan = TestPlan.new(new_plan_params)
+    if @create_plan.save
+      respond_to do |format|
+        format.js { render :js => "window.location= '#{url_for(test_plans_url)}'" }
       end
+    else
+      puts @create_plan.errors.full_messages.inspect
+    end
   end
 
   def show
@@ -54,8 +54,11 @@ class TestPlansController < ApplicationController
         @worklog_sum_per_date = [worklog_sum_per_date,[{date: start_test_date, value: 0}, {date: end_test_date, value: @project_estimate}], [{date: start_test_date, value: 0}, {date: end_test_date, value: @backlog_estimate}]]
         if @backlog_estimate == 0
           @use_tester_estimate = false
-        else
-          @project_estimate/@backlog_estimate >= 2.5 ? @use_tester_estimate = true : @use_tester_estimate = false
+        else if @backlog_estimate && @project_estimate == 0
+               @use_tester_estimate = true
+             else
+               @project_estimate/@backlog_estimate >= 2.5 ? @use_tester_estimate = true : @use_tester_estimate = false
+             end
         end
         @report_feature = Array.new
         @show_plan.features.each_with_index do |f, i|

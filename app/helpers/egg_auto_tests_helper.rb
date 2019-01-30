@@ -2,6 +2,7 @@ require 'zip'
 module EggAutoTestsHelper
 
   class Logger_egg # Класс логирования в браузер и БД
+    attr_reader :log_dir, :log_egg
 
     def initialize
       @log_egg = Hash.new # Переменная класса, пустой хэш. В него пишется весь лог.
@@ -13,6 +14,7 @@ module EggAutoTestsHelper
     def write_to_log(functional, action, result = '') # Метод для записи в лог html.
       # Параметры: functional - Корневое имя теста, action - действие (левая колонка в логе), result - результат (правая колонка в логе), его можно не указывать при вызове.
       if @log_egg.has_key?(functional) # Если хэш уже содержит ключ с именем такого теста, то делаем из этого ключа хэш с ключом action и значением result
+        action = "#{Time.now.strftime('[%H-%M-%S.%L]')} #{action}"
         @log_egg[functional][action] = result # Таким образом мы формируем единую таблицу с одним заголовком functional для каждого теста
       else # Если ключ новый, то просто создаем новый хэш
         @log_egg[functional] = {action => result}
@@ -47,7 +49,7 @@ module EggAutoTestsHelper
       FileUtils.rm Dir.glob("#{@log_dir}/*.html")
       FileUtils.rm Dir.glob("#{@log_dir}/*.txt")
       FileUtils.rm Dir.glob("#{@log_dir}/*.1")
-      return zipfile_name
+      return zipfile_name, zipfile_path
     end
   end
 
@@ -61,8 +63,10 @@ module EggAutoTestsHelper
     begin
       endTime = Time.now
       puts_time_egg(startTime, endTime) if startTime
-      until $browser_egg[:message].empty? && $browser_egg[:event].empty?
+      count = 20
+      until ($browser_egg[:message].empty? and $browser_egg[:event].empty?) or count < 0
         sleep 0.5
+        count -=1
       end
       log_file_name = $log_egg.make_log
     rescue Exception => msg
@@ -70,9 +74,80 @@ module EggAutoTestsHelper
       $log_egg.write_to_browser("Ошибка! #{msg}")
       $log_egg.write_to_log(@end_test_message, "Ошибка при завершении тестов:", "#{msg.backtrace.join("\n")}")
     ensure
+      $status_egg_tests = false
       respond_to do |format|
-        format.js { render :js => "kill_listener_egg(); download_link_egg('#{log_file_name}')" }
+        format.js { render :js => "kill_listener_egg(); download_link_egg('#{log_file_name[0]}')" }
       end
+    end
+  end
+
+  def end_auto_test_egg(startTime = false, build_version)
+    begin
+      endTime = Time.now
+      puts_time_egg(startTime, endTime) if startTime
+      count = 10
+      until ($browser_egg[:message].empty? and $browser_egg[:event].empty?) or count > 0
+        sleep 0.5
+        count -=1
+      end
+      log_file_path = $log_egg.make_log
+      puts log_file_path[1]
+      send_email(log_file_path[1], build_version)
+    rescue Exception => msg
+      puts msg.backtrace.join("\n")
+      $log_egg.write_to_log(@end_test_message, "Ошибка при завершении тестов:", "#{msg.backtrace.join("\n")}")
+    ensure
+      $status_egg_tests = false
+      respond_to do |format|
+        format.js { render :js => "kill_listener_egg();" }
+      end
+    end
+  end
+
+  def send_email(attachment, build_version)
+    require 'mail'
+    begin
+      error = false
+      body = "Выполнены автотесты на новой сборке ЕГГ #{build_version} на #{SQL_query.db_type}. Отчет прикреплен к письму.\n"
+      body << "Проваленные проверки:\n\n"
+      $log_egg.log_egg.each do |key, value|
+        if value.is_a?(Hash)
+          @fail = false
+          value.each do |key2, value|
+            @fail = true if key2.include?("Проверка не пройдена!") || key2.include?("Случилось непредвиденное") || key2.include?("Ошибка")
+          end
+          if @fail
+            error = true
+            body << "#{key} - Провалено!!!\n"
+            body << "------------\n"
+          end
+        end
+      end
+      body << "Нет проваленных тестов" unless error
+      subject = "[#{build_version}] Результаты прохождения автотестов. "
+      subject << if error
+                   "Есть ошибки!"
+                 else
+                   "Ошибок нет"
+                 end
+      options = { :address              => "postman.bssys.com",
+                  :port                 => 25,
+                  :authentication       => 'plain',
+                  :openssl_verify_mode => "none",
+                  :enable_starttls_auto => true}
+      mail = Mail.new do
+        from     'iTools@bssys.com'
+        to       ['a.pekhov@bssys.com', 'd.bojko@bssys.com', 'A.Shpinko@bssys.com', 'N.Tkachenko@bssys.com']
+        subject  subject
+        body      body
+        add_file attachment
+      end
+      mail.delivery_method :smtp, options
+      mail.deliver
+      puts "Send Email"
+    rescue Exception => msg
+      puts msg
+      puts msg.backtrace.join('\n')
     end
   end
 
@@ -113,7 +188,7 @@ module EggAutoTestsHelper
     end
   end
 
-  def receive_from_amq_egg(manager, functional, ignore_ticket = false, counter = 60) # Получение сообщений из Active MQ по протоколу OpenWire
+  def receive_from_amq_egg(manager, functional, process_ticket = false, counter = 60) # Получение сообщений из Active MQ по протоколу OpenWire
     java_import 'org.apache.activemq.ActiveMQConnectionFactory'
     java_import 'javax.jms.Session'
     java_import 'javax.jms.TextMessage'
@@ -142,7 +217,7 @@ module EggAutoTestsHelper
         $log_egg.write_to_log(functional, "Результат отправки:", "Пришла ошибка из СМЭВ: Внешний сервис недоступен.\n#{xml_actual.getText}")
         return nil
       end
-      if ignore_ticket
+      if process_ticket && xml_actual.getText.include?("Ticket")
         $log_egg.write_to_log(functional, "Получили квиток", "Получили промежуточный квиток из очереди #{manager.queue_in}:\n #{xml_actual.getText}")
         $log_egg.write_to_browser("Получили промежуточный квиток от eGG")
         count = counter
@@ -214,36 +289,6 @@ module EggAutoTestsHelper
     end
   end
 
-  def delete_db_egg(functional)
-    java_import 'oracle.jdbc.OracleDriver'
-    java_import 'java.sql.DriverManager'
-    begin
-      $log_egg.write_to_browser("Удаляем БД '#{@db_username}'")
-      $log_egg.write_to_log(functional, "Удаляем БД '#{@db_username}'", "...")
-      url = "jdbc:oracle:thin:@vm-corint:1521:corint"
-      connection = java.sql.DriverManager.getConnection(url, "sys as sysdba", "waaaaa");
-      stmt = connection.create_statement
-      stmt.executeUpdate(%Q{BEGIN
-  EXECUTE IMMEDIATE 'DROP USER #{@db_username} cascade';
-EXCEPTION
-  WHEN OTHERS THEN
-    IF SQLCODE != -1918 THEN
-      RAISE;
-    END IF;
-END;})
-    rescue Exception => msg
-      $log_egg.write_to_browser("Ошибка! #{msg}")
-      $log_egg.write_to_log(functional, "Ошибка при удалении БД '#{@db_username}'", "#{msg}")
-      return true
-    ensure
-      stmt.close
-      connection.close
-    end
-    sleep 0.5
-    $log_egg.write_to_browser("Удалили БД '#{@db_username}'")
-    $log_egg.write_to_log(functional, "Результат удаления БД '#{@db_username}'", "Done!")
-  end
-
   def start_servicemix_egg(dir)
     $log_egg.write_to_browser("Запускаем Servicemix...")
     $log_egg.write_to_log(@run_test_message, "Запускаем Servicemix...", "Ждем окончания запуска eGG")
@@ -280,7 +325,7 @@ END;})
     Dir.chdir "#{dir}\\apache-servicemix-6.1.2\\bin"
     @servicemix_stop_thread_egg = Thread.new do
       sleep 1
-      system('servicemix.bat stop')
+      system('stop.bat')
     end
     sleep 5
     @kill_cmd_thread_egg = Thread.new do
@@ -403,11 +448,14 @@ END;})
   end
 
   def ufebs_file_count(functional, packetepd = false, gis_type = 'gis_gmp') # Метод, который возвращает кол-во полученных из УФЭБС файлов
-    # functional - название тест, packetepd - признак, что это запрос packetepd, gis_type - тип адаптера, по умолчанию ГИС ГМП, если другое, то будет ГИС ЖКХ
-    if gis_type == 'gis_gmp' # Анализируем тип адаптера и соответственно выбираем каталог, куда класть файлы
+    # functional - название тест, packetepd - признак, что это запрос packetepd, gis_type - тип адаптера, по умолчанию ГИС ГМП
+    case gis_type # Анализируем тип адаптера и соответственно выбираем каталог, куда класть файлы
+    when 'gis_gmp'
       dir = 'C:/data/inbox/1/inbound/all'
-    else
+    when 'gis_zkh'
       dir = 'C:/data/inbox/GIS_ZKH/inbound/all'
+    when 'gis_gmp_smev3'
+      dir = 'C:/data/INAD_GISGMP_UFEBS/inbound/all'
     end
     code_adps000 = 'ADPS000' # Переменная хранит код промежуточного тикета от адаптера
     code_adps001 = 'ADPS001' # Переменная хранит код успешного сообщения от СМЭВ
@@ -418,10 +466,12 @@ END;})
     $log_egg.write_to_browser("Ждем ответ в течении #{count} секунд")
     if packetepd
       case gis_type
-        when 'gis_gmp'
-          positive_code = 3 # Ждем три файла со статусом ADPS001
-        when 'gis_zkh'
-          positive_code = 2
+      when 'gis_gmp'
+        positive_code = 3 # Ждем три файла со статусом ADPS001
+      when 'gis_zkh'
+        positive_code = 2
+      when 'gis_gmp_smev3'
+        positive_code = 3
       end
     else
       positive_code = 1
@@ -466,15 +516,15 @@ END;})
     return adps000_count, adps001_count # Возвращаем кол-во файлов с каждым статусом
   end
 
-  def download_installer_egg # Качаем сборку с ftp
-    $log_egg.write_to_browser("Скачиваем инсталлятор eGG #{tests_params_egg[:build_version]}...")
-    $log_egg.write_to_log(@run_test_message, "Скачиваем инсталлятор eGG #{tests_params_egg[:build_version]}...", "Запустили задачу в #{Time.now.strftime('%H-%M-%S')}")
+  def download_installer_egg(build_version) # Качаем сборку с ftp
+    $log_egg.write_to_browser("Скачиваем инсталлятор eGG #{build_version}...")
+    $log_egg.write_to_log(@run_test_message, "Скачиваем инсталлятор eGG #{build_version}...", "Запустили задачу в #{Time.now.strftime('%H-%M-%S')}")
     begin
       ftp = Net::FTP.new('10.1.1.163')
       ftp.login
-      ftp.chdir("build-release/egg-installer/#{tests_params_egg[:build_version]}")
+      ftp.chdir("build-release/egg-installer/#{build_version}")
       ftp.passive = true
-      ftp.getbinaryfile("egg-installer-#{tests_params_egg[:build_version]}-installer-windows.exe", localfile = File.basename(@build_file_egg))
+      ftp.getbinaryfile("egg-installer-#{build_version}-installer-windows.exe", localfile = File.basename(@build_file_egg))
     rescue Exception => msg
       $log_egg.write_to_browser("Ошибка! #{msg}")
       $log_egg.write_to_log(@run_test_message, "Ошибка при скачивании инсталлятора", "Ошибка! #{msg}. #{msg.backtrace.join("\n")}")
@@ -510,8 +560,8 @@ END;})
 
   def copy_egg_files
     begin
-      FileUtils.cp_r("#{tests_params_egg[:egg_dir]}/apache-servicemix-6.1.2/data/log/.", $log_egg.log_dir) # копируем лог сервисмикса
-      FileUtils.cp_r Dir.glob("#{tests_params_egg[:egg_dir]}/*.txt"), $log_egg.log_dir # копируем лог инсталлятора
+      FileUtils.cp_r("C:/EGG/apache-servicemix-6.1.2/data/log/.", $log_egg.log_dir) # копируем лог сервисмикса
+      FileUtils.cp_r Dir.glob("C:/EGG/*.txt"), $log_egg.log_dir # копируем лог инсталлятора
       $log_egg.write_to_log(@end_test_message, "Копирование логов eGG", "Done!")
     rescue Exception => msg
       $log_egg.write_to_browser("Ошибка! #{msg}")
@@ -519,42 +569,19 @@ END;})
     end
   end
 
-  def insert_inn(db_user) # Метод вставляет в таблицу zkh_inn запись с поставщиком для тестов. Ничего не возвращает.
-    begin
-      url = "jdbc:oracle:thin:@vm-corint:1521:corint"
-      connection = java.sql.DriverManager.getConnection(url, db_user, db_user);
-      stmt = connection.create_statement
-      # stmt.executeUpdate("TRUNCATE TABLE zkh_inn")
-      # $log_egg.write_to_browser("Очистили таблицу ZKH_INN")
-      #$log_egg.write_to_log(functional, "Очистили таблицу ZKH_INN")
-      #stmt.executeUpdate("insert into zkh_inn (inn, kpp, name, account, bank_name, bank_bik) values (5406562465, 540501001, 'ФОНД МОДЕРНИЗАЦИИ И РАЗВИТИЯ ЖИЛИЩНО-КОММУНАЛЬНОГО ХОЗЯЙСТВА МУНИЦИПАЛЬНЫХ ОБРАЗОВАНИЙ НОВОСИБИРСКОЙ ОБЛАСТИ', 40604810200290003717, '\"ГАЗПРОМБАНК\" (АКЦИОНЕРНОЕ ОБЩЕСТВО)', '045004783')")
-      stmt.executeUpdate("insert into zkh_inn (inn, kpp, name, account, bank_name, bank_bik) values (9909400765, 774763002, 'ООО Межгосударственный банк', 30301810000006000001, 'ПАО СБЕРБАНК', '044525225')")
-    ensure
-      stmt.close if stmt
-      connection.close if connection
-    end
+  def insert_inn # Метод вставляет в таблицу zkh_inn запись с поставщиком для тестов. Ничего не возвращает.
+    @sql_query = SQL_query.new
+    @sql_query.insert_inn # Вставляем в БД запись с поставщиком
   end
 
-  def change_smevmessageid(xml_rexml, smev_id, db_user, functional) # метод меняет id для запросов в СМЭВ3
-    process_id = xml_rexml.elements["//mq:RequestMessage"].attributes["processID"]
-    begin
-      url = "jdbc:oracle:thin:@vm-corint:1521:corint"
-      connection = java.sql.DriverManager.getConnection(url, db_user, db_user);
-      stmt = connection.create_statement
-      result = 0
-      while result == 0 # 0, if no rows are affected by the operation.
-        result = stmt.executeUpdate("UPDATE EGG_SMEV3_CONTEXT SET SMEVMESSAGEID = '#{smev_id}' WHERE PROCESSID = '#{process_id}'")
-        sleep 1
-      end
-    rescue Exception => msg
-      $log_egg.write_to_browser("Ошибка! #{msg}")
-      $log_egg.write_to_log(@end_test_message, "Ошибка при копировании логов", "Ошибка! #{msg}\n#{msg.backtrace.join("\n")}")
-    ensure
-      stmt.close if stmt
-      connection.close if connection
-    end
-    $log_egg.write_to_browser("Заменили id в SMEVMESSAGEID на #{smev_id}")
-    $log_egg.write_to_log(functional, "Заменили id в SMEVMESSAGEID", "UPDATE EGG_SMEV3_CONTEXT SET SMEVMESSAGEID = '#{smev_id}' WHERE PROCESSID = '#{process_id}'")
+  def change_smevmessageid(xml_rexml, smev_id, functional) # метод меняет id для запросов в СМЭВ3
+    @sql_query = SQL_query.new
+    @sql_query.change_smevmessageid(xml_rexml, smev_id, functional)
+  end
+
+  def change_smevmessageid_gis_gmp(xml_rexml, smev_id, functional, ufebs = false) # метод меняет id для запросов ГИС ГМП в СМЭВ3
+    @sql_query = SQL_query.new
+    @sql_query.change_smevmessageid_gis_gmp(xml_rexml, smev_id, functional, ufebs)
   end
 
   # def change_correlationid(xml_rexml, correlation_id, db_user, functional) # метод меняет id для запросов в УФЭБС
@@ -571,16 +598,16 @@ END;})
   #   $log_egg.write_to_log(functional, "Заменили id в EGG_FILE_ADAPTER_MCICB", "UPDATE EGG_FILE_ADAPTER_MCICB SET CORRELATION_ID = '#{correlation_id}' WHERE EDAUTHOR = '#{request_EDAuthor}'")
   # end
 
-  def get_installer_config
+  def get_installer_config(build_version)
     case # Определяем название файла с конфигом инсталлятора
-      when tests_params_egg[:build_version].include?('6.9')
-        "optionsEgg69.txt"
-      when tests_params_egg[:build_version].include?('6.10')
-        "optionsEgg610.txt"
-      when tests_params_egg[:build_version].include?('6.11')
-        "optionsEgg611.txt"
-      else
-        "optionsEgg69.txt"
+    when build_version.include?('6.9')
+      "optionsEgg69.txt"
+    when build_version.include?('6.10')
+      "optionsEgg610.txt"
+    when build_version.include?('6.11')
+      "optionsEgg611.txt"
+    else
+      "optionsEgg69.txt"
     end
   end
 
@@ -594,9 +621,9 @@ ValidateOutputEgg=true
 #Настройка логирования
 isLog=false
 
-#Входная очередь ядра 
+#Входная очередь ядра
 core_sa=core_sa_real
-#Ответная очередь ядра 
+#Ответная очередь ядра
 core_ia=core_ia
 #Количество потоков чтения входной очереди ядра
 queue_core_sa_consumers=5
@@ -620,41 +647,45 @@ queue_core_ia_consumers=5
       @core_in_ufebs_gmp = Array.new
       @core_in_ufebs_zkh = Array.new
       @core_in_ufebs_jpm = Array.new
+      @core_in_ufebs_gmp_smev3 = Array.new
       @manager = QueueManager.find_by_manager_name('iTools[EGG]')
       start_core_in_listener # Запускаем прослушку входной очереди ядра
     end
 
-    attr_accessor :core_in_ufebs_gmp, :core_in_ufebs_zkh, :core_in_ufebs_jpm
+    attr_accessor :core_in_ufebs_gmp, :core_in_ufebs_zkh, :core_in_ufebs_jpm, :core_in_ufebs_gmp_smev3
 
     def start_core_in_listener
       @thread_get_core_message = Thread.new do
         begin
-            factory = ActiveMQConnectionFactory.new
-            factory.setBrokerURL("tcp://#{@manager.host}:#{@manager.port}")
-            @manager.user.nil? ? user ='' : user=@manager.user
-            @manager.password.nil? ? password ='' : password=@manager.user
-            connection = factory.createQueueConnection(user, password)
-            session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-            connection.start
-            receiver = session.createReceiver(session.createQueue('core_sa'))
-            sender = session.createSender(session.createQueue('core_sa_real'))
-            while true do
+          factory = ActiveMQConnectionFactory.new
+          factory.setBrokerURL("tcp://#{@manager.host}:#{@manager.port}")
+          @manager.user.nil? ? user ='' : user=@manager.user
+          @manager.password.nil? ? password ='' : password=@manager.user
+          connection = factory.createQueueConnection(user, password)
+          session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+          connection.start
+          receiver = session.createReceiver(session.createQueue('core_sa'))
+          sender = session.createSender(session.createQueue('core_sa_real'))
+          loop do
             message = receiver.receiveNoWait()
             if message
               message_rexml = Document.new(message.getText)
               case message_rexml.elements['//tns:Request'].attributes['adapterId']
-                when 'egg-file-adapter-mcicb'
-                  puts "Receive UFEBS GIS GMP message"
-                  @core_in_ufebs_gmp << {correlation_id: message.getJMSCorrelationID, body: message.getText }
-                when 'egg-file-adapter-zkh-mcicb'
-                  puts "Receive UFEBS GIS ZKH message"
-                  @core_in_ufebs_zkh << {correlation_id: message.getJMSCorrelationID, body: message.getText }
-                when 'egg-zkhfileMq-adapter'
-                  puts "Receive UFEBS GIS ZKH JPMorgan message"
-                  @core_in_ufebs_jpm << {correlation_id: message.getJMSCorrelationID, body: message.getText }
-                else
-                  puts "Receive not UFEBS message"
-                  sender.send(message)
+              when 'egg-file-adapter-mcicb'
+                puts "Receive UFEBS GIS GMP message"
+                @core_in_ufebs_gmp << {correlation_id: message.getJMSCorrelationID, body: message.getText }
+              when 'egg-file-adapter-zkh-mcicb'
+                puts "Receive UFEBS GIS ZKH message"
+                @core_in_ufebs_zkh << {correlation_id: message.getJMSCorrelationID, body: message.getText }
+              when 'egg-zkhfileMq-adapter'
+                puts "Receive UFEBS GIS ZKH JPMorgan message"
+                @core_in_ufebs_jpm << {correlation_id: message.getJMSCorrelationID, body: message.getText }
+              when 'gisgmp-fileUfebs-iadp'
+                puts "Receive UFEBS GIS GMP SMEV3 message"
+                @core_in_ufebs_gmp_smev3 << {correlation_id: message.getJMSCorrelationID, body: message.getText }
+              else
+                puts "Receive not UFEBS message"
+                sender.send(message)
               end
             end
             sleep 1
@@ -757,5 +788,4 @@ queue_core_ia_consumers=5
       end
     end
   end
-
 end

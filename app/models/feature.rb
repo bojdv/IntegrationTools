@@ -4,4 +4,5 @@ class Feature < ApplicationRecord
   serialize :manager, Array
   serialize :developer, Array
   serialize :analytic, Array
+  default_scope {order(created_at: :asc)}
 end

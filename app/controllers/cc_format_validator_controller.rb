@@ -1,6 +1,8 @@
 # encoding: utf-8
+
 require 'rexml/document'
 include REXML
+
 class CcFormatValidatorController < ApplicationController
   include CcFormatValidatorHelper
 
@@ -52,7 +54,7 @@ class CcFormatValidatorController < ApplicationController
 
   def tester
     puts Xml.find_by_xml_name('PayRequestIn')
-    
+
 #     xml = <<-EOF
 #     <?xml version="1.0" encoding="UTF-8"?>
 # <tns:AnswerMessage xmlns:tns="MQMessage" processID="ID_#id#"

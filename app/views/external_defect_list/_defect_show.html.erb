@@ -1,0 +1,27 @@
+<table class="table table-dark">
+  <thead>
+  <tr>
+    <th scope="col">Ключ</th>
+    <th scope="col">Описание</th>
+    <th scope="col">Дата создания</th>
+    <th scope="col">Статус</th>
+    <th scope="col">Причина пропуска</th>
+  </tr>
+  </thead>
+  <tbody>
+  <% resource.each do |defect| %>
+    <tr>
+      <td><%= link_to defect.key, "https://jira.bssys.com/browse/#{defect.key}", target: '_blank' %></td>
+      <td><%= defect.summary %></td>
+      <td><%= defect.created %></td>
+      <td><%= defect.status %></td>
+      <td><%= best_in_place defect, :reason, as: :textarea,
+                            # :ok_button => "Ok",
+                            # :ok_button_class => "button_best_in_place",
+                            # :cancel_button => "Отмена",
+                            # :cancel_button_class => "button_best_in_place",
+                            :place_holder => "Кликнуть для заполнения"%></td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>

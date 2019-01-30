@@ -338,3 +338,11 @@ esia_smev3_SMEV3_ESIA_adapterId=amq-jms-iadp
 esia_smev3_SMEV3_ESIA_systemId=egg
 esia_smev3_SMEV3_ESIA_departmentId=egg
 esia_smev3_apply_to_all=true
+
+# ГИС ЖКХ СМЭВ3
+egg_ZkhSmev3_attachmentMode=true
+egg_ZkhSmev3_isCryptoLog=true
+egg_ZkhSmev3_TestMessage=true
+egg_ZkhSmev3_isResponseLock=false
+egg_ZkhSmev3_sendingTicket1000=true
+egg_ZkhSmev3_sendingTicket1012=true

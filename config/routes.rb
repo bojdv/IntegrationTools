@@ -1,6 +1,7 @@
 Rails.application.routes.draw do
 
-  get 'soap/tester'
+  get 'soap/name'
+  get 'soap/user_room'
 
   get 'sessions/new'
   get 'users/new'
@@ -73,6 +74,10 @@ Rails.application.routes.draw do
   resources :test_plans do
     resources :features
   end
+
+  # ExternalDefectList
+
+  resources :external_defect_list
 
   wash_out :soap
 

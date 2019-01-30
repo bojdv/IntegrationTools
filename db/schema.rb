@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180809091320) do
+ActiveRecord::Schema.define(version: 20190128093917) do
 
   create_table "categories", force: :cascade do |t|
     t.integer "product_id", limit: 10, precision: 10
@@ -31,6 +31,18 @@ ActiveRecord::Schema.define(version: 20180809091320) do
     t.text "xml"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "external_defect_lists", force: :cascade do |t|
+    t.string "key"
+    t.string "summary"
+    t.datetime "created", precision: 6
+    t.string "status"
+    t.string "labels"
+    t.text "reason"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["key"], name: "i_external_defect_lists_key", unique: true
   end
 
   create_table "features", force: :cascade do |t|

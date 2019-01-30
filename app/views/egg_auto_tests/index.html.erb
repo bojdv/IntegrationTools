@@ -31,12 +31,34 @@
           <div class="tab-content" id="myTabContent">
             <div class="tab-pane fade show active" id="output" role="tabpanel" aria-labelledby="output-tab">
               <%= f.input :build_version, label: 'Выберите сборку:', collection: @dir, required: false %>
-              <%= f.button :submit, 'Запустить', id: 'run-button', class: 'btn-primary', onclick: "clear_log_egg(); document.getElementById('download-link').style.display = 'none';"%>
+              <%= f.button :submit, 'Запустить тесты', id: 'run-button', class: 'btn-primary', onclick: "clear_log_egg(); document.getElementById('download-link').style.display = 'none';"%>
               <a class="btn btn-primary form-group" id="download-link" href="" style="display: none;" onclick="this.style.display = 'none';">Скачать лог</a>
-              <a class="btn btn-primary" id="tester" href="egg_auto_tests/tester" data-remote="true">Click</a>
+              <!--a class="btn btn-primary" id="tester" href="egg_auto_tests/tester" data-remote="true">Click</a-->
+              </br></br>
+              <a class="btn btn-primary" id="tester" href="egg_auto_tests/run_automate" data-remote="true">Включить автотест сборок</a>
+              <a class="btn btn-primary" id="tester" href="egg_auto_tests/stop_autotests" data-remote="true">Отключить</a>
+              </br></br>
+              <a>Текущий статус тестов:</a>
+              <% if $status_egg_tests %>
+                <a class="text-success">Выполняются</a>
+              <%	 else %>
+                <a class="text-danger">Не выполняются</a>
+              <%	 end %>
+              <br>
+              <a>Статус проверки сборок:</a>
+              <% if $check_new_egg_version %>
+                <% if $check_new_egg_version.alive? %>
+                  <a class="text-success">Запущено</a>
+                <%	 else %>
+                  <a class="text-danger">Остановлено</a>
+                <%	 end %>
+              <%	 else %>
+                <a class="text-danger">Остановлено</a>
+              <%	 end %>
             </div>
             <!-- Вторая вкладка -->
             <div class="tab-pane fade" id="input" role="tabpanel" aria-labelledby="input-tab">
+              <%= f.input :db_type, label: 'Выберите СУБД:', selected: 'Oracle 11G', collection: ['Oracle 11G', 'SQL Server 2012', 'SQL Server 2014', 'SQL Server 2016'], required: false %>
               <%= f.input :egg_dir, label: 'Каталог eGG:', required: false, input_html: {value: 'C:\\EGG'} %>
               <%= f.input :try_count, label: 'Кол-во попыток отправки в СМЭВ:', required: false, input_html: {value: '3'} %>
               <%= f.input :drop_db, as: :boolean, :label => 'Удалять БД перед тестом', checked_value: true, unchecked_value: false, input_html: {checked: true} %>
@@ -49,5 +71,6 @@
       <%end%>
     </div>
   </div>
+</div>
 </div>
 <%= render 'layouts/modal_xml_sender' %>

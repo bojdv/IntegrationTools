@@ -1,0 +1,99 @@
+<% provide(:title, 'Планы тестирования') %>
+<script type="text/javascript" charset="utf-8">
+    $(document).ready(function() {
+        /* Activating Best In Place */
+        jQuery(".best_in_place").best_in_place();
+    });
+</script>
+<div class="container-fluid">
+  <ul class="nav nav-tabs" id="mqTab" role="tablist">
+    <li class="nav-item">
+      <a class="nav-link active" id="egg-tab" data-toggle="tab" href="#egg" role="tab" aria-controls="output" aria-selected="true">BSS e-Goverment Gate</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="fa-tab" data-toggle="tab" href="#fa" role="tab" aria-controls="input" aria-selected="false">Fraud-Анализ</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="mt-tab" data-toggle="tab" href="#mt" role="tab" aria-controls="input" aria-selected="false">MoneyTrans</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="sn-tab" data-toggle="tab" href="#sn" role="tab" aria-controls="input" aria-selected="false">Сервер Нотификаций</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="tir-tab" data-toggle="tab" href="#tir" role="tab" aria-controls="input" aria-selected="false">ТИР</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="epos-tab" data-toggle="tab" href="#epos" role="tab" aria-controls="input" aria-selected="false">ЭПОС</a>
+    </li>
+  </ul>
+
+  <div class="tab-content" id="myTabContent">
+
+    <!-- EGG -->
+
+    <div class="tab-pane fade show active" id="egg" role="tabpanel" aria-labelledby="egg-tab">
+      <div class="container-fluid">
+        <br/>
+        <div style="height:600px;width:auto;border:3px solid dodgerblue;font:14px/18px Calibri, Garamond, Serif;overflow:auto;">
+          <%= render 'defect_show', resource: @defects_egg %>
+        </div>
+      </div>
+    </div>
+
+    <!-- FA -->
+
+    <div class="tab-pane fade" id="fa" role="tabpanel" aria-labelledby="fa-tab">
+      <div class="container-fluid">
+        <br/>
+        <div style="height:600px;width:auto;border:3px solid dodgerblue;font:14px/18px Calibri, Garamond, Serif;overflow:auto;">
+          <%= render 'defect_show', resource: @defects_fa %>
+        </div>
+      </div>
+    </div>
+
+    <!-- MT -->
+
+    <div class="tab-pane fade" id="mt" role="tabpanel" aria-labelledby="mt-tab">
+      <div class="container-fluid">
+        <br/>
+        <div style="height:600px;width:auto;border:3px solid dodgerblue;font:14px/18px Calibri, Garamond, Serif;overflow:auto;">
+          <%= render 'defect_show', resource: @defects_mt %>
+        </div>
+      </div>
+    </div>
+
+    <!-- SN -->
+
+    <div class="tab-pane fade" id="sn" role="tabpanel" aria-labelledby="sn-tab">
+      <div class="container-fluid">
+        <br/>
+        <div style="height:600px;width:auto;border:3px solid dodgerblue;font:14px/18px Calibri, Garamond, Serif;overflow:auto;">
+          <%= render 'defect_show', resource: @defects_sn %>
+        </div>
+      </div>
+    </div>
+
+    <!-- TIR -->
+
+    <div class="tab-pane fade" id="tir" role="tabpanel" aria-labelledby="tir-tab">
+      <div class="container-fluid">
+        <br/>
+        <div style="height:600px;width:auto;border:3px solid dodgerblue;font:14px/18px Calibri, Garamond, Serif;overflow:auto;">
+          <%= render 'defect_show', resource: @defects_tir %>
+        </div>
+      </div>
+    </div>
+
+    <!-- EPSO -->
+
+    <div class="tab-pane fade" id="epos" role="tabpanel" aria-labelledby="epos-tab">
+      <div class="container-fluid">
+        <br/>
+        <div style="height:600px;width:auto;border:3px solid dodgerblue;font:14px/18px Calibri, Garamond, Serif;overflow:auto;">
+          <%= render 'defect_show', resource: @defects_epos %>
+        </div>
+      </div>
+    </div>
+
+  </div><br>
+</div>

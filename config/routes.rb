@@ -1,6 +1,7 @@
 Rails.application.routes.draw do
 
-  get 'soap/tester'
+  get 'soap/name'
+  get 'soap/user_room'
 
   get 'sessions/new'
   get 'users/new'
@@ -48,6 +49,8 @@ Rails.application.routes.draw do
   get '/egg_auto_tests/tester' => 'egg_auto_tests#tester'
   get '/egg_auto_tests/live_stream_egg' => 'egg_auto_tests#live_stream_egg'
   get '/egg_auto_tests/download_log_egg' => 'egg_auto_tests#download_log_egg'
+  get '/egg_auto_tests/run_automate' => 'egg_auto_tests#run_automate'
+  get '/egg_auto_tests/stop_autotests' => 'egg_auto_tests#stop_autotests'
   resources :users
 
   # CC Format Validator
@@ -71,6 +74,10 @@ Rails.application.routes.draw do
   resources :test_plans do
     resources :features
   end
+
+  # ExternalDefectList
+
+  resources :external_defect_list
 
   wash_out :soap
 

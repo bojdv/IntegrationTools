@@ -13,7 +13,7 @@ class EggAutoTestsController < ApplicationController
 
   def initialize
     super
-    @db_username = "egg_autotest2"
+    @db_username = "egg_autotest"
     SQL_query.db_name = @db_username
   end
   # helper :egg_auto_tests

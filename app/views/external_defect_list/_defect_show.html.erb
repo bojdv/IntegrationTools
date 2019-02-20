@@ -1,11 +1,14 @@
 <table class="table table-dark">
   <thead>
   <tr>
-    <th scope="col">Ключ</th>
-    <th scope="col">Описание</th>
-    <th scope="col">Дата создания</th>
-    <th scope="col">Статус</th>
-    <th scope="col">Причина пропуска</th>
+    <th scope="col"><font color="yellow">Ключ</font></th>
+    <th scope="col"><font color="yellow">Описание</font></th>
+    <th scope="col"><font color="yellow">Дата создания</font></th>
+    <th scope="col"><font color="yellow">Статус</font></th>
+    <th scope="col"><font color="yellow">Причина пропуска</font></th>
+    <% if logged_in? && current_user.admin? %>
+      <th scope="col"><font color="yellow">Действия</font></th>
+    <% end  %>
   </tr>
   </thead>
   <tbody>
@@ -21,6 +24,9 @@
                             # :cancel_button => "Отмена",
                             # :cancel_button_class => "button_best_in_place",
                             :place_holder => "Кликнуть для заполнения"%></td>
+      <% if logged_in? && current_user.admin? %>
+        <td><%= link_to "Удалить", external_defect_list_path(defect), method: :delete, data: {confirm: 'Точно?'} %></td>
+      <% end  %>
     </tr>
   <% end %>
   </tbody>

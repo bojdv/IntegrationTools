@@ -6,9 +6,9 @@
 mode=unattended
 
 # возможные значения:
-# none - не требуется взаимодействие с пользователем, результат не отображается, 
-# minimal - не требуется взаимодействие с пользователем и отображаются всплывающие окна прогресса, показывающее ход установки, 
-# minimalWithDialogs - в дополнение к режиму minimal отображаются всплывающие окна диалога. Этот режим может потребовать некоторого 
+# none - не требуется взаимодействие с пользователем, результат не отображается,
+# minimal - не требуется взаимодействие с пользователем и отображаются всплывающие окна прогресса, показывающее ход установки,
+# minimalWithDialogs - в дополнение к режиму minimal отображаются всплывающие окна диалога. Этот режим может потребовать некоторого
 #  взаимодействия с пользователем, в зависимости от конкретной логики инсталлятора.
 unattendedmodeui=minimalWithDialogs
 
@@ -16,7 +16,7 @@ unattendedmodeui=minimalWithDialogs
 installdir=C:\EGG
 
 # устанавливаемые компоненты перечисляются через запятую
-enable-components=egg,DBcreate,ServiceMix,iaAmqComponent,saSpepComponent,saGmpComponent,iaFileGmpComponent,saZkhComponent,iaFileZkhComponent, saZkhPayeesComponent, iaFileMqGmpComponent,iaFileMqZkhComponent,saGmp20Component,saFnsEgripComponent,saFnsEgrulComponent,saEfrsbComponent,saEsiaSmev3Component,iaFileUfebsGmpComponent
+enable-components=egg,DBcreate,ServiceMix,iaAmqComponent,saSpepComponent,saGmpComponent,iaFileGmpComponent,saZkhComponent,iaFileZkhComponent, saZkhPayeesComponent, iaFileMqGmpComponent,iaFileMqZkhComponent,saGmp20Component,saFnsEgripComponent,saFnsEgrulComponent,saEfrsbComponent,saEsiaSmev3Component,iaFileUfebsGmpComponent,saZkhSmev3Component,iaFileUfebsZkhComponent
 # компоненты, установка которых не требуется, перечисляются через запятую
 disable-components=crypto,CryptoService,saEsiaComponent,saReestrFsspComponent,saUpridComponent
 
@@ -83,7 +83,6 @@ senderIdentifier=3536aa
 fk_PaymentVersion=1.16.5
 fk_NumberOfAttempts=5
 fk_DeliverySchedule=3
-
 fk_SID0003663=http://vm-itools:5000/GIS-GMP
 #fk_SID0003663=http://smev-mvf.test.gosuslugi.ru:7777/gateway/services/SID0003663/1.00
 
@@ -158,6 +157,30 @@ zkh_file_ignoreTicket1004=false
 zkh_file_payees_request_schedule=0 0/3 * 1/1 * ? *
 zkh_file_zkh_loader_consumers=5
 zkh_file_is_payees_request=true
+
+# настройки УФЭБС ГИС ЖКХ СМЭВ 3 iaFileUfebsZkhComponent
+fileUfebs_zkh_testMode=true
+fileUfebs_zkh_ValidateInputEgg=false
+fileUfebs_zkh_inbox=C:/data/INAD_ZHKH3_UFEBS/outbound
+fileUfebs_zkh_outbox=C:/data/INAD_ZHKH3_UFEBS/inbound
+fileUfebs_zkh_backupbox=C:/data/INAD_ZHKH3_UFEBS/outbound/archive
+fileUfebs_zkh_errorbox=C:/data/INAD_ZHKH3_UFEBS/error
+fileUfebs_zkh_systemID=Egg
+fileUfebs_zkh_serviceID=SMEV3_GIS_ZHKH3_PAYMENT
+fileUfebs_zkh_consumers=5
+fileUfebs_zkh_FormatVersion=2019.1.1
+fileUfebs_zkh_PaymentVersion=1.0.0
+fileUfebs_zkh_reestr_Shedule=0 0 1 */1 * *
+fileUfebs_zkh_reestr_ZkhLoaderDeltaLock=3600
+fileUfebs_zkh_reestr_maxAge=14
+fileUfebs_zkh_reestr_systemID=Egg
+fileUfebs_zkh_reestr_serviceID=SMEV3_GIS_ZHKH3_PAYEES
+fileUfebs_zkh_reestr_consumers=10
+fileUfebs_zkh_reestr_ValidateInputEgg=true
+fileUfebs_zkh_reestr_PaymentVersion=1.0.0
+fileUfebs_zkh_reestr_FoldersInbound=./folderSMEV
+fileUfebs_zkh_reestr_ZkhLoaderBatchSize=100
+
 
 # saZkhPayeesComponent - Импорт справочника поставщиков
 zkhPayees_zkhPayeesService=http://smev-mvf.test.gosuslugi.ru:7777/gateway/services/SID0004768/1.00
@@ -340,9 +363,37 @@ esia_smev3_SMEV3_ESIA_departmentId=egg
 esia_smev3_apply_to_all=true
 
 # ГИС ЖКХ СМЭВ3
+egg_ZkhSmev3_PaymentVersion=1.0.0
+egg_ZkhSmev3_NumberOfPayments=10
+egg_ZkhSmev3_package_period=1000
+egg_ZkhSmev3_SMEV3_ZKH=http://vm-itools:8763/SA_GIS_ZHKH_SMEV3
+egg_ZkhSmev3_informationSystemId=1750f483-1684-4a06-b72e-485a559a2358
+egg_ZkhSmev3_organizationId=c901756b-40c7-41dc-85c2-f95bbd15b5b9
+egg_ZkhSmev3_CodesForRepeat=INT0212031
+egg_ZkhSmev3_RequestStatusCodesForRepeat=21
+egg_ZkhSmev3_RequestStatusCodesForWait=212
 egg_ZkhSmev3_attachmentMode=true
+egg_ZkhSmev3_timer_period=10000
 egg_ZkhSmev3_isCryptoLog=true
+egg_ZkhSmev3_CryptoService=http://10.1.8.233:9090/axis2/services/CryptoService
+egg_ZkhSmev3_CheckingSignature=none
+egg_ZkhSmev3_CheckSignatureAttachment=none
+egg_ZkhSmev3_CheckEPOV=none
+egg_ZkhSmev3_CheckEPSP=none
+egg_ZkhSmev3_deadLine=10
+egg_ZkhSmev3_NumberOfAttempts=1
+egg_ZkhSmev3_DeliverySchedule=1
 egg_ZkhSmev3_TestMessage=true
-egg_ZkhSmev3_isResponseLock=false
+egg_ZkhSmev3_payment_adapterId=amq-jms-iadp
+egg_ZkhSmev3_payment_isResponseLock=true
+egg_ZkhSmev3_paymentDetails_adapterId=amq-jms-iadp
+egg_ZkhSmev3_paymentDetails_isResponseLock=true
+egg_ZkhSmev3_payees_adapterId=amq-jms-iadp
+egg_ZkhSmev3_payees_isResponseLock=true
 egg_ZkhSmev3_sendingTicket1000=true
 egg_ZkhSmev3_sendingTicket1012=true
+egg_ZkhSmev3_FTPServer=192.168.3.75
+egg_ZkhSmev3_FTPPort=21
+egg_ZkhSmev3_FoldersInbound=C:/data/FTP
+egg_ZkhSmev3_GarbageShedule=0 0 1 */1 * *
+egg_ZkhSmev3_GarbageAge=10

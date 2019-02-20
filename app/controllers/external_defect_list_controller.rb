@@ -1,5 +1,6 @@
 class ExternalDefectListController < ApplicationController
   include ExternalDefectListHelper
+  before_action :find_defect, only: :destroy
 
   def index
     update_external_defects
@@ -23,9 +24,18 @@ class ExternalDefectListController < ApplicationController
     end
   end
 
+  def destroy
+    @defect.destroy
+    redirect_to external_defect_list_index_path
+  end
+
   private
 
   def defect_params
     params.require(:external_defect_list).permit(:reason)
+  end
+
+  def find_defect
+    @defect = ExternalDefectList.find(params[:id])
   end
 end

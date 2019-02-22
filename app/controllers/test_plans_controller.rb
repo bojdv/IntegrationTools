@@ -17,6 +17,7 @@ class TestPlansController < ApplicationController
     @mt_plans = TestPlan.where(:product_id => '10007')
     @sn_plans = TestPlan.where(:product_id => '10003')
     @tir_plans = TestPlan.where(:product_id => '10001')
+    @epos_plans = TestPlan.where(:product_id => '10008')
   end
 
   def new

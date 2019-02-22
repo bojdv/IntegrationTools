@@ -16,6 +16,9 @@
     <li class="nav-item">
       <a class="nav-link" id="tir-tab" data-toggle="tab" href="#tir" role="tab" aria-controls="input" aria-selected="false">ТИР</a>
     </li>
+    <li class="nav-item">
+      <a class="nav-link" id="epos-tab" data-toggle="tab" href="#epos" role="tab" aria-controls="input" aria-selected="false">ЭПОС</a>
+    </li>
   </ul>
   <!-- EGG -->
   <div class="tab-content" id="myTabContent">
@@ -211,6 +214,46 @@
         </div>
       </div>
     </div>
+
+    <!-- EPOS -->
+    <div class="tab-pane fade" id="epos" role="tabpanel" aria-labelledby="epos-tab">
+      <div class="container-fluid">
+        <br/>
+        <div style="height:600px;width:auto;border:3px solid dodgerblue;font:14px/18px Calibri, Garamond, Serif;overflow:auto;">
+          <table class="table table-dark">
+            <thead>
+            <tr>
+              <th scope="col">Название плана</th>
+              <th scope="col">Дата создания</th>
+              <th scope="col">Дата окончания работ</th>
+              <th scope="col">Статус</th>
+              <th scope="col">Автор</th>
+              <th scope="col">Отчет</th>
+              <th scope="col">Комментарий</th>
+              <th scope="col">Редактировать</th>
+            </tr>
+            </thead>
+            <tbody>
+            <%	 unless @epos_plans.nil?  %>
+              <% @epos_plans.order(created_at: :desc).each do |plan| %>
+                <tr>
+                  <td><%= link_to plan.name, test_plan_path(plan), {:style=>'color:yellow;'} %></td>
+                  <td><%= plan.created_at %></td>
+                  <td><%= plan.finish_date %></td>
+                  <td><%= plan.status %></td>
+                  <td><%= User.where(:id => plan.user_id).pluck(:email).join %></td>
+                  <td><%= link_to 'Скачать отчет', {:controller => "test_plans", :action =>"download_test_report", :url => plan.report_url} unless plan.report_url.nil? %></td>
+                  <td><%	 if !plan.comment.empty? %><a tabindex="0" class="show-popover" data-toggle="popover" title="Комментарий" data-content='<%= simple_format(plan.comment) %>'>Комментарий</a><%  end %></td>
+                  <%	 if logged_in? %><td><%= link_to 'Редактировать', edit_test_plan_path(plan) %></td><% end %>
+                </tr>
+              <% end %>
+            <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
   </div><br>
   <%	 if logged_in? %>
     <%= link_to 'Новый план тестирования', new_test_plan_path, {:class => "btn btn-primary form-group" } %>

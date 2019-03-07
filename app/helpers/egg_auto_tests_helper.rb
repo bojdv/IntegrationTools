@@ -709,8 +709,6 @@ queue_core_ia_consumers=5
                 puts "Receive not UFEBS message"
                 sender.send(message)
               end
-            else
-              puts "Don't receive message from queue core_sa"
             end
             sleep 1
           end

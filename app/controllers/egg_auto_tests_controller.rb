@@ -40,7 +40,7 @@ class EggAutoTestsController < ApplicationController
                         'ИА УФЭБС (ГИС ЖКХ СМЭВ3)']
     @egg68_components = Array.new(@egg67_components)
     @egg68_components.push('ЕСИА')
-    regex = /\A[6]{,1}[.](9|10|11|12|13){,2}[.][\d]{,3}[-][\w]{,8}\Z/
+    regex = /\A[6]{,1}[.](9|10|11|12|13|14|15|16|17){,2}[.][\d]{,3}[-][\w]{,8}\Z/
 
     ftp = Net::FTP.new('10.1.1.163')
     ftp.login
@@ -159,7 +159,7 @@ class EggAutoTestsController < ApplicationController
   def run_automate
     $browser_egg[:event] = ''
     $browser_egg[:message] = ''
-    regex = /\A[6]{,1}[.](9|10|11|12|13){,2}[.][\d]{,3}[-][\w]{,8}\Z/
+    regex = /\A[6]{,1}[.](9|10|11|12|13|14|15|16|17){,2}[.][\d]{,3}[-][\w]{,8}\Z/
     ftp = Net::FTP.new('10.1.1.163')
     ftp.login
     etalon_dir = []

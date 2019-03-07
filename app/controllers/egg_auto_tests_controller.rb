@@ -189,8 +189,7 @@ class EggAutoTestsController < ApplicationController
             etalon_dir = current_dir
             puts "New EGG dir detected! #{new_dir}"
             build_version = new_dir.join
-            components = if build_version.include?("6.11") or build_version.include?("6.12")
-                           ['ИА Active MQ',
+            components =   ['ИА Active MQ',
                             'ИА УФЭБС (ГИС ГМП)',
                             'ИА УФЭБС (ГИС ЖКХ)',
                             'ИА JPMorgan (ГИС ГМП)',
@@ -207,19 +206,6 @@ class EggAutoTestsController < ApplicationController
                             'ИА УФЭБС (ГИС ГМП СМЭВ3)',
                             'СА ГИС ЖКХ СМЭВ3',
                             'ИА УФЭБС (ГИС ЖКХ СМЭВ3)']
-                         else
-                           ['ИА Active MQ',
-                            'ИА УФЭБС (ГИС ГМП)',
-                            'ИА УФЭБС (ГИС ЖКХ)',
-                            'ИА JPMorgan (ГИС ГМП)',
-                            'ИА JPMorgan (ГИС ЖКХ)',
-                            'ИА ZKH-Loader/СА ZkhPayees',
-                            'СА ГИС ГМП',
-                            'СА ГИС ЖКХ',
-                            'СА SPEP',
-                            'СА ФНС ЕГРИП',
-                            'СА ФНС ЕГРЮЛ']
-                         end
             begin
               $status_egg_tests = true
               sleep 20

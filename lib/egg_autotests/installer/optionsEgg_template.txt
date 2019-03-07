@@ -16,7 +16,7 @@ unattendedmodeui=minimalWithDialogs
 installdir=C:\EGG
 
 # устанавливаемые компоненты перечисляются через запятую
-enable-components=egg,DBcreate,ServiceMix,iaAmqComponent,saSpepComponent,saGmpComponent,iaFileGmpComponent,saZkhComponent,iaFileZkhComponent, saZkhPayeesComponent, iaFileMqGmpComponent,iaFileMqZkhComponent,saGmp20Component,saFnsEgripComponent,saFnsEgrulComponent,saEfrsbComponent,saEsiaSmev3Component,iaFileUfebsGmpComponent,saZkhSmev3Component,iaFileUfebsZkhComponent
+enable-components=egg,DBcreate,ServiceMix,iaAmqComponent,saZkhSmev3Component,iaFileUfebsZkhComponent,saSpepComponent,saGmpComponent,iaFileGmpComponent,saZkhComponent,iaFileZkhComponent, saZkhPayeesComponent, iaFileMqGmpComponent,iaFileMqZkhComponent,saGmp20Component,saFnsEgripComponent,saFnsEgrulComponent,saEfrsbComponent,saEsiaSmev3Component,iaFileUfebsGmpComponent
 # компоненты, установка которых не требуется, перечисляются через запятую
 disable-components=crypto,CryptoService,saEsiaComponent,saReestrFsspComponent,saUpridComponent
 
@@ -313,7 +313,7 @@ egg_gmp20_payment_CodesForRepeat=1
 egg_gmp20_sendingTicket1000=false
 egg_gmp20_sendingTicket1012=true
 
-# iaFileUfebsGmpComponent - ИА УФЭБС (СМЭВ3)
+# iaFileUfebsGmpComponent - ИА УФЭБС ГИС ГМП (СМЭВ3)
 fileUfebs_mq_gmp_testMode=true
 fileUfebs_mq_gmp_ValidateInputEgg=true
 fileUfebs_mq_gmp_inbox=C:/data/INAD_GISGMP_UFEBS/outbound
@@ -367,12 +367,12 @@ egg_ZkhSmev3_PaymentVersion=1.0.0
 egg_ZkhSmev3_NumberOfPayments=10
 egg_ZkhSmev3_package_period=1000
 egg_ZkhSmev3_SMEV3_ZKH=http://vm-itools:8763/SA_GIS_ZHKH_SMEV3
-egg_ZkhSmev3_informationSystemId=1750f483-1684-4a06-b72e-485a559a2358
-egg_ZkhSmev3_organizationId=c901756b-40c7-41dc-85c2-f95bbd15b5b9
-egg_ZkhSmev3_CodesForRepeat=INT0212031
-egg_ZkhSmev3_RequestStatusCodesForRepeat=21
-egg_ZkhSmev3_RequestStatusCodesForWait=212
-egg_ZkhSmev3_attachmentMode=true
+egg_ZkhSmev3_informationSystemId=f58d7403-9133-483b-bc1b-e7239bbf069f
+egg_ZkhSmev3_organizationId=b41cc57c-455d-4c6f-87b1-e6e333197911
+egg_ZkhSmev3_CodesForRepeat=
+egg_ZkhSmev3_RequestStatusCodesForRepeat=EXP001000, EXP002003
+egg_ZkhSmev3_RequestStatusCodesForWait=
+egg_ZkhSmev3_attachmentMode=false
 egg_ZkhSmev3_timer_period=10000
 egg_ZkhSmev3_isCryptoLog=true
 egg_ZkhSmev3_CryptoService=http://10.1.8.233:9090/axis2/services/CryptoService
@@ -383,14 +383,14 @@ egg_ZkhSmev3_CheckEPSP=none
 egg_ZkhSmev3_deadLine=10
 egg_ZkhSmev3_NumberOfAttempts=1
 egg_ZkhSmev3_DeliverySchedule=1
-egg_ZkhSmev3_TestMessage=true
+egg_ZkhSmev3_TestMessage=false
 egg_ZkhSmev3_payment_adapterId=amq-jms-iadp
 egg_ZkhSmev3_payment_isResponseLock=true
 egg_ZkhSmev3_paymentDetails_adapterId=amq-jms-iadp
 egg_ZkhSmev3_paymentDetails_isResponseLock=true
 egg_ZkhSmev3_payees_adapterId=amq-jms-iadp
 egg_ZkhSmev3_payees_isResponseLock=true
-egg_ZkhSmev3_sendingTicket1000=true
+egg_ZkhSmev3_sendingTicket1000=false
 egg_ZkhSmev3_sendingTicket1012=true
 egg_ZkhSmev3_FTPServer=192.168.3.75
 egg_ZkhSmev3_FTPPort=21

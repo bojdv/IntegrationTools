@@ -35,10 +35,12 @@ class EggAutoTestsController < ApplicationController
                         'СА EFRSB (Банкроты)',
                         'СА ЕСИА СМЭВ3',
                         'СА ГИС ГМП СМЭВ3',
-                        'ИА УФЭБС (ГИС ГМП СМЭВ3)']
+                        'ИА УФЭБС (ГИС ГМП СМЭВ3)',
+                        'СА ГИС ЖКХ СМЭВ3',
+                        'ИА УФЭБС (ГИС ЖКХ СМЭВ3)']
     @egg68_components = Array.new(@egg67_components)
     @egg68_components.push('ЕСИА')
-    regex = /\A[6]{,1}[.](9|10|11|12|13){,2}[.][\d]{,3}[-][\w]{,8}\Z/
+    regex = /\A[6]{,1}[.](9|10|11|12|13|14|15|16|17){,2}[.][\d]{,3}[-][\w]{,8}\Z/
 
     ftp = Net::FTP.new('10.1.1.163')
     ftp.login
@@ -157,7 +159,7 @@ class EggAutoTestsController < ApplicationController
   def run_automate
     $browser_egg[:event] = ''
     $browser_egg[:message] = ''
-    regex = /\A[6]{,1}[.](9|10|11|12|13){,2}[.][\d]{,3}[-][\w]{,8}\Z/
+    regex = /\A[6]{,1}[.](9|10|11|12|13|14|15|16|17){,2}[.][\d]{,3}[-][\w]{,8}\Z/
     ftp = Net::FTP.new('10.1.1.163')
     ftp.login
     etalon_dir = []
@@ -187,8 +189,7 @@ class EggAutoTestsController < ApplicationController
             etalon_dir = current_dir
             puts "New EGG dir detected! #{new_dir}"
             build_version = new_dir.join
-            components = if build_version.include?("6.11") or build_version.include?("6.12")
-                           ['ИА Active MQ',
+            components =   ['ИА Active MQ',
                             'ИА УФЭБС (ГИС ГМП)',
                             'ИА УФЭБС (ГИС ЖКХ)',
                             'ИА JPMorgan (ГИС ГМП)',
@@ -202,20 +203,9 @@ class EggAutoTestsController < ApplicationController
                             'СА EFRSB (Банкроты)',
                             'СА ЕСИА СМЭВ3',
                             'СА ГИС ГМП СМЭВ3',
-                            'ИА УФЭБС (ГИС ГМП СМЭВ3)']
-                         else
-                           ['ИА Active MQ',
-                            'ИА УФЭБС (ГИС ГМП)',
-                            'ИА УФЭБС (ГИС ЖКХ)',
-                            'ИА JPMorgan (ГИС ГМП)',
-                            'ИА JPMorgan (ГИС ЖКХ)',
-                            'ИА ZKH-Loader/СА ZkhPayees',
-                            'СА ГИС ГМП',
-                            'СА ГИС ЖКХ',
-                            'СА SPEP',
-                            'СА ФНС ЕГРИП',
-                            'СА ФНС ЕГРЮЛ']
-                         end
+                            'ИА УФЭБС (ГИС ГМП СМЭВ3)',
+                            'СА ГИС ЖКХ СМЭВ3',
+                            'ИА УФЭБС (ГИС ЖКХ СМЭВ3)']
             begin
               $status_egg_tests = true
               sleep 20

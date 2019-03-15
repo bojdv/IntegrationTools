@@ -18,6 +18,8 @@ require_dependency "#{Rails.root}/lib/egg_autotests/SA_EFRSB"
 require_dependency "#{Rails.root}/lib/egg_autotests/SA_ESIA_SMEV3"
 require_dependency "#{Rails.root}/lib/egg_autotests/SA_GIS_GMP_SMEV3"
 require_dependency "#{Rails.root}/lib/egg_autotests/IA_UFEBS_GIS_GMP_SMEV3"
+require_dependency "#{Rails.root}/lib/egg_autotests/SA_GIS_ZKH_SMEV3"
+require_dependency "#{Rails.root}/lib/egg_autotests/IA_UFEBS_GIS_ZKH_SMEV3"
 
 class EggAutotestsList
 
@@ -33,12 +35,11 @@ class EggAutotestsList
     @db_username = db_username # имя схемы Oracle на которую ставится БД еГГ
     @build_version = build_version
     case # Определяем версию форматов по версии сборки
-      when build_version.include?('6.10')
-        @ufebs_version = '2018.3.2' #\app\smx\resourceapp.war\wsdl\XSD\CBR\х\ed\cbr_ed101_vх.xsd
+      when build_version.include?('6.11')
+        @ufebs_version = '2019.1.1' #\app\smx\resourceapp.war\wsdl\XSD\CBR\х\ed\cbr_ed101_vх.xsd
       else
-        @ufebs_version = '2019.1.1'
+        @ufebs_version = '2019.2.1'
     end
-
   end
 
   def runTest_egg(components) # Запуск автотестов
@@ -146,6 +147,21 @@ class EggAutotestsList
       ia_ufebs_gis_gmp_smev3.ed101_change
       ia_ufebs_gis_gmp_smev3.ed101_delete
       ia_ufebs_gis_gmp_smev3.ed101_change_delete
+    end
+    if components.include?('СА ГИС ЖКХ СМЭВ3')
+      sa_gis_zkh_smev3 = SA_GIS_ZKH_SMEV3.new(@pass_menu_color, @fail_menu_color, @not_find_xml, @not_receive_answer, @egg_version, @try_count)
+      sa_gis_zkh_smev3.payment
+      sa_gis_zkh_smev3.payment_cancellation
+      sa_gis_zkh_smev3.payment_details
+    end
+    if components.include?('ИА УФЭБС (ГИС ЖКХ СМЭВ3)')
+      ia_ufebs_gis_zkh_smev3 = IA_UFEBS_GIS_ZKH_SMEV3.new(@pass_menu_color, @fail_menu_color, @not_find_xml, @not_receive_answer, @egg_version, @try_count, @ufebs_version)
+      ia_ufebs_gis_zkh_smev3.ed101_test
+      ia_ufebs_gis_zkh_smev3.ed104_test
+      ia_ufebs_gis_zkh_smev3.ed105_test
+      ia_ufebs_gis_zkh_smev3.ed108_test
+      ia_ufebs_gis_zkh_smev3.ed101_delete
+      ia_ufebs_gis_zkh_smev3.packetepd_test
     end
   end
 end

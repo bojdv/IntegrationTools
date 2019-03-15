@@ -210,7 +210,11 @@ module EggAutoTestsHelper
         xml_actual = receiver.receiveNoWait
         sleep 1
         puts count -=1
-        return nil if count == 0
+        if count == 0
+          $log_egg.write_to_browser("Не получили ответ")
+          $log_egg.write_to_log(functional, "Результат отправки:", "Не получили ответ")
+          return nil
+        end
       end
       if xml_actual.getText.include?("<ErrorCode>1014</ErrorCode>")
         $log_egg.write_to_browser("Пришла ошибка из СМЭВ: Внешний сервис недоступен")
@@ -456,6 +460,8 @@ module EggAutoTestsHelper
       dir = 'C:/data/inbox/GIS_ZKH/inbound/all'
     when 'gis_gmp_smev3'
       dir = 'C:/data/INAD_GISGMP_UFEBS/inbound/all'
+      when 'gis_zkh_smev3'
+        dir = 'C:/data/INAD_ZHKH3_UFEBS/inbound/all'
     end
     code_adps000 = 'ADPS000' # Переменная хранит код промежуточного тикета от адаптера
     code_adps001 = 'ADPS001' # Переменная хранит код успешного сообщения от СМЭВ
@@ -472,6 +478,8 @@ module EggAutoTestsHelper
         positive_code = 2
       when 'gis_gmp_smev3'
         positive_code = 3
+        when 'gis_zkh_smev3'
+          positive_code = 2
       end
     else
       positive_code = 1
@@ -574,6 +582,11 @@ module EggAutoTestsHelper
     @sql_query.insert_inn # Вставляем в БД запись с поставщиком
   end
 
+  def insert_ZKH_SMEV3(functional)# Метод заполняет Реестр получателей платежей ГИС ЖКХ СМЭВ3. Ничего не возвращает.
+    @sql_query = SQL_query.new
+    @sql_query.insert_ZKH_SMEV3(functional) # Вставляем в БД запись с поставщиком
+  end
+
   def change_smevmessageid(xml_rexml, smev_id, functional) # метод меняет id для запросов в СМЭВ3
     @sql_query = SQL_query.new
     @sql_query.change_smevmessageid(xml_rexml, smev_id, functional)
@@ -582,6 +595,11 @@ module EggAutoTestsHelper
   def change_smevmessageid_gis_gmp(xml_rexml, smev_id, functional, ufebs = false) # метод меняет id для запросов ГИС ГМП в СМЭВ3
     @sql_query = SQL_query.new
     @sql_query.change_smevmessageid_gis_gmp(xml_rexml, smev_id, functional, ufebs)
+  end
+
+  def change_smevmessageid_gis_zkh(xml_rexml, smev_id, functional, ufebs = false) # метод меняет id для запросов ГИС ЖКХ в СМЭВ3
+    @sql_query = SQL_query.new
+    @sql_query.change_smevmessageid_gis_zkh(xml_rexml, smev_id, functional, ufebs)
   end
 
   # def change_correlationid(xml_rexml, correlation_id, db_user, functional) # метод меняет id для запросов в УФЭБС
@@ -648,11 +666,12 @@ queue_core_ia_consumers=5
       @core_in_ufebs_zkh = Array.new
       @core_in_ufebs_jpm = Array.new
       @core_in_ufebs_gmp_smev3 = Array.new
+      @core_in_ufebs_zkh_smev3 = Array.new
       @manager = QueueManager.find_by_manager_name('iTools[EGG]')
       start_core_in_listener # Запускаем прослушку входной очереди ядра
     end
 
-    attr_accessor :core_in_ufebs_gmp, :core_in_ufebs_zkh, :core_in_ufebs_jpm, :core_in_ufebs_gmp_smev3
+    attr_accessor :core_in_ufebs_gmp, :core_in_ufebs_zkh, :core_in_ufebs_jpm, :core_in_ufebs_gmp_smev3, :core_in_ufebs_zkh_smev3
 
     def start_core_in_listener
       @thread_get_core_message = Thread.new do
@@ -683,6 +702,9 @@ queue_core_ia_consumers=5
               when 'gisgmp-fileUfebs-iadp'
                 puts "Receive UFEBS GIS GMP SMEV3 message"
                 @core_in_ufebs_gmp_smev3 << {correlation_id: message.getJMSCorrelationID, body: message.getText }
+                when 'zkh-fileUfebs-iadp'
+                  puts "Receive UFEBS GIS ZKH SMEV3 message"
+                  @core_in_ufebs_zkh_smev3 << {correlation_id: message.getJMSCorrelationID, body: message.getText }
               else
                 puts "Receive not UFEBS message"
                 sender.send(message)

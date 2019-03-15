@@ -151,6 +151,40 @@ END;})
     end
   end
 
+  def insert_ZKH_SMEV3(functional)# Метод заполняет Реестр получателей платежей ГИС ЖКХ СМЭВ3. Ничего не возвращает.
+    begin
+      # Вставка записи в таблицу ZKH_SMEV3_PAYMENT_RECEIVER
+      rs = @stmt.executeQuery("select OGRN from ZKH_SMEV3_PAYMENT_RECEIVER")
+      unless rs.isBeforeFirst()
+        row_insert = @stmt.executeUpdate("INSERT INTO ZKH_SMEV3_PAYMENT_RECEIVER (OGRN, INN, KPP, NAME, REC_DATECREATE, REC_DATEUPDATE) VALUES ('1234567890123', '1234567890', '123456789', 'Получатель', TO_DATE('29.01.19', 'DD.MM.RR'), TO_DATE('29.01.19', 'DD.MM.RR'))")
+      end
+      if row_insert == 1
+        $log_egg.write_to_browser("Вставили запись в таблицу ZKH_SMEV3_PAYMENT_RECEIVER")
+        $log_egg.write_to_log(functional, "Вставили запись в таблицу ZKH_SMEV3_PAYMENT_RECEIVER", "INSERT INTO ZKH_SMEV3_PAYMENT_RECEIVER (OGRN, INN, KPP, NAME, REC_DATECREATE, REC_DATEUPDATE) VALUES ('1234567890123', '1234567890', '123456789', 'Получатель', TO_DATE('29.01.19', 'DD.MM.RR'), TO_DATE('29.01.19', 'DD.MM.RR'))")
+      else
+        $log_egg.write_to_browser("Не вставили запись в таблицу ZKH_SMEV3_PAYMENT_RECEIVER, т к она уже существует")
+        $log_egg.write_to_log(functional, "Не вставили запись в таблицу ZKH_SMEV3_PAYMENT_RECEIVER, т к она уже существует", "INSERT INTO ZKH_SMEV3_PAYMENT_RECEIVER (OGRN, INN, KPP, NAME, REC_DATECREATE, REC_DATEUPDATE) VALUES ('1234567890123', '1234567890', '123456789', 'Получатель', TO_DATE('29.01.19', 'DD.MM.RR'), TO_DATE('29.01.19', 'DD.MM.RR'))")
+      end
+      # Вставка записи в таблицу ZKH_SMEV3_PAYMENT_RECEIVER_INF
+    rs = @stmt.executeQuery("select PAYMENT_RECEIVER_OGRN from ZKH_SMEV3_PAYMENT_RECEIVER_INF")
+    unless rs.isBeforeFirst()
+      row_insert = @stmt.executeUpdate("INSERT INTO ZKH_SMEV3_PAYMENT_RECEIVER_INF (GUID, UPDATEDATE, RECIPIENT_INN, RECIPIENT_KPP, BANK_NAME, PAYMENT_RECIPIENT, BIK, OPERATING_ACCOUNT, CORRESPONDENT_ACCOUNT, KBK, OKTMO, NUMBER_BUDGETARY_ACCOUNT, IS_CAPITAL_REPAIR, PAYMENT_RECEIVER_OGRN, REC_DATECREATE, REC_DATEUPDATE) VALUES ('1', TO_DATE('29.01.19', 'DD.MM.RR'), '1234512345', '987654321', 'СБЕРБАНК', 'получатель', '044525225', '30301810000006000001', '30301810000006000002', '18210202131061010160', '87654321', '30301810000006000003', '1', '1234567890123', TO_DATE('29.01.19', 'DD.MM.RR'), TO_DATE('29.01.19', 'DD.MM.RR'))")
+    end
+    if row_insert == 1
+      $log_egg.write_to_browser("Вставили запись в таблицу ZKH_SMEV3_PAYMENT_RECEIVER_INF")
+      $log_egg.write_to_log(functional, "Вставили запись в таблицу ZKH_SMEV3_PAYMENT_RECEIVER_INF", "INSERT INTO ZKH_SMEV3_PAYMENT_RECEIVER_INF (GUID, UPDATEDATE, RECIPIENT_INN, RECIPIENT_KPP, BANK_NAME, PAYMENT_RECIPIENT, BIK, OPERATING_ACCOUNT, CORRESPONDENT_ACCOUNT, KBK, OKTMO, NUMBER_BUDGETARY_ACCOUNT, IS_CAPITAL_REPAIR, PAYMENT_RECEIVER_OGRN, REC_DATECREATE, REC_DATEUPDATE) VALUES ('1', TO_DATE('29.01.19', 'DD.MM.RR'), '1234512345', '987654321', 'СБЕРБАНК', 'получатель', '044525225', '30301810000006000001', '30301810000006000002', '18210202131061010160', '87654321', '30301810000006000003', '1', '1234567890123', TO_DATE('29.01.19', 'DD.MM.RR'), TO_DATE('29.01.19', 'DD.MM.RR'))")
+    else
+      $log_egg.write_to_browser("Не вставили запись в таблицу ZKH_SMEV3_PAYMENT_RECEIVER_INF, т к она уже существует")
+      $log_egg.write_to_log(functional, "Не вставили запись в таблицу ZKH_SMEV3_PAYMENT_RECEIVER_INF, т к она уже существует", "INSERT INTO ZKH_SMEV3_PAYMENT_RECEIVER_INF (GUID, UPDATEDATE, RECIPIENT_INN, RECIPIENT_KPP, BANK_NAME, PAYMENT_RECIPIENT, BIK, OPERATING_ACCOUNT, CORRESPONDENT_ACCOUNT, KBK, OKTMO, NUMBER_BUDGETARY_ACCOUNT, IS_CAPITAL_REPAIR, PAYMENT_RECEIVER_OGRN, REC_DATECREATE, REC_DATEUPDATE) VALUES ('1', TO_DATE('29.01.19', 'DD.MM.RR'), '1234512345', '987654321', 'СБЕРБАНК', 'получатель', '044525225', '30301810000006000001', '30301810000006000002', '18210202131061010160', '87654321', '30301810000006000003', '1', '1234567890123', TO_DATE('29.01.19', 'DD.MM.RR'), TO_DATE('29.01.19', 'DD.MM.RR'))")
+    end
+    rescue Exception => msg
+      $log_egg.write_to_browser("Ошибка! #{msg}")
+      $log_egg.write_to_log("Завершение тестов", "Ошибка при вставке записи в таблицу ZKH_SMEV3_PAYMENT_RECEIVER_INF", "Ошибка! #{msg}\n#{msg.backtrace.join("\n")}")
+    ensure
+      close_connection
+    end
+    end
+
   def change_smevmessageid(xml_rexml, smev_id, functional) # метод меняет id для запросов в СМЭВ3
     begin
       process_id = xml_rexml.elements["//mq:RequestMessage"].attributes["processID"]
@@ -198,6 +232,45 @@ END;})
         if count == 0
           $log_egg.write_to_browser("Не заменили id в SMEVMESSAGEID")
           $log_egg.write_to_log(functional, "Не заменили id в SMEVMESSAGEID", "UPDATE FK_SMEV3 SET SMEVMESSAGEID = '#{smev_id}' WHERE PROCESSID = '#{process_id}'")
+          return nil
+        end
+        puts count -=1
+        sleep 0.5
+      end
+    rescue Exception => msg
+      $log_egg.write_to_browser("Ошибка! #{msg}")
+      $log_egg.write_to_log("Завершение тестов", "Ошибка при замене SMEVMESSAGEID", "Ошибка! #{msg}\n#{msg.backtrace.join("\n")}")
+    ensure
+      close_connection
+    end
+  end
+
+  def change_smevmessageid_gis_zkh(xml_rexml, smev_id, functional, ufebs = false) # метод меняет id для запросов ГИС ЖКХ в СМЭВ3
+    begin
+      if ufebs
+        process_id = xml_rexml.elements["//tns:Request"].attributes["processId"]
+      else
+        process_id = xml_rexml.elements["//mq:RequestMessage"].attributes["processID"]
+      end
+      row_updated = 0
+      count = 30
+      while row_updated.zero?
+        rs = @stmt.executeQuery("select SMEVMESSAGEID from ZKH_SMEV3 WHERE PROCESSID = '#{process_id}'")
+        if rs.isBeforeFirst()
+          while rs.next() do
+            check_null = rs.getString('SMEVMESSAGEID')
+          end
+          if check_null
+            row_updated = @stmt.executeUpdate("UPDATE ZKH_SMEV3 SET SMEVMESSAGEID = '#{smev_id}' WHERE PROCESSID = '#{process_id}'")
+            if row_updated == 1
+              $log_egg.write_to_browser("Заменили id в SMEVMESSAGEID на #{smev_id}")
+              $log_egg.write_to_log(functional, "Заменили id в SMEVMESSAGEID", "UPDATE ZKH_SMEV3 SET SMEVMESSAGEID = '#{smev_id}' WHERE PROCESSID = '#{process_id}'")
+            end
+          end
+        end
+        if count == 0
+          $log_egg.write_to_browser("Не заменили id в SMEVMESSAGEID")
+          $log_egg.write_to_log(functional, "Не заменили id в SMEVMESSAGEID", "UPDATE ZKH_SMEV3 SET SMEVMESSAGEID = '#{smev_id}' WHERE PROCESSID = '#{process_id}'")
           return nil
         end
         puts count -=1

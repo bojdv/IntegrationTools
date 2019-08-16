@@ -365,7 +365,7 @@ module TestReportsHelper
       SELECT summary, issue_type, project_key, issuenum, status,
       SUM(
       CASE
-      WHEN worklogautor not in ('bojdv','pekav','kotvv','shpae','tkans','pasap') or worklogautor is null THEN 0
+      WHEN worklogautor not in ('bojdv','pekav','kotvv','shpae','tkans','pasap','uboav','povao') or worklogautor is null THEN 0
       ELSE worklogtime
       END
       ) worklogtime

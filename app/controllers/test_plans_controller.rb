@@ -6,10 +6,12 @@ class TestPlansController < ApplicationController
          'pekav' => 'Пехов Алексей',
          'kotvv' => 'Коцупенко Владимир',
          'shpae' => 'Шпинько Александр',
-         'tkans'=>'Ткаченко Никита',
-         'pasap'=>'Пащенко Анастасия',
-         'e.vasilyeva'=>'Васильева Елена',
-         'chivs'=>'Чиркова Вера'}
+         'tkans' => 'Ткаченко Никита',
+         'pasap' => 'Пащенко Анастасия',
+         'e.vasilyeva' => 'Васильева Елена',
+         'chivs' => 'Чиркова Вера',
+         'uboav' => 'Уборский Алексей',
+         'povao' => 'Пономарева Анжелика'}
 
   def index
     @egg_plans = TestPlan.where(:product_id => '10002')

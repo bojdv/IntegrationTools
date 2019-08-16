@@ -7,7 +7,7 @@ class TestReportsController < ApplicationController
   def run
     response_ajax_reports("Не заполнены метки") and return if report_params[:labels].empty?
     response_ajax_reports("Не указана задача с оценкой тестирования") and return if report_params[:backlog_keys].empty?
-    worklog_autor = {'bojdv' => 'Бойко Дина', 'pekav' => 'Пехов Алексей', 'kotvv' => 'Коцупенко Владимир', 'shpae' => 'Шпинько Александр', 'tkans'=>'Ткаченко Никита', 'pasap'=>'Пащенко Анастасия', 'e.vasilyeva'=>'Васильева Елена'}
+    worklog_autor = {'bojdv' => 'Бойко Дина', 'pekav' => 'Пехов Алексей', 'kotvv' => 'Коцупенко Владимир', 'shpae' => 'Шпинько Александр', 'tkans'=>'Ткаченко Никита', 'pasap'=>'Пащенко Анастасия', 'e.vasilyeva'=>'Васильева Елена', 'uboav' => 'Уборский Алексей', 'povao' => 'Пономарева Анжелика'}
     @report = JIRA_Report.new(report_params[:backlog_keys], report_params[:labels], worklog_autor)
     #@backlog_estimate, @project_estimate = @report.select_backlog_project_estimate
     @backlog_estimate = @report.select_backlog_estimate

@@ -433,7 +433,7 @@ module EggAutoTestsHelper
 
   def get_file_body(dir)
     body = String.new
-    count = 80 # Ожидание ответа в секундах
+    count = 100 # Ожидание ответа в секундах
     until body.size > 0 or count == 0
       if File.directory?(dir) # Проверяем существует ли директория
         Dir.entries(dir).each_entry do |entry| # Просматриваем каждый файл в каталоге, имя файла пишется в переменную entry
@@ -667,11 +667,12 @@ queue_core_ia_consumers=5
       @core_in_ufebs_jpm = Array.new
       @core_in_ufebs_gmp_smev3 = Array.new
       @core_in_ufebs_zkh_smev3 = Array.new
+      @core_in_ufebs_jpm_gmp = Array.new
       @manager = QueueManager.find_by_manager_name('iTools[EGG]')
       start_core_in_listener # Запускаем прослушку входной очереди ядра
     end
 
-    attr_accessor :core_in_ufebs_gmp, :core_in_ufebs_zkh, :core_in_ufebs_jpm, :core_in_ufebs_gmp_smev3, :core_in_ufebs_zkh_smev3
+    attr_accessor :core_in_ufebs_gmp, :core_in_ufebs_zkh, :core_in_ufebs_jpm, :core_in_ufebs_gmp_smev3, :core_in_ufebs_zkh_smev3, :core_in_ufebs_jpm_gmp
 
     def start_core_in_listener
       @thread_get_core_message = Thread.new do
@@ -690,24 +691,27 @@ queue_core_ia_consumers=5
             if message
               message_rexml = Document.new(message.getText)
               case message_rexml.elements['//tns:Request'].attributes['adapterId']
-              when 'egg-file-adapter-mcicb'
-                puts "Receive UFEBS GIS GMP message"
-                @core_in_ufebs_gmp << {correlation_id: message.getJMSCorrelationID, body: message.getText }
-              when 'egg-file-adapter-zkh-mcicb'
-                puts "Receive UFEBS GIS ZKH message"
-                @core_in_ufebs_zkh << {correlation_id: message.getJMSCorrelationID, body: message.getText }
-              when 'egg-zkhfileMq-adapter'
-                puts "Receive UFEBS GIS ZKH JPMorgan message"
-                @core_in_ufebs_jpm << {correlation_id: message.getJMSCorrelationID, body: message.getText }
-              when 'gisgmp-fileUfebs-iadp'
-                puts "Receive UFEBS GIS GMP SMEV3 message"
-                @core_in_ufebs_gmp_smev3 << {correlation_id: message.getJMSCorrelationID, body: message.getText }
+                when 'egg-file-adapter-mcicb'
+                  puts "Receive UFEBS GIS GMP message"
+                  @core_in_ufebs_gmp << {correlation_id: message.getJMSCorrelationID, body: message.getText }
+                when 'egg-file-adapter-zkh-mcicb'
+                  puts "Receive UFEBS GIS ZKH message"
+                  @core_in_ufebs_zkh << {correlation_id: message.getJMSCorrelationID, body: message.getText }
+                when 'egg-zkhfileMq-adapter'
+                  puts "Receive GIS ZKH JPMorgan message"
+                  @core_in_ufebs_jpm << {correlation_id: message.getJMSCorrelationID, body: message.getText }
+                when 'gisgmp-fileUfebs-iadp'
+                  puts "Receive UFEBS GIS GMP SMEV3 message"
+                  @core_in_ufebs_gmp_smev3 << {correlation_id: message.getJMSCorrelationID, body: message.getText }
                 when 'zkh-fileUfebs-iadp'
                   puts "Receive UFEBS GIS ZKH SMEV3 message"
                   @core_in_ufebs_zkh_smev3 << {correlation_id: message.getJMSCorrelationID, body: message.getText }
-              else
-                puts "Receive not UFEBS message"
-                sender.send(message)
+                when 'gisgmp-file-iadp'
+                  puts "Receive GIS GMP JPMorgan message"
+                  @core_in_ufebs_jpm_gmp << {correlation_id: message.getJMSCorrelationID, body: message.getText }
+                else
+                  puts "Receive unknown message"
+                  sender.send(message)
               end
             end
             sleep 1

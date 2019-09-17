@@ -20,7 +20,15 @@ class IA_UFEBS_GIS_GMP_SMEV3
     @edno_ed101 = Random.rand(1000..50000)
   end
 
-  def change_id(functional, correlation_id)
+  def get_decode_answer(xml) # Метод, который получает текст XML и возвращает раскодированный текст тега '//mq:Answer'
+    response = Document.new(xml)
+    answer = response.elements['//mq:Answer'].text
+    answer_decode = Base64.decode64(answer)
+    answer_decode = answer_decode.force_encoding("utf-8")
+    return answer_decode
+  end
+
+  def change_id(functional, correlation_id) # Перехватываем сообщение до ядра и меняем Id на entityId ответа из заглушки
     30.times do
       $egg_integrator.core_in_ufebs_gmp_smev3.any? ? (break) : (sleep 1)
     end
@@ -36,7 +44,15 @@ class IA_UFEBS_GIS_GMP_SMEV3
       # next
     end
     decode_rexml_request = get_decode_core_request(@xml_from_ia)
-    decode_rexml_request.elements['//p1:ImportedPayment'].attributes['Id'] = correlation_id
+    #$log_egg.write_to_log(functional, "decode_rexml_request", "#{decode_rexml_request}")
+    case # Определяем наличие префикса у xml
+      when decode_rexml_request.to_s.include?('p1:ImportedPayment')
+        decode_rexml_request.elements['//p1:ImportedPayment'].attributes['Id'] = correlation_id
+      when decode_rexml_request.to_s.include?('ImportedChange')
+        decode_rexml_request.elements['//ImportedChange'].attributes['Id'] = correlation_id
+      else
+        $log_egg.write_to_log(functional, "correlation_id", "не заменили")
+    end
     xml_to_sa = get_encode_core_request(functional, @xml_from_ia, decode_rexml_request.to_s)
     $egg_integrator.send_to_core(xml_to_sa, $egg_integrator.core_in_ufebs_gmp_smev3.first[:correlation_id])
     $log_egg.write_to_browser("Изменили в XML Id и отправили в ядро")
@@ -76,8 +92,8 @@ class IA_UFEBS_GIS_GMP_SMEV3
         File.open("#{@dir_outbound}/#{xml_name}.xml", 'w'){ |file| file.write xml_rexml.to_s }
         $log_egg.write_to_browser("Положили запрос в каталог #{@dir_outbound}")
         $log_egg.write_to_log(functional, "Подкладываем запрос #{xml_name}.xml", "Положили запрос в каталог #{@dir_outbound}:\n#{xml_rexml.to_s}")
-        change_id(functional, 'I_09bcf2c6-a08a-4ea2-959d-8e198ba689d9') # Перехватываем сообщение до ядра и меняем Id на entityId ответа из заглушки
-        change_smevmessageid_gis_gmp(Document.new(@xml_from_ia), '25106819-6012-11e8-9f80-005056b644cd', functional, true)
+        change_id(functional, 'I_09bcf2c6-a08a-4ea2-959d-8e198ba689d1') # Перехватываем сообщение до ядра и меняем Id на entityId ответа из заглушки
+        change_smevmessageid_gis_gmp(Document.new(@xml_from_ia), '3fc2ba3d-8c27-11e9-aab8-005056b6497f', functional, true)
         answer = ufebs_file_count(functional, false, 'gis_gmp_smev3')
         if answer.first == 1 and answer.last == 1 # Если нашли в каталоге 1 файл со статусом ADPS000 (Принят адаптером) и 1 файл со статусом ADPS001 (Принят СМЭВ), считаем, что все ок.
           @result["ed101_test"] = "true"
@@ -133,8 +149,8 @@ class IA_UFEBS_GIS_GMP_SMEV3
         File.open("#{@dir_outbound}/#{xml_name}.xml", 'w'){ |file| file.write xml_rexml.to_s }
         $log_egg.write_to_browser("Положили запрос в каталог #{@dir_outbound}")
         $log_egg.write_to_log(functional, "Подкладываем запрос #{xml_name}.xml", "Положили запрос в каталог #{@dir_outbound}:\n#{xml_rexml.to_s}")
-        change_id(functional, 'I_09bcf2c6-a08a-4ea2-959d-8e198ba689d9') # Перехватываем сообщение до ядра и меняем Id на entityId ответа из заглушки
-        change_smevmessageid_gis_gmp(Document.new(@xml_from_ia), '25106819-6012-11e8-9f80-005056b644cd', functional, true)
+        change_id(functional, 'I_09bcf2c6-a08a-4ea2-959d-8e198ba689d1') # Перехватываем сообщение до ядра и меняем Id на entityId ответа из заглушки
+        change_smevmessageid_gis_gmp(Document.new(@xml_from_ia), '3fc2ba3d-8c27-11e9-aab8-005056b6497f', functional, true)
         answer = ufebs_file_count(functional, false, 'gis_gmp_smev3')
         if answer.first == 1 and answer.last == 1 # Если нашли в каталоге 1 файл со статусом ADPS000 (Принят адаптером) и 1 файл со статусом ADPS001 (Принят СМЭВ), считаем, что все ок.
           @result["ed104_test"] = "true"
@@ -190,8 +206,8 @@ class IA_UFEBS_GIS_GMP_SMEV3
         File.open("#{@dir_outbound}/#{xml_name}.xml", 'w'){ |file| file.write xml_rexml.to_s }
         $log_egg.write_to_browser("Положили запрос в каталог #{@dir_outbound}")
         $log_egg.write_to_log(functional, "Подкладываем запрос #{xml_name}.xml", "Положили запрос в каталог #{@dir_outbound}:\n#{xml_rexml.to_s}")
-        change_id(functional, 'I_09bcf2c6-a08a-4ea2-959d-8e198ba689d9') # Перехватываем сообщение до ядра и меняем Id на entityId ответа из заглушки
-        change_smevmessageid_gis_gmp(Document.new(@xml_from_ia), '25106819-6012-11e8-9f80-005056b644cd', functional, true)
+        change_id(functional, 'I_09bcf2c6-a08a-4ea2-959d-8e198ba689d1') # Перехватываем сообщение до ядра и меняем Id на entityId ответа из заглушки
+        change_smevmessageid_gis_gmp(Document.new(@xml_from_ia), '3fc2ba3d-8c27-11e9-aab8-005056b6497f', functional, true)
         answer = ufebs_file_count(functional, false, 'gis_gmp_smev3')
         if answer.first == 1 and answer.last == 1 # Если нашли в каталоге 1 файл со статусом ADPS000 (Принят адаптером) и 1 файл со статусом ADPS001 (Принят СМЭВ), считаем, что все ок.
           @result["ed105_test"] = "true"
@@ -255,8 +271,8 @@ class IA_UFEBS_GIS_GMP_SMEV3
         File.open("#{@dir_outbound}/#{xml_name}.xml", 'w'){ |file| file.write xml_rexml.to_s }
         $log_egg.write_to_browser("Положили запрос в каталог #{@dir_outbound}")
         $log_egg.write_to_log(functional, "Подкладываем запрос #{xml_name}.xml", "Положили запрос в каталог #{@dir_outbound}:\n#{xml_rexml.to_s}")
-        change_id(functional, 'I_09bcf2c6-a08a-4ea2-959d-8e198ba689d9') # Перехватываем сообщение до ядра и меняем Id на entityId ответа из заглушки
-        change_smevmessageid_gis_gmp(Document.new(@xml_from_ia), '25106819-6012-11e8-9f80-005056b644cd', functional, true)
+        change_id(functional, 'I_09bcf2c6-a08a-4ea2-959d-8e198ba689d1') # Перехватываем сообщение до ядра и меняем Id на entityId ответа из заглушки
+        change_smevmessageid_gis_gmp(Document.new(@xml_from_ia), '3fc2ba3d-8c27-11e9-aab8-005056b6497f', functional, true)
         answer = ufebs_file_count(functional, false, 'gis_gmp_smev3')
         if answer.first == 1 and answer.last == 1 # Если нашли в каталоге 1 файл со статусом ADPS000 (Принят адаптером) и 1 файл со статусом ADPS001 (Принят СМЭВ), считаем, что все ок.
           @result["ed108_test"] = "true"
@@ -327,13 +343,13 @@ class IA_UFEBS_GIS_GMP_SMEV3
             $log_egg.write_to_browser("Перехватили сообщение от ИА к ядру. CorrelationID: #{request[:correlation_id]}")
             $log_egg.write_to_log(functional, "Перехватили сообщение от ИА к ядру. CorrelationID: #{request[:correlation_id]}", @xml_from_ia)
             decode_rexml_request = get_decode_core_request(@xml_from_ia)
-            decode_rexml_request.elements['//p1:ImportedPayment'].attributes['Id'] = 'I_09bcf2c6-a08a-4ea2-959d-8e198ba689d9'
+            decode_rexml_request.elements['//p1:ImportedPayment'].attributes['Id'] = 'I_09bcf2c6-a08a-4ea2-959d-8e198ba689d1'
             xml_to_sa = get_encode_core_request(functional, @xml_from_ia, decode_rexml_request.to_s)
             $egg_integrator.send_to_core(xml_to_sa, request[:correlation_id])
             $log_egg.write_to_browser("Изменили в XML Id и отправили в ядро")
             $log_egg.write_to_log(functional, "Изменили в XML Id и отправили в ядро", xml_to_sa)
             sleep 2
-            change_smevmessageid_gis_gmp(Document.new(@xml_from_ia), '25106819-6012-11e8-9f80-005056b644cd', functional, true)
+            change_smevmessageid_gis_gmp(Document.new(@xml_from_ia), '3fc2ba3d-8c27-11e9-aab8-005056b6497f', functional, true)
           end
           $egg_integrator.core_in_ufebs_gmp_smev3.clear
         else
@@ -408,8 +424,8 @@ class IA_UFEBS_GIS_GMP_SMEV3
         File.open("#{@dir_outbound}/#{xml_name}.xml", 'w'){ |file| file.write xml_rexml.to_s }
         $log_egg.write_to_browser("Положили запрос в каталог #{@dir_outbound}")
         $log_egg.write_to_log(functional, "Подкладываем запрос #{xml_name}.xml", "Положили запрос в каталог #{@dir_outbound}:\n#{xml_rexml.to_s}")
-        change_id(functional, 'I_09bcf2c6-a08a-4ea2-959d-8e198ba689d9') # Перехватываем сообщение до ядра и меняем Id на entityId ответа из заглушки
-        change_smevmessageid_gis_gmp(Document.new(@xml_from_ia), '25106819-6012-11e8-9f80-005056b644cd', functional, true)
+        change_id(functional, 'I_09bcf2c6-a08a-4ea2-959d-8e198ba689d1') # Перехватываем сообщение до ядра и меняем Id на entityId ответа из заглушки
+        change_smevmessageid_gis_gmp(Document.new(@xml_from_ia), '3fc2ba3d-8c27-11e9-aab8-005056b6497f', functional, true)
         answer = ufebs_file_count(functional, false, 'gis_gmp_smev3')
         if answer.first == 1 and answer.last == 1 # Если нашли в каталоге 1 файл со статусом ADPS000 (Принят адаптером) и 1 файл со статусом ADPS001 (Принят СМЭВ), считаем, что все ок.
           @result["ed101_change"] = "true"
@@ -469,8 +485,8 @@ class IA_UFEBS_GIS_GMP_SMEV3
         File.open("#{@dir_outbound}/#{xml_name}.xml", 'w'){ |file| file.write xml_rexml.to_s }
         $log_egg.write_to_browser("Положили запрос в каталог #{@dir_outbound}")
         $log_egg.write_to_log(functional, "Подкладываем запрос #{xml_name}.xml", "Положили запрос в каталог #{@dir_outbound}:\n#{xml_rexml.to_s}")
-        change_id(functional, 'I_09bcf2c6-a08a-4ea2-959d-8e198ba689d9') # Перехватываем сообщение до ядра и меняем Id на entityId ответа из заглушки
-        change_smevmessageid_gis_gmp(Document.new(@xml_from_ia), '25106819-6012-11e8-9f80-005056b644cd', functional, true)
+        change_id(functional, 'I_09bcf2c6-a08a-4ea2-959d-8e198ba689d1') # Перехватываем сообщение до ядра и меняем Id на entityId ответа из заглушки
+        change_smevmessageid_gis_gmp(Document.new(@xml_from_ia), '3fc2ba3d-8c27-11e9-aab8-005056b6497f', functional, true)
         answer = ufebs_file_count(functional, false, 'gis_gmp_smev3')
         if answer.first == 1 and answer.last == 1 # Если нашли в каталоге 1 файл со статусом ADPS000 (Принят адаптером) и 1 файл со статусом ADPS001 (Принят СМЭВ), считаем, что все ок.
           @result["ed101_delete"] = "true"
@@ -530,8 +546,8 @@ class IA_UFEBS_GIS_GMP_SMEV3
         File.open("#{@dir_outbound}/#{xml_name}.xml", 'w'){ |file| file.write xml_rexml.to_s }
         $log_egg.write_to_browser("Положили запрос в каталог #{@dir_outbound}")
         $log_egg.write_to_log(functional, "Подкладываем запрос #{xml_name}.xml", "Положили запрос в каталог #{@dir_outbound}:\n#{xml_rexml.to_s}")
-        change_id(functional, 'I_09bcf2c6-a08a-4ea2-959d-8e198ba689d9') # Перехватываем сообщение до ядра и меняем Id на entityId ответа из заглушки
-        change_smevmessageid_gis_gmp(Document.new(@xml_from_ia), '25106819-6012-11e8-9f80-005056b644cd', functional, true)
+        change_id(functional, 'I_09bcf2c6-a08a-4ea2-959d-8e198ba689d1') # Перехватываем сообщение до ядра и меняем Id на entityId ответа из заглушки
+        change_smevmessageid_gis_gmp(Document.new(@xml_from_ia), '3fc2ba3d-8c27-11e9-aab8-005056b6497f', functional, true)
         answer = ufebs_file_count(functional, false, 'gis_gmp_smev3')
         if answer.first == 1 and answer.last == 1 # Если нашли в каталоге 1 файл со статусом ADPS000 (Принят адаптером) и 1 файл со статусом ADPS001 (Принят СМЭВ), считаем, что все ок.
           @result["ed101_change_delete"] = "true"

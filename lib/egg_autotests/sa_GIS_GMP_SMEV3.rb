@@ -38,7 +38,7 @@ class SA_GIS_GMP_SMEV3
         $log_egg.write_to_log(functional, "Валидация исходящей XML", "Валидируем XML для запроса:\n#{xml.xml_name}\nПо XSD:\n #{xsd}")
         validate_egg_xml(xsd, xml_rexml.to_s, functional)
         if send_to_amq_egg(@manager, xml_rexml.to_s, functional)
-          change_smevmessageid_gis_gmp(xml_rexml, '25106819-6012-11e8-9f80-005056b644cd', functional)
+          change_smevmessageid_gis_gmp(xml_rexml, '3fc2ba3d-8c27-11e9-aab8-005056b6497f', functional)
           answer = receive_from_amq_egg(@manager, functional, true, 80)
         end
         if answer.nil? # Если ответ от ЕГГ пустой, начинаем цикл заново
@@ -61,7 +61,7 @@ class SA_GIS_GMP_SMEV3
         answer_decode = get_decode_answer(answer)
         $log_egg.write_to_browser("Раскодировали ответ!")
         $log_egg.write_to_log(functional, "Раскодированный тег Answer", "#{answer_decode}")
-        expected_result = 'Успешно'
+        expected_result = 'успешно'
         if answer_decode.include?(expected_result)
           @result["Payment_new"] = "true"
           $log_egg.write_to_browser("Проверка пройдена!")
@@ -106,7 +106,7 @@ class SA_GIS_GMP_SMEV3
         $log_egg.write_to_log(functional, "Валидация исходящей XML", "Валидируем XML для запроса:\n#{xml.xml_name}\nПо XSD:\n #{xsd}")
         validate_egg_xml(xsd, xml_rexml.to_s, functional)
         if send_to_amq_egg(@manager, xml_rexml.to_s, functional)
-          change_smevmessageid_gis_gmp(xml_rexml, '25106819-6012-11e8-9f80-005056b644cd', functional)
+          change_smevmessageid_gis_gmp(xml_rexml, '3fc2ba3d-8c27-11e9-aab8-005056b6497f', functional)
           answer = receive_from_amq_egg(@manager, functional, true, 80)
         end
         if answer.nil? # Если ответ от ЕГГ пустой, начинаем цикл заново
@@ -129,7 +129,7 @@ class SA_GIS_GMP_SMEV3
         answer_decode = get_decode_answer(answer)
         $log_egg.write_to_browser("Раскодировали ответ!")
         $log_egg.write_to_log(functional, "Раскодированный тег Answer", "#{answer_decode}")
-        expected_result = 'Успешно'
+        expected_result = 'успешно'
         if answer_decode.include?(expected_result)
           @result["Payment_refinement"] = "true"
           $log_egg.write_to_browser("Проверка пройдена!")
@@ -174,7 +174,7 @@ class SA_GIS_GMP_SMEV3
         $log_egg.write_to_log(functional, "Валидация исходящей XML", "Валидируем XML для запроса:\n#{xml.xml_name}\nПо XSD:\n #{xsd}")
         validate_egg_xml(xsd, xml_rexml.to_s, functional)
         if send_to_amq_egg(@manager, xml_rexml.to_s, functional)
-          change_smevmessageid_gis_gmp(xml_rexml, '25106819-6012-11e8-9f80-005056b644cd', functional)
+          change_smevmessageid_gis_gmp(xml_rexml, '3fc2ba3d-8c27-11e9-aab8-005056b6497f', functional)
           answer = receive_from_amq_egg(@manager, functional, true, 80)
         end
         if answer.nil? # Если ответ от ЕГГ пустой, начинаем цикл заново
@@ -197,7 +197,7 @@ class SA_GIS_GMP_SMEV3
         answer_decode = get_decode_answer(answer)
         $log_egg.write_to_browser("Раскодировали ответ!")
         $log_egg.write_to_log(functional, "Раскодированный тег Answer", "#{answer_decode}")
-        expected_result = 'Успешно'
+        expected_result = 'успешно'
         if answer_decode.include?(expected_result)
           @result["Payment_cancellation"] = "true"
           $log_egg.write_to_browser("Проверка пройдена!")
@@ -242,7 +242,7 @@ class SA_GIS_GMP_SMEV3
         $log_egg.write_to_log(functional, "Валидация исходящей XML", "Валидируем XML для запроса:\n#{xml.xml_name}\nПо XSD:\n #{xsd}")
         validate_egg_xml(xsd, xml_rexml.to_s, functional)
         if send_to_amq_egg(@manager, xml_rexml.to_s, functional)
-          change_smevmessageid_gis_gmp(xml_rexml, '25106819-6012-11e8-9f80-005056b644cd', functional)
+          change_smevmessageid_gis_gmp(xml_rexml, '3fc2ba3d-8c27-11e9-aab8-005056b6497f', functional)
           answer = receive_from_amq_egg(@manager, functional, true, 80)
         end
         if answer.nil? # Если ответ от ЕГГ пустой, начинаем цикл заново
@@ -265,7 +265,7 @@ class SA_GIS_GMP_SMEV3
         answer_decode = get_decode_answer(answer)
         $log_egg.write_to_browser("Раскодировали ответ!")
         $log_egg.write_to_log(functional, "Раскодированный тег Answer", "#{answer_decode}")
-        expected_result = 'Успешно'
+        expected_result = 'успешно'
         if answer_decode.include?(expected_result)
           @result["payment_change_delete"] = "true"
           $log_egg.write_to_browser("Проверка пройдена!")
@@ -310,7 +310,7 @@ class SA_GIS_GMP_SMEV3
         $log_egg.write_to_log(functional, "Валидация исходящей XML", "Валидируем XML для запроса:\n#{xml.xml_name}\nПо XSD:\n #{xsd}")
         validate_egg_xml(xsd, xml_rexml.to_s, functional)
         if send_to_amq_egg(@manager, xml_rexml.to_s, functional)
-          change_smevmessageid(xml_rexml, '93c40542-657b-11e8-b6ef-005056b644cd', functional)
+          change_smevmessageid(xml_rexml, '99d0546c-8e91-11e9-9dd2-005056b6497f', functional)
           answer = receive_from_amq_egg(@manager, functional, true, 80)
         end
         if answer.nil? # Если ответ от ЕГГ пустой, начинаем цикл заново

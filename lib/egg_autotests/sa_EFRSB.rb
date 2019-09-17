@@ -101,7 +101,7 @@ class SA_EFRSB
         answer_decode = get_decode_answer(answer)
         $log_egg.write_to_browser("Раскодировали ответ!")
         $log_egg.write_to_log(functional, "Раскодированный тег Answer", "#{answer_decode}")
-        expected_result = 'УПРАВЛЯЮЩАЯ КОМПАНИЯ - СИТИ'
+        expected_result = 'Специализированное управление 122'
         if answer_decode.include?(expected_result)
           @result["searchCompany"] = "true"
           $log_egg.write_to_browser("Проверка пройдена!")

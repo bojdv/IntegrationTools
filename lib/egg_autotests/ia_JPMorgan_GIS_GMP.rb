@@ -18,6 +18,27 @@ class IA_JPMorgan_GIS_GMP
     @functional = "Проверка ИА JPMorgan (ГИС ГМП)"
   end
 
+   def spot_id(functional)# Перехватываем сообщение до ядра
+      30.times do
+        $egg_integrator.core_in_ufebs_jpm_gmp.any? ? (break) : (sleep 1)
+      end
+      if $egg_integrator.core_in_ufebs_jpm_gmp.any?
+        @xml_from_ia = $egg_integrator.core_in_ufebs_jpm_gmp.first[:body]
+        $log_egg.write_to_browser("Перехватили сообщение от ИА к ядру. CorrelationID: #{$egg_integrator.core_in_ufebs_jpm_gmp.first[:correlation_id]}")
+        $log_egg.write_to_log(functional, "Перехватили сообщение от ИА к ядру. CorrelationID: #{$egg_integrator.core_in_ufebs_jpm_gmp.first[:correlation_id]}", @xml_from_ia)
+      else
+        $log_egg.write_to_browser("Сообщение не дошло до ядра")
+        $log_egg.write_to_log(functional, "Проверка сообщения в очереди core_sa", "Сообщение не дошло до ядра")
+        return
+        # count +=1
+        # next
+      end
+      $egg_integrator.send_to_core($egg_integrator.core_in_ufebs_jpm_gmp.first[:body], $egg_integrator.core_in_ufebs_jpm_gmp.first[:correlation_id])
+      $log_egg.write_to_browser("Отправили сообщение в ядро без изменений")
+      $log_egg.write_to_log(functional, "Отправили сообщение в ядро без изменений", $egg_integrator.core_in_ufebs_jpm_gmp.first[:body])
+      $egg_integrator.core_in_ufebs_jpm_gmp.clear
+   end
+
   def payment
     sleep 1.5
     begin
@@ -35,13 +56,15 @@ class IA_JPMorgan_GIS_GMP
         raise @not_find_xml if xml.nil?
         $log_egg.write_to_log(functional, "Получили xml", "Получили xml: #{xml.xml_name}\n#{xml.xml_text}")
         xml_rexml = Document.new(xml.xml_text)
-        xml_rexml.elements["//pi:SystemIdentifier"].text = "1042202001000215060220170000#{Random.rand(1000..9000)}"
+        #xml_rexml.elements["//pi:SystemIdentifier"].text = "1042202001000215060220170000#{Random.rand(1000..9000)}"
         FileUtils.rm_r @dir_inbound if File.directory?(@dir_inbound)# Чистим каталог для получения
         $log_egg.write_to_browser("Удалили каталог #{@dir_inbound}...")
         $log_egg.write_to_log(functional, "Удаляем каталог для отправления", "Удалили каталог #{@dir_inbound}")
         File.open("#{@dir_outbound}/#{xml_name}.xml", 'w'){ |file| file.write xml_rexml.to_s }
         $log_egg.write_to_browser("Положили запрос в каталог #{@dir_outbound}")
         $log_egg.write_to_log(functional, "Подкладываем запрос #{xml_name}.xml", "Положили запрос в каталог #{@dir_outbound}:\n#{xml_rexml.to_s}")
+        spot_id(functional)
+        change_smevmessageid_gis_gmp(Document.new(@xml_from_ia), '3fc2ba3d-8c27-11e9-aab8-005056b6497f', functional, true)
         answer = get_file_body(@dir_inbound)
         if answer.size == 0
           @result["payment"] = "false"

@@ -38,7 +38,7 @@ class EggAutotestsList
       when build_version.include?('6.11')
         @ufebs_version = '2019.1.1' #\app\smx\resourceapp.war\wsdl\XSD\CBR\х\ed\cbr_ed101_vх.xsd
       else
-        @ufebs_version = '2019.3.1'
+        @ufebs_version = '2019.4.1'
     end
   end
 
@@ -93,9 +93,8 @@ class EggAutotestsList
     end
     if components.include?('СА SPEP')
       sa_spep = SA_SPEP.new(@pass_menu_color, @fail_menu_color, @not_find_xml, @not_receive_answer, @egg_version, @try_count)
-      sa_spep.verifycertificate_ok
-      sa_spep.verifycertificatewithreport
       sa_spep.verifycertificate_crl
+      sa_spep.verifycertificatewithreport
       sa_spep.verifycertificate_nocert
     end
     if components.include?('СА ФНС ЕГРИП')

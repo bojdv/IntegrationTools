@@ -333,7 +333,7 @@ module EggAutoTestsHelper
     end
     sleep 5
     @kill_cmd_thread_egg = Thread.new do
-      system('Taskkill /IM cmd.exe /F')
+      system('Taskkill /IM cmd.exe /T /F')
     end
     while @servicemix_start_thread_egg.alive?
       puts "@@servicemix_start_thread_egg alive!"

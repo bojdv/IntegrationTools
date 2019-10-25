@@ -16,7 +16,7 @@ unattendedmodeui=minimalWithDialogs
 installdir=C:\EGG
 
 # устанавливаемые компоненты перечисляются через запятую
-enable-components=egg,DBcreate,ServiceMix,iaAmqComponent,saZkhSmev3Component,iaFileUfebsZkhComponent,saSpepComponent,saGmpComponent,iaFileGmpComponent,saZkhComponent,iaFileZkhComponent, saZkhPayeesComponent, iaFileMqGmpComponent,iaFileMqZkhComponent,saGmp20Component,saFnsEgripComponent,saFnsEgrulComponent,saEfrsbComponent,saEsiaSmev3Component,iaFileUfebsGmpComponent
+enable-components=egg,DBcreate,ServiceMix,iaAmqComponent,saZkhSmev3Component,iaFileUfebsZkhComponent,saSpepComponent,saGmpComponent,iaFileGmpComponent,saZkhComponent,iaFileZkhComponent, saZkhPayeesComponent, iaFileMqGmpComponent,iaFileMqZkhComponent,saGmp20Component,saFnsEgripComponent,saFnsEgrulComponent,saEfrsbComponent,saEsiaSmev3Component,iaFileUfebsGmpComponent,saEsiaImSmev3Component
 # компоненты, установка которых не требуется, перечисляются через запятую
 disable-components=crypto,CryptoService,saEsiaComponent,saReestrFsspComponent,saUpridComponent
 
@@ -86,7 +86,7 @@ fk_DeliverySchedule=1
 fk_SID0003663=http://vm-itools:5000/GIS-GMP
 #fk_SID0003663=http://smev-mvf.test.gosuslugi.ru:7777/gateway/services/SID0003663/1.00
 
-sadp_CryptoService=http://10.1.8.233:9090/axis2/services/CryptoService
+sadp_CryptoService=http://vm-eggcrypttest:9090/axis2/services/CryptoService
 fk_isCryptoLog=true
 fk_sendingTicket1012=true
 fk_proxy_host=127.0.0.1
@@ -116,7 +116,7 @@ zkh_SA_GIS_ZHKH_Payment_details_1=http://vm-itools:5000/SA_GIS_ZHKH_Payment_deta
 zkh_GIS_ZHKH_Payment_2=http://smev-mvf.test.gosuslugi.ru:7777/gateway/services/SID0004766
 zkh_SA_GIS_ZHKH_Payment_details_2=http://smev-mvf.test.gosuslugi.ru:7777/gateway/services/SID0004157
 zkh_GisZkhVersion=zkh_GisZkhVersion_8
-zkh_CryptoService=http://10.1.8.233:9090/axis2/services/CryptoService
+zkh_CryptoService=http://vm-eggcrypttest:9090/axis2/services/CryptoService
 zkh_NumberOfAttempts=1
 zkh_NumberOfPackages=10
 zkh_DeliverySchedule=1
@@ -184,7 +184,7 @@ fileUfebs_zkh_reestr_ZkhLoaderBatchSize=100
 
 # saZkhPayeesComponent - Импорт справочника поставщиков
 zkhPayees_zkhPayeesService=http://smev-mvf.test.gosuslugi.ru:7777/gateway/services/SID0004768/1.00
-zkhPayees_CryptoService=http://10.1.8.233:9090/axis2/services/CryptoService
+zkhPayees_CryptoService=http://vm-eggcrypttest:9090/axis2/services/CryptoService
 zkhPayees_zkh_payees_sadp_consumers=5
 zkhPayees_zkh_payees_sgd_consumers=5
 zkhPayees_zkh_payees_result_sgd_consumers=5
@@ -229,6 +229,7 @@ file_mq_zkh_errorbox=C:\data\INAD_GISZHKH\error
 file_mq_zkh_systemID=Egg
 file_mq_zkh_serviceID=GIS_ZKH_Payment
 file_mq_zkh_charset=Cp1251
+file_mq_zkh_FolderMode=0
 file_mq_zkh_consumers=5
 file_mq_zkh_ValidateInputEgg=true
 file_mq_zkh_adapterCode=egg-zkhfileMq-adapter
@@ -237,7 +238,7 @@ file_mq_zkh_brokerURL=failover:tcp://127.0.0.1:61616
 # saFnsEgripComponent - ФНС ЕГРИП
 fns_egrip_SMEV=http://vm-itools:5000/egrip_smev3
 #fns_egrip_SMEV=http://smev3-n0.test.gosuslugi.ru:7500/smev/v1.1/ws
-fns_egrip_CryptoService=http://10.1.8.233:9090/axis2/services/CryptoService
+fns_egrip_CryptoService=http://vm-eggcrypttest:9090/axis2/services/CryptoService
 fns_egrip_isCryptoLog=false
 fns_egrip_fns_egrip_sadp_consumers=5
 fns_egrip_TestMessage=true
@@ -260,7 +261,7 @@ fns_egrip_sendingTicket1012=true
 # saFnsEgrulComponent - ФНС ЕГРЮЛ
 fns_egrul_FNS_URL=http://vm-itools:5000/egrul_smev3
 #fns_egrul_FNS_URL=http://smev3-n0.test.gosuslugi.ru:7500/smev/v1.1/ws
-fns_egrul_CryptoService=http://10.1.8.233:9090/axis2/services/CryptoService
+fns_egrul_CryptoService=http://vm-eggcrypttest:9090/axis2/services/CryptoService
 fns_egrul_fns_sadp_consumers=10
 fns_egrul_fns_queue_request_consumers=10
 fns_egrul_TestMessage=true
@@ -295,7 +296,7 @@ egg_gmp20_NegativeCodes=5;11
 egg_gmp20_attachmentMode=true
 egg_gmp20_timer_period=10000
 egg_gmp20_isCryptoLog=true
-egg_gmp20_CryptoService=http://10.1.8.233:9090/axis2/services/CryptoService
+egg_gmp20_CryptoService=http://vm-eggcrypttest:9090/axis2/services/CryptoService
 egg_gmp20_CheckingSignature=none
 egg_gmp20_CheckSignatureAttachment=none
 egg_gmp20_CheckEPOV=none
@@ -343,7 +344,7 @@ efrsb_use_proxy=false
 
 # saEsiaSmev3Component - СА ЕСИА СМЭВ3
 esia_smev3_SMEV3_ESIA=http://vm-itools:4085/SA_ESIA_SMEV3?WSDL
-esia_smev3_CryptoService=http://10.1.8.233:9090/axis2/services/CryptoService
+esia_smev3_CryptoService=http://vm-eggcrypttest:9090/axis2/services/CryptoService
 esia_smev3_isCryptoLog=true
 esia_smev3_TestMessage=true
 esia_smev3_timer_period=10000
@@ -380,7 +381,7 @@ egg_ZkhSmev3_RequestStatusCodesForWait=
 egg_ZkhSmev3_attachmentMode=false
 egg_ZkhSmev3_timer_period=10000
 egg_ZkhSmev3_isCryptoLog=true
-egg_ZkhSmev3_CryptoService=http://10.1.8.233:9090/axis2/services/CryptoService
+egg_ZkhSmev3_CryptoService=http://vm-eggcrypttest:9090/axis2/services/CryptoService
 egg_ZkhSmev3_CheckingSignature=none
 egg_ZkhSmev3_CheckSignatureAttachment=none
 egg_ZkhSmev3_CheckEPOV=none
@@ -402,3 +403,30 @@ egg_ZkhSmev3_FTPPort=21
 egg_ZkhSmev3_FoldersInbound=C:/data/FTP
 egg_ZkhSmev3_GarbageShedule=0 0 1 */1 * *
 egg_ZkhSmev3_GarbageAge=10
+
+# saEsiaImSmev3Component - СА ЕСИА ИМ СМЭВ3
+esia_im_TestMessage=false
+esia_im_SMEV3=http://vm-egg-jmp:8488/SA_SMEV3-ESIA-IM?WSDL
+esia_im_queue_consumers=10
+esia_im_queueSGD_consumers=10
+esia_im_timer_period=20000
+esia_im_deadLine=10
+esia_im_CheckingSignature=check
+esia_im_CheckSignatureAttachment=none
+esia_im_CheckEPOV=check
+esia_im_CheckEPSP=none
+esia_im_NumberOfAttempts=1
+esia_im_DeliverySchedule=1
+esia_im_http_client=http4
+esia_im_NodeID=node1
+esia_im_IgnoreTickets=1012, 1064
+esia_im_isCryptoLog=true
+esia_im_CryptoService=http://vm-eggcrypttest:9090/axis2/services/CryptoService
+esia_im_attachmentMode=true
+esia_im_FTPServer=10.1.4.232
+esia_im_FTPPort=21
+esia_im_FoldersInbound=./folderFromSmev
+esia_im_CleanUpShedule=0 0 0 * * 6
+esia_im_CleanUpAge=180
+esia_im_getresponse_isResponseLock=true
+esia_im_getresponse_adapterId=amq-jms-iadp

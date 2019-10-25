@@ -97,7 +97,7 @@ class TestPlansController < ApplicationController
   def make_report
     begin
       @plan = TestPlan.find(report_params[:plan_id])
-      testplan_report = TestPlanReport.new(@plan, report_params[:builds], report_params[:version], report_params[:minus], report_params[:rn])
+      testplan_report = TestPlanReport.new(@plan, report_params[:builds], report_params[:version], report_params[:minus], report_params[:rn], report_params[:file_info])
       filepath = testplan_report.make_testplan_reports
       @plan.update_attributes(:report_url => filepath)
     rescue Exception => msg
@@ -132,6 +132,6 @@ class TestPlansController < ApplicationController
     params.require(:test_plan).permit(:name, :product_id, :finish_date, :status, :comment)
   end
   def report_params
-    params.require(:report_params).permit(:plan_id, :builds, :version, :minus, :rn)
+    params.require(:report_params).permit(:plan_id, :builds, :version, :minus, :rn, :file_info)
   end
 end

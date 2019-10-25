@@ -37,7 +37,8 @@ class EggAutoTestsController < ApplicationController
                         'СА ГИС ГМП СМЭВ3',
                         'ИА УФЭБС (ГИС ГМП СМЭВ3)',
                         'СА ГИС ЖКХ СМЭВ3',
-                        'ИА УФЭБС (ГИС ЖКХ СМЭВ3)']
+                        'ИА УФЭБС (ГИС ЖКХ СМЭВ3)',
+                        'СА ЕСИА ИМ СМЭВ3']
     @egg68_components = Array.new(@egg67_components)
     @egg68_components.push('ЕСИА')
     regex = /\A[6]{,1}[.](9|10|11|12|13|14|15|16|17){,2}[.][\d]{,3}[-][\w]{,8}\Z/
@@ -99,10 +100,10 @@ class EggAutoTestsController < ApplicationController
       copy_core_config
       sleep 1
       start_servicemix_egg(tests_params_egg[:egg_dir])
-      count = 400
-      until egg_log_include?(tests_params_egg[:egg_dir],'Successfully')
+      count = 600
+      until egg_log_include?(tests_params_egg[:egg_dir],'ufebs-file-iadp')
         count -=1
-        puts "Wait egg starting..#{count}"
+        puts "Wait egg starting count = #{count}"
         return if count == 0
         sleep 1
       end
@@ -187,7 +188,7 @@ class EggAutoTestsController < ApplicationController
           new_dir = current_dir - etalon_dir
           unless new_dir.empty?
             etalon_dir = current_dir
-            puts "New EGG dir detected! #{new_dir}"
+            puts "New EGG dir detected! #{new_dir} = #{current_dir} - #{etalon_dir}"
             build_version = new_dir.join
             components =   ['ИА Active MQ',
                             'ИА УФЭБС (ГИС ГМП)',
@@ -205,7 +206,8 @@ class EggAutoTestsController < ApplicationController
                             'СА ГИС ГМП СМЭВ3',
                             'ИА УФЭБС (ГИС ГМП СМЭВ3)',
                             'СА ГИС ЖКХ СМЭВ3',
-                            'ИА УФЭБС (ГИС ЖКХ СМЭВ3)']
+                            'ИА УФЭБС (ГИС ЖКХ СМЭВ3)',
+                            'СА ЕСИА ИМ СМЭВ3']
             begin
               $status_egg_tests = true
               sleep 20
@@ -235,10 +237,10 @@ class EggAutoTestsController < ApplicationController
               sleep 1
               puts "Starting EGG..."
               start_servicemix_egg('C:\EGG')
-              count = 400
-              until egg_log_include?('C:\EGG','Successfully')
+              count = 600
+              until egg_log_include?('C:\EGG','ufebs-file-iadp')
                 count -=1
-                puts "Wait egg starting..#{count}"
+                puts "Wait egg starting count = #{count}"
                 return if count == 0
                 sleep 1
               end

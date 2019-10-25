@@ -10,6 +10,7 @@
           <%= f.input :backlog_keys, label: 'Ключи задач на оценку из бэклога (тестирования):', required: false, placeholder: 'Например: BACKLOG-14044, BACKLOG-16261' %>
           <%= f.input :test_plan, label: 'Ссылка на план тестирования:', required: false %>
           <%= f.input :test_rail, label: 'Ссылка на TestRail:', required: false %>
+          <%= f.input :test_data, label: 'Ссылка на тестовые данные:', required: false %>
           <%= f.input :release_note, label: 'Ссылка на RN в JIRA', required: false, placeholder: 'Ключ задачи, где сделали RN, например: BSSEGGSA-66' %>
           <%= f.input :build_link, label: 'Ссылки на сборки:', required: false, placeholder: 'Можно через запятую' %>
           <%= f.input :testing, as: :text, :label => 'Что было проверено', :required => false, placeholder: 'Описание по пунктам'%>

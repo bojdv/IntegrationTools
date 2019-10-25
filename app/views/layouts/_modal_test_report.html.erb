@@ -11,6 +11,7 @@
             <%= f.input :version, :label => 'Версия сборки', :required => false %>
             <%= f.input :builds, as: :text, :label => 'Ссылки на сборки', :required => false, :placeholder => "1. \n2. ", :input_html => {style: "height:100px"} %>
             <%= f.input :rn, :label => 'Ссылка на Release Note', :required => false %>
+            <%= f.input :file_info, :label => 'Ссылка на файл с информацией по тестированию', :required => false %>
             <%= f.input :minus, as: :text, :label => 'Ограничения', :required => false, :placeholder => "1. \n2. ", :input_html => {style: "height:100px"} %>
             <%= f.input :plan_id, :label => false, :required => false, input_html: { value: @show_plan.id, :style=> 'display:none' } %>
             <%= f.button :submit, 'Построить отчет', class: 'btn btn-primary form-group', id: "submit_prefix", :onclick =>"$('.modal').modal('hide');"%>

@@ -20,6 +20,7 @@ require_dependency "#{Rails.root}/lib/egg_autotests/SA_GIS_GMP_SMEV3"
 require_dependency "#{Rails.root}/lib/egg_autotests/IA_UFEBS_GIS_GMP_SMEV3"
 require_dependency "#{Rails.root}/lib/egg_autotests/SA_GIS_ZKH_SMEV3"
 require_dependency "#{Rails.root}/lib/egg_autotests/IA_UFEBS_GIS_ZKH_SMEV3"
+require_dependency "#{Rails.root}/lib/egg_autotests/SA_ESIA_IM_SMEV3"
 
 class EggAutotestsList
 
@@ -161,6 +162,10 @@ class EggAutotestsList
       ia_ufebs_gis_zkh_smev3.ed108_test
       ia_ufebs_gis_zkh_smev3.ed101_delete
       ia_ufebs_gis_zkh_smev3.packetepd_test
+    end
+    if components.include?('СА ЕСИА ИМ СМЭВ3')
+      sa_esia_im_smev3 = SA_ESIA_IM_SMEV3.new(@pass_menu_color, @fail_menu_color, @not_find_xml, @not_receive_answer, @egg_version, @try_count)
+      sa_esia_im_smev3.ignoreCache
     end
   end
 end

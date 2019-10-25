@@ -465,7 +465,7 @@ END;})
     end
     sleep 2
     @kill_cmd_thread = Thread.new do
-      system('Taskkill /IM cmd.exe /T /F')
+      system('Taskkill /IM cmd.exe /F')
     end
     while @servicemix_start_thread.alive?
       puts "@servicemix_start_thread alive!"

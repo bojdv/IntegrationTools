@@ -66,6 +66,7 @@ class TestReportsController < ApplicationController
                                           :backlog_keys,
                                           :test_plan,
                                           :test_rail,
+                                          :test_data,
                                           :release_note,
                                           :build_link,
                                           :testing,

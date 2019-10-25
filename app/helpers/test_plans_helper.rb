@@ -2,11 +2,12 @@ module TestPlansHelper
   class TestPlanReport
     include TestPlansHelper
     include TestReportsHelper
-    def initialize(plan, builds, version, minus, rn)
+    def initialize(plan, builds, version, minus, rn, file_info)
       @plan = plan
       @build_links = builds
       @version = version
       @rn = rn
+      @file_info = file_info
       @minus = minus
       @qa = Array.new
       if @plan.features.any?

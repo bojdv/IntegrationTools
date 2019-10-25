@@ -188,16 +188,32 @@ END;})
   def change_smevmessageid(xml_rexml, smev_id, functional) # метод меняет id для запросов в СМЭВ3
     begin
       process_id = xml_rexml.elements["//mq:RequestMessage"].attributes["processID"]
-      result = 0
+      row_updated = 0
       count = 30
-      while result == 0 # 0, if no rows are affected by the operation.
-        result = @stmt.executeUpdate("UPDATE EGG_SMEV3_CONTEXT SET SMEVMESSAGEID = '#{smev_id}' WHERE PROCESSID = '#{process_id}'")
-        sleep 1
+      puts "UPDATE EGG_SMEV3_CONTEXT SET SMEVMESSAGEID = '#{smev_id}' WHERE PROCESSID = '#{process_id}'"
+      while row_updated.zero?
+        rs = @stmt.executeQuery("select SMEVMESSAGEID from EGG_SMEV3_CONTEXT WHERE PROCESSID = '#{process_id}'")
+        if rs.isBeforeFirst()
+          while rs.next() do
+            check_null = rs.getString('SMEVMESSAGEID')
+          end
+          if check_null
+            row_updated = @stmt.executeUpdate("UPDATE EGG_SMEV3_CONTEXT SET SMEVMESSAGEID = '#{smev_id}' WHERE PROCESSID = '#{process_id}'")
+            if row_updated == 1
+              $log_egg.write_to_browser("Заменили id в SMEVMESSAGEID на #{smev_id}")
+              $log_egg.write_to_log(functional, "Заменили id в SMEVMESSAGEID", "UPDATE EGG_SMEV3_CONTEXT SET SMEVMESSAGEID = '#{smev_id}' WHERE PROCESSID = '#{process_id}'")
+            end
+          end
+        end
+        if count == 0
+          $log_egg.write_to_browser("Не заменили id в SMEVMESSAGEID")
+          $log_egg.write_to_log(functional, "Не заменили id в SMEVMESSAGEID", "UPDATE EGG_SMEV3_CONTEXT SET SMEVMESSAGEID = '#{smev_id}' WHERE PROCESSID = '#{process_id}'")
+          return nil
+        end
         puts count -=1
-        return nil if count == 0
+        puts "check_null = '#{check_null}', row_updated = '#{row_updated}'"
+        sleep 0.5
       end
-      $log_egg.write_to_browser("Заменили id в SMEVMESSAGEID на #{smev_id}")
-      $log_egg.write_to_log(functional, "Заменили id в SMEVMESSAGEID", "UPDATE EGG_SMEV3_CONTEXT SET SMEVMESSAGEID = '#{smev_id}' WHERE PROCESSID = '#{process_id}'")
     rescue Exception => msg
       $log_egg.write_to_browser("Ошибка! #{msg}")
       $log_egg.write_to_log("Завершение тестов", "Ошибка при замене SMEVMESSAGEID", "Ошибка! #{msg}\n#{msg.backtrace.join("\n")}")

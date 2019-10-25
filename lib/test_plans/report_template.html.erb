@@ -107,6 +107,17 @@
         </tr>
       <%	 end %>
        <%	 end %>
+       <tr>
+         <td rowspan="<%= @plan.features.count %>">Ссылка на тестовые данные</td>
+         <td><% unless @plan.features.first.test_data.nil? %><a href=<%= @plan.features.first.test_data %> target="_blank"><%=@plan.features.first.test_data%></a><%	 end %></td>
+       </tr>
+       <% if @plan.features.count > 1 %>
+        <% @plan.features.drop(1).each do |f| %>
+          <tr>
+            <td><% unless f.test_data.nil? %><a href=<%= f.test_data %> target="_blank"><%=f.test_data%></a><%	 end %></td>
+          </tr>
+        <%	 end %>
+      <%	 end %>
       <tr bgcolor="#99CC00">
         <td colspan="2"><strong><span style="color: #ffffff;"> Информация о сборке</span></strong></td>
       </tr>
@@ -121,6 +132,10 @@
       <tr>
         <td>Release Note</td>
         <td><%=@rn%></td>
+      </tr>
+      <tr>
+        <td>Информация по тестированию</td>
+        <td><%=@file_info%></td>
       </tr>
       <tr bgcolor="#99CC00">
         <td colspan="2"><strong><span style="color: #ffffff;">Тестовое покрытие</span></strong></td>

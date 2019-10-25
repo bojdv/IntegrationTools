@@ -137,7 +137,7 @@ module EggAutoTestsHelper
                   :enable_starttls_auto => true}
       mail = Mail.new do
         from     'iTools@bssys.com'
-        to       ['A.Uborskij@bssys.com', 'd.bojko@bssys.com', 'A.Shpinko@bssys.com', 'N.Tkachenko@bssys.com']
+        to       ['A.Uborskij@bssys.com', 'd.bojko@bssys.com', 'A.Shpinko@bssys.com']
         subject  subject
         body      body
         add_file attachment
@@ -333,7 +333,7 @@ module EggAutoTestsHelper
     end
     sleep 5
     @kill_cmd_thread_egg = Thread.new do
-      system('Taskkill /IM cmd.exe /T /F')
+      system('Taskkill /IM cmd.exe /F')
     end
     while @servicemix_start_thread_egg.alive?
       puts "@@servicemix_start_thread_egg alive!"

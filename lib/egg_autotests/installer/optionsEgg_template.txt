@@ -406,7 +406,7 @@ egg_ZkhSmev3_GarbageAge=10
 
 # saEsiaImSmev3Component - СА ЕСИА ИМ СМЭВ3
 esia_im_TestMessage=false
-esia_im_SMEV3=http://vm-egg-jmp:8488/SA_SMEV3-ESIA-IM?WSDL
+esia_im_SMEV3=http://vm-itools:8488/SA_SMEV3-ESIA-IM?WSDL
 esia_im_queue_consumers=10
 esia_im_queueSGD_consumers=10
 esia_im_timer_period=20000
@@ -423,7 +423,7 @@ esia_im_IgnoreTickets=1012, 1064
 esia_im_isCryptoLog=true
 esia_im_CryptoService=http://vm-eggcrypttest:9090/axis2/services/CryptoService
 esia_im_attachmentMode=true
-esia_im_FTPServer=10.1.4.232
+esia_im_FTPServer=10.1.11.108
 esia_im_FTPPort=21
 esia_im_FoldersInbound=./folderFromSmev
 esia_im_CleanUpShedule=0 0 0 * * 6

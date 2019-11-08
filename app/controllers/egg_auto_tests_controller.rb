@@ -168,13 +168,14 @@ class EggAutoTestsController < ApplicationController
     ftp.nlst.each do |line|
       if line.match(regex)
         etalon_dir << line
+        puts "etalon_dir = #{etalon_dir}"
       end
     end
     ftp.quit
     $check_new_egg_version = Thread.new do
       loop do
         begin
-          #puts "Checking new EGG version in ftp..."
+          puts "Checking new EGG version in ftp..."
           ftp = Net::FTP.new('10.1.1.163')
           ftp.login
           current_dir = Array.new
@@ -182,13 +183,16 @@ class EggAutoTestsController < ApplicationController
           ftp.nlst.each do |line|
             if line.match(regex)
               current_dir << line
+              puts "current_dir = #{current_dir}"
             end
           end
           ftp.quit
           new_dir = current_dir - etalon_dir
+          puts "new_dir = current_dir - etalon_dir: #{new_dir} = #{current_dir} - #{etalon_dir}"
           unless new_dir.empty?
             etalon_dir = current_dir
-            puts "New EGG dir detected! #{new_dir} = #{current_dir} - #{etalon_dir}"
+            puts "etalon_dir = current_dir: #{etalon_dir} = #{current_dir}"
+            puts "New EGG dir detected!"
             build_version = new_dir.join
             components =   ['ИА Active MQ',
                             'ИА УФЭБС (ГИС ГМП)',

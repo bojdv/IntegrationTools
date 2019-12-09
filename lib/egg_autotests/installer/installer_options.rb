@@ -14,8 +14,8 @@ dbType=oracle
 dbHost1=vm-corint
 dbPort1=1521
 dbSID1=corint
-dbLogin1=egg_autotest
-dbPassword1=egg_autotest
+dbLogin1=egg_autotest_shpae
+dbPassword1=egg_autotest_shpae
 
 # настройки автоматического создания пользователя oracle
 oracledbaLogin=sys as sysdba

@@ -183,15 +183,15 @@ class EggAutoTestsController < ApplicationController
           ftp.nlst.each do |line|
             if line.match(regex)
               current_dir << line
-              puts "current_dir = #{current_dir}"
+              #puts "current_dir = #{current_dir}"
             end
           end
           ftp.quit
           new_dir = current_dir - etalon_dir
-          puts "new_dir = current_dir - etalon_dir: #{new_dir} = #{current_dir} - #{etalon_dir}"
+          #puts "new_dir = current_dir - etalon_dir: #{new_dir} = #{current_dir} - #{etalon_dir}"
           unless new_dir.empty?
             etalon_dir = current_dir
-            puts "etalon_dir = current_dir: #{etalon_dir} = #{current_dir}"
+            #puts "etalon_dir = current_dir: #{etalon_dir} = #{current_dir}"
             puts "New EGG dir detected!"
             build_version = new_dir.join
             components =   ['ИА Active MQ',

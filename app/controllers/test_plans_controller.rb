@@ -3,15 +3,14 @@ class TestPlansController < ApplicationController
   helper TestReportsHelper
   helper XmlSenderHelper
   $qa = {'bojdv' => 'Бойко Дина',
-         'pekav' => 'Пехов Алексей',
-         'kotvv' => 'Коцупенко Владимир',
          'shpae' => 'Шпинько Александр',
-         'tkans' => 'Ткаченко Никита',
          'pasap' => 'Пащенко Анастасия',
          'e.vasilyeva' => 'Васильева Елена',
          'chivs' => 'Чиркова Вера',
          'uboav' => 'Уборский Алексей',
-         'povao' => 'Пономарева Анжелика'}
+         'povao' => 'Пономарева Анжелика',
+         'egokk' => 'Егорова Ксения',
+         'rommv' => 'Романов Максим'}
 
   def index
     @egg_plans = TestPlan.where(:product_id => '10002')

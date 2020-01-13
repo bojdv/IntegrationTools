@@ -74,7 +74,8 @@ class FeaturesController < ApplicationController
                   's.ledentsov' => 'Леденцов Сергей',
                   'ldi' => 'Ляпин Дмитрий',
                   'lartg' => 'Подкатилова Татьяна'}
-    @manager = {'KosAS' => 'Космин Александр',
+    @manager = {'KleIM' => 'Клевцов Игорь',
+                'KosAS' => 'Космин Александр',
                  'KhmVM' => 'Хмельницкий Валерий',
                  'GolAV' => 'Головченко Андрей',
                  'ldi' => 'Ляпин Дмитрий',

@@ -73,7 +73,8 @@ class FeaturesController < ApplicationController
                   'BalYV' => 'Балакин Юрий',
                   's.ledentsov' => 'Леденцов Сергей',
                   'ldi' => 'Ляпин Дмитрий',
-                  'lartg' => 'Подкатилова Татьяна'}
+                  'lartg' => 'Подкатилова Татьяна',
+                  'a.shishkin' => 'Шишкин Александр'}
     @manager = {'KleIM' => 'Клевцов Игорь',
                 'KosAS' => 'Космин Александр',
                  'KhmVM' => 'Хмельницкий Валерий',
@@ -81,6 +82,7 @@ class FeaturesController < ApplicationController
                  'ldi' => 'Ляпин Дмитрий',
                   'StoEA' => 'Столбов Евгений',
                 'LogVA' => 'Логинов Всеволод',
-                'KonSA' => 'Кондрашов Сергей' }
+                'KonSA' => 'Кондрашов Сергей',
+                'VokSY' => 'Вохманов Сергей'}
   end
 end
